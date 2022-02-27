@@ -33,7 +33,7 @@ class Board:
         return int((self.screen.SCREEN_WIDTH - actual_board_width) / 2)
 
     def draw_board_rect(self) -> None:
-        pygame.draw.rect(surface=self.screen.screen, color=Color.OFF_WHITE.value, rect=self.rect)
+        self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)
 
     def create_cell_grid(self) -> list[list[Cell]]:
         return [[self.create_cell(row_number, col_number, cell_value) for col_number, cell_value in enumerate(row)]
