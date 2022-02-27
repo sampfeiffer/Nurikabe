@@ -48,4 +48,4 @@ class Nurikabe:
 
     def process_left_click_down(self, event_position: Position) -> None:
         cell_change_info = self.board.handle_board_click(event_position)
-        self.game_status_checker.check_status(cell_change_info)
+        self.game_status_checker.is_solution_correct(cell_change_info)

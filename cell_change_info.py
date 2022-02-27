@@ -9,4 +9,4 @@ class CellChangeInfo:
     after_state: CellState
 
     def is_wall_change(self) -> bool:
-        return self.before_state is CellState.WALL or self.after_state is CellState.WALL
+        return self.before_state.is_wall() or self.after_state.is_wall()

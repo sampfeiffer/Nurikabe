@@ -7,6 +7,9 @@ class CellState(Enum):
     WALL = auto()
     NON_WALL = auto()
 
+    def is_wall(self) -> bool:
+        return self is CellState.WALL
+
     def get_next_in_cycle(self) -> CellState:
         if self is CellState.EMPTY:
             return CellState.WALL
