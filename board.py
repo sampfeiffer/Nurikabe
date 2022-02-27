@@ -1,3 +1,4 @@
+from typing import Optional
 import pygame
 
 from screen import Screen
@@ -13,7 +14,8 @@ class Board:
 
         self.rect = self.get_board_rect()
         self.draw_board_rect()
-        self.cells = self.create_cells()
+        self.cell_grid = self.create_cell_grid()
+        self.flat_cell_list = self.get_flat_cell_list()
 
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.get_top_left_of_board()
@@ -32,18 +34,21 @@ class Board:
     def draw_board_rect(self) -> None:
         pygame.draw.rect(surface=self.screen.screen, color=Screen.BOARD_COLOR, rect=self.rect)
 
-    def create_cells(self) -> list[Cell]:
-        cells: list[Cell] = []
-        for row_number, row in enumerate(self.level.level_setup):
-            for col_number, cell_value in enumerate(row):
-                cell_location = self.screen.get_cell_location(self.rect, row_number, col_number)
-                cells.append(Cell(row_number, col_number, cell_value, cell_location, self.screen))
-        return cells
+    def create_cell_grid(self) -> list[list[Cell]]:
+        return [[self.create_cell(row_number, col_number, cell_value) for col_number, cell_value in enumerate(row)]
+                for row_number, row in enumerate(self.level.level_setup)]
+
+    def create_cell(self, row_number: int, col_number: int, cell_value: Optional[int]) -> Cell:
+        cell_location = self.screen.get_cell_location(self.rect, row_number, col_number)
+        return Cell(row_number, col_number, cell_value, cell_location, self.screen)
+
+    def get_flat_cell_list(self) -> list[Cell]:
+        return [cell for row in self.cell_grid for cell in row]
 
     def handle_board_click(self, event_position: Position) -> None:
         if not self.is_inside_board(event_position):
             return
-        for cell in self.cells:
+        for cell in self.flat_cell_list:
             if cell.is_inside_cell(event_position):
                 cell.handle_cell_click()
 
