@@ -29,13 +29,15 @@ class Nurikabe:
         for event in pygame.event.get():
             self.process_single_event(event)
 
-    def process_single_event(self, event) -> None:
+    def process_single_event(self, event: pygame.event.Event) -> None:
         event_type = event.type
         if event_type == pygame.QUIT:
             self.process_quit()
         elif event_type == pygame.MOUSEBUTTONDOWN and event.button == LEFT_BUTTON:
-            event_position = Position(event.pos[0], event.pos[1])
+            event_position = Position.from_tuple(event.pos)
             self.process_left_click_down(event_position)
+        else:
+            pass  # ignore all other events
 
     @staticmethod
     def process_quit() -> None:

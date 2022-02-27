@@ -1,3 +1,4 @@
+from typing import Optional
 import pygame
 
 from level import Level
@@ -18,25 +19,20 @@ class Screen:
         pygame.display.set_caption('Nurikabe')
         self.screen.fill(self.BACKGROUND_COLOR)
 
-        self.cell_width = None
-        self.font_size = None
-        self.set_component_sizes(level)
+        self.cell_width = self.get_cell_width(level.width_in_cells, level.height_in_cells)
+        self.font_size = self.get_font_size()
 
-    def set_component_sizes(self, level: Level) -> None:
-        self.set_cell_width(level.width_in_cells, level.height_in_cells)
-        self.set_font_size()
-
-    def set_cell_width(self, width_in_cells: int, height_in_cells: int) -> None:
+    def get_cell_width(self, width_in_cells: int, height_in_cells: int) -> int:
         max_board_width = self.SCREEN_WIDTH - 2 * self.MIN_BORDER
         max_cell_width = int(max_board_width / width_in_cells)
 
         max_board_height = self.SCREEN_HEIGHT - 2 * self.MIN_BORDER
         max_cell_height = int(max_board_height / height_in_cells)
 
-        self.cell_width = min((max_cell_width, max_cell_height))
+        return min((max_cell_width, max_cell_height))
 
-    def set_font_size(self) -> None:
-        self.font_size = int(0.8 * self.cell_width)
+    def get_font_size(self) -> int:
+        return int(0.8 * self.cell_width)
 
     def get_cell_location(self, board_rect: pygame.Rect, row_number: int, col_number: int) -> Position:
         left = board_rect.left + self.cell_width * col_number
