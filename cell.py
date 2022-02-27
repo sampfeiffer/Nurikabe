@@ -5,6 +5,7 @@ from screen import Screen
 from cell_state import CellState
 from position import Position
 from color import Color
+from cell_change_info import CellChangeInfo
 
 
 class Cell:
@@ -43,8 +44,17 @@ class Cell:
     def draw_non_wall_cell(self) -> None:
         self.draw_empty_cell(text=self.CENTER_DOT)
 
-    def update_cell_state(self, new_cell_state: CellState) -> None:
-        self.cell_state = new_cell_state
+    def is_inside_cell(self, event_position: Position) -> bool:
+        return self.rect.collidepoint(event_position.coordinates)
+
+    def handle_cell_click(self) -> Optional[CellChangeInfo]:
+        if not self.is_clickable:
+            return
+
+        new_cell_state = self.cell_state.get_next_in_cycle()
+        return self.update_cell_state(new_cell_state)
+
+    def update_cell_state(self, new_cell_state: CellState) -> Optional[CellChangeInfo]:
         if new_cell_state is CellState.EMPTY:
             self.draw_empty_cell()
         elif new_cell_state is CellState.WALL:
@@ -53,13 +63,6 @@ class Cell:
             self.draw_non_wall_cell()
         else:
             raise RuntimeError('This should not be possible')
-
-    def is_inside_cell(self, event_position: Position) -> bool:
-        return self.rect.collidepoint(event_position.coordinates)
-
-    def handle_cell_click(self) -> None:
-        if not self.is_clickable:
-            return
-
-        new_cell_state = self.cell_state.get_next_in_cycle()
-        self.update_cell_state(new_cell_state)
+        cell_change_info = CellChangeInfo(before_state=self.cell_state, after_state=new_cell_state)
+        self.cell_state = new_cell_state
+        return cell_change_info

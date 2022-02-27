@@ -6,6 +6,7 @@ from level import Level
 from cell import Cell
 from position import Position
 from color import Color
+from cell_change_info import CellChangeInfo
 
 
 class Board:
@@ -46,12 +47,12 @@ class Board:
     def get_flat_cell_list(self) -> list[Cell]:
         return [cell for row in self.cell_grid for cell in row]
 
-    def handle_board_click(self, event_position: Position) -> None:
+    def handle_board_click(self, event_position: Position) -> Optional[CellChangeInfo]:
         if not self.is_inside_board(event_position):
             return
         for cell in self.flat_cell_list:
             if cell.is_inside_cell(event_position):
-                cell.handle_cell_click()
+                return cell.handle_cell_click()
 
     def is_inside_board(self, event_position: Position) -> bool:
         return self.rect.collidepoint(event_position.coordinates)

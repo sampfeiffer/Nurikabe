@@ -6,6 +6,7 @@ from screen import Screen
 from level import Level
 from board import Board
 from position import Position
+from game_status_checker import GameStatusChecker
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,7 @@ class Nurikabe:
         level = Level(level_number)
         self.screen = Screen(level)
         self.board = Board(self.screen, level)
+        self.game_status_checker = GameStatusChecker(self.board)
         self.start_game_loop()
 
     def start_game_loop(self) -> None:
@@ -45,4 +47,5 @@ class Nurikabe:
         sys.exit()
 
     def process_left_click_down(self, event_position: Position) -> None:
-        self.board.handle_board_click(event_position)
+        cell_change_info = self.board.handle_board_click(event_position)
+        self.game_status_checker.check_status(cell_change_info)
