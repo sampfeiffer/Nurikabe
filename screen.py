@@ -3,6 +3,7 @@ import pygame
 
 from level import Level
 from position import Position
+from color import Color
 
 
 class Screen:
@@ -10,17 +11,13 @@ class Screen:
     SCREEN_HEIGHT = 500
     MIN_BORDER = 5
 
-    BLACK = 3 * [0]
-    BOARD_COLOR = 3 * [230]  # off-white
-    BACKGROUND_COLOR = 3 * [160]  # gray
-
     def __init__(self, level: Level):
         self.screen = pygame.display.set_mode(size=(Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT))
         pygame.display.set_caption('Nurikabe')
-        self.screen.fill(self.BACKGROUND_COLOR)
+        self.screen.fill(Color.GRAY.value)
 
         self.cell_width = self.get_cell_width(level.width_in_cells, level.height_in_cells)
-        self.font_size = self.get_font_size()
+        self.font = self.get_font()
 
     def get_cell_width(self, width_in_cells: int, height_in_cells: int) -> int:
         max_board_width = self.SCREEN_WIDTH - 2 * self.MIN_BORDER
@@ -31,6 +28,10 @@ class Screen:
 
         return min((max_cell_width, max_cell_height))
 
+    def get_font(self) -> pygame.font.SysFont:
+        font_size = self.get_font_size()
+        return pygame.font.SysFont('Courier', font_size)
+
     def get_font_size(self) -> int:
         return int(0.8 * self.cell_width)
 
@@ -38,6 +39,13 @@ class Screen:
         left = board_rect.left + self.cell_width * col_number
         top = board_rect.top + self.cell_width * row_number
         return Position(left, top)
+
+    def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: Optional[str] = None) -> None:
+        pygame.draw.rect(surface=self.screen, color=color.value, rect=rect, width=width)
+        if text is not None:
+            text = self.font.render(text, True, Color.BLACK.value)
+            text_rect = text.get_rect(center=rect.center)
+            self.screen.blit(text, text_rect)
 
     @staticmethod
     def update_screen() -> None:

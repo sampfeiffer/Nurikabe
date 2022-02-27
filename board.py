@@ -5,6 +5,7 @@ from screen import Screen
 from level import Level
 from cell import Cell
 from position import Position
+from color import Color
 
 
 class Board:
@@ -32,7 +33,7 @@ class Board:
         return int((self.screen.SCREEN_WIDTH - actual_board_width) / 2)
 
     def draw_board_rect(self) -> None:
-        pygame.draw.rect(surface=self.screen.screen, color=Screen.BOARD_COLOR, rect=self.rect)
+        pygame.draw.rect(surface=self.screen.screen, color=Color.OFF_WHITE.value, rect=self.rect)
 
     def create_cell_grid(self) -> list[list[Cell]]:
         return [[self.create_cell(row_number, col_number, cell_value) for col_number, cell_value in enumerate(row)]

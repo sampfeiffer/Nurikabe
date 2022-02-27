@@ -4,6 +4,7 @@ import pygame
 from screen import Screen
 from cell_state import CellState
 from position import Position
+from color import Color
 
 
 class Cell:
@@ -21,8 +22,6 @@ class Cell:
         self.cell_state = CellState.EMPTY
 
         self.rect = self.get_rect()
-        self.font = pygame.font.SysFont('Courier', self.screen.font_size)
-
         self.draw_initial_value()
 
     def get_rect(self) -> pygame.Rect:
@@ -31,24 +30,18 @@ class Cell:
         return pygame.Rect(self.cell_location.x_coordinate, self.cell_location.y_coordinate, width, height)
 
     def draw_initial_value(self) -> None:
-        self.draw_empty_cell()
-        if self.initial_value is not None:
-            text = self.font.render(str(self.initial_value), True, Screen.BLACK)
-            text_rect = text.get_rect(center=self.rect.center)
-            self.screen.screen.blit(text, text_rect)
+        text = None if self.initial_value is None else str(self.initial_value)
+        self.draw_empty_cell(text)
 
-    def draw_empty_cell(self) -> None:
-        pygame.draw.rect(surface=self.screen.screen, color=Screen.BOARD_COLOR, rect=self.rect, width=0)  # background
-        pygame.draw.rect(surface=self.screen.screen, color=Screen.BLACK, rect=self.rect, width=1)  # border
+    def draw_empty_cell(self, text: Optional[str] = None) -> None:
+        self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)  # background
+        self.screen.draw_rect(color=Color.BLACK, rect=self.rect, width=1, text=text)  # border (and text if provided)
 
     def draw_wall_cell(self) -> None:
-        pygame.draw.rect(surface=self.screen.screen, color=Screen.BLACK, rect=self.rect, width=0)
+        self.screen.draw_rect(color=Color.BLACK, rect=self.rect, width=0)
 
     def draw_non_wall_cell(self) -> None:
-        self.draw_empty_cell()  # first clear out the cell
-        text = self.font.render(self.CENTER_DOT, True, Screen.BLACK)
-        text_rect = text.get_rect(center=self.rect.center)
-        self.screen.screen.blit(text, text_rect)
+        self.draw_empty_cell(text=self.CENTER_DOT)
 
     def update_cell_state(self, new_cell_state: CellState) -> None:
         self.cell_state = new_cell_state
