@@ -1,4 +1,5 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, Iterable
 import pygame
 
 from screen import Screen
@@ -6,6 +7,7 @@ from cell_state import CellState
 from position import Position
 from color import Color
 from cell_change_info import CellChangeInfo
+from direction import Direction
 
 
 class Cell:
@@ -15,6 +17,7 @@ class Cell:
                  screen: Screen):
         self.row_number = row_number
         self.col_number = col_number
+        self.position_in_grid = Position(x_coordinate=col_number, y_coordinate=row_number)
         self.initial_value = initial_value
         self.cell_location = cell_location
         self.screen = screen
@@ -24,6 +27,8 @@ class Cell:
 
         self.rect = self.get_rect()
         self.draw_initial_value()
+
+        self.neighbor_cell_map: Optional[dict[Direction, Cell]] = None
 
     def get_rect(self) -> pygame.Rect:
         width = self.screen.cell_width
@@ -43,6 +48,9 @@ class Cell:
 
     def draw_non_wall_cell(self) -> None:
         self.draw_empty_cell(text=self.CENTER_DOT)
+
+    def set_neighbor_map(self, neighbor_cell_map: dict[Direction, Cell]) -> None:
+        self.neighbor_cell_map = neighbor_cell_map
 
     def is_inside_cell(self, event_position: Position) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
@@ -66,3 +74,13 @@ class Cell:
         cell_change_info = CellChangeInfo(before_state=self.cell_state, after_state=new_cell_state)
         self.cell_state = new_cell_state
         return cell_change_info
+
+    def get_neighbors(self, directions: Iterable[Direction]) -> list[Cell]:
+        return [self.get_neighbor(direction) for direction in directions]
+
+    def get_neighbor(self, direction: Direction) -> Cell:
+        return self.neighbor_cell_map[direction]
+
+    def __str__(self) -> str:
+        return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
+                f'initial_value={self.initial_value})')

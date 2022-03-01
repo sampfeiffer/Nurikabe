@@ -1,6 +1,11 @@
+import logging
+
 from board import Board
 from game_status import GameStatus
 from cell_change_info import CellChangeInfo
+from direction import Direction
+
+logger = logging.getLogger(__name__)
 
 
 class GameStatusChecker:
@@ -18,25 +23,25 @@ class GameStatusChecker:
 
     def is_solution_correct(self, cell_change_info: CellChangeInfo) -> GameStatus:
         if not cell_change_info.is_wall_change():
-            print('no wall changes')
+            logger.debug('no wall changes')
             game_status = GameStatus.IN_PROGRESS
         elif not self.has_expected_number_of_walls():
-            print('not correct number of walls')
+            logger.debug('not correct number of walls')
             game_status = GameStatus.IN_PROGRESS
         elif self.has_two_by_two_wall():
-            print('has two by two wall')
+            logger.debug('has two by two wall')
             game_status = GameStatus.IN_PROGRESS
         elif not self.do_gardens_have_exactly_one_clue():
-            print('gardens must have exactly one clue')
+            logger.debug('gardens must have exactly one clue')
             game_status = GameStatus.IN_PROGRESS
         elif not self.are_gardens_appropriately_sized():
-            print('garden size must equal the clue value')
+            logger.debug('garden size must equal the clue value')
             game_status = GameStatus.IN_PROGRESS
         elif not self.are_all_walls_connected():
-            print('walls are not all connected')
+            logger.debug('walls are not all connected')
             game_status = GameStatus.IN_PROGRESS
         else:
-            print('correct solution!')
+            logger.debug('correct solution!')
             game_status = GameStatus.GAME_OVER
 
         return game_status
@@ -48,13 +53,20 @@ class GameStatusChecker:
         return len([cell for cell in self.board.flat_cell_list if cell.cell_state.is_wall()])
 
     def has_two_by_two_wall(self) -> bool:
-        pass
+        directions = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
+        for row in self.board.cell_grid[:-1]:
+            for cell in row[:-1]:
+                if cell.cell_state.is_wall():
+                    neighbor_cells = cell.get_neighbors(directions)
+                    if all(neighbor_cell.cell_state.is_wall() for neighbor_cell in neighbor_cells):
+                        return True
+        return False
 
     def do_gardens_have_exactly_one_clue(self) -> bool:
-        pass
+        return True  # TODO
 
     def are_gardens_appropriately_sized(self) -> bool:
-        pass
+        return True  # TODO
 
     def are_all_walls_connected(self) -> bool:
-        pass
+        return True  # TODO

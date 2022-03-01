@@ -7,6 +7,7 @@ from cell import Cell
 from position import Position
 from color import Color
 from cell_change_info import CellChangeInfo
+from direction import Direction
 
 
 class Board:
@@ -18,6 +19,7 @@ class Board:
         self.draw_board_rect()
         self.cell_grid = self.create_cell_grid()
         self.flat_cell_list = self.get_flat_cell_list()
+        self.set_cell_neighbors()
 
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.get_top_left_of_board()
@@ -46,6 +48,28 @@ class Board:
 
     def get_flat_cell_list(self) -> list[Cell]:
         return [cell for row in self.cell_grid for cell in row]
+
+    def get_cell_from_grid(self, row_number: int, col_number: int) -> Cell:
+        return self.cell_grid[row_number][col_number]
+
+    def set_cell_neighbors(self) -> None:
+        for cell in self.flat_cell_list:
+            neighbor_cell_map: dict[Direction, Cell] = {}
+            for direction in Direction:
+                neighbor_cell = self.get_neighbor_cell(cell, direction)
+                if neighbor_cell is not None:
+                    neighbor_cell_map[direction] = neighbor_cell
+            cell.set_neighbor_map(neighbor_cell_map)
+
+    def get_neighbor_cell(self, cell: Cell, direction: Direction) -> Optional[Cell]:
+        neighbor_coordinate = cell.position_in_grid.get_offset(direction)
+        if self.is_valid_cell_coordinate(neighbor_coordinate):
+            return self.get_cell_from_grid(row_number=neighbor_coordinate.y_coordinate,
+                                           col_number=neighbor_coordinate.x_coordinate)
+
+    def is_valid_cell_coordinate(self, coordinate: Position) -> bool:
+        return 0 <= coordinate.x_coordinate < self.level.width_in_cells and \
+            0 <= coordinate.y_coordinate < self.level.height_in_cells
 
     def handle_board_click(self, event_position: Position) -> Optional[CellChangeInfo]:
         if not self.is_inside_board(event_position):
