@@ -2,7 +2,7 @@ from typing import Optional
 import pygame
 
 from level import Level
-from position import Position
+from pixel_position import PixelPosition
 from color import Color
 
 
@@ -35,10 +35,10 @@ class Screen:
     def get_font_size(self) -> int:
         return int(0.8 * self.cell_width)
 
-    def get_cell_location(self, board_rect: pygame.Rect, row_number: int, col_number: int) -> Position:
+    def get_cell_location(self, board_rect: pygame.Rect, row_number: int, col_number: int) -> PixelPosition:
         left = board_rect.left + self.cell_width * col_number
         top = board_rect.top + self.cell_width * row_number
-        return Position(left, top)
+        return PixelPosition(left, top)
 
     def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: Optional[str] = None) -> None:
         pygame.draw.rect(surface=self.screen, color=color.value, rect=rect, width=width)

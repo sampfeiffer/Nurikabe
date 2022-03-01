@@ -4,36 +4,36 @@ import pygame
 
 from screen import Screen
 from cell_state import CellState
-from position import Position
+from pixel_position import PixelPosition
 from color import Color
 from cell_change_info import CellChangeInfo
 from direction import Direction
+from grid_coordinate import GridCoordinate
 
 
 class Cell:
     CENTER_DOT = '\u2022'
 
-    def __init__(self, row_number: int, col_number: int, initial_value: Optional[int], cell_location: Position,
+    def __init__(self, row_number: int, col_number: int, initial_value: Optional[int], pixel_position: PixelPosition,
                  screen: Screen):
         self.row_number = row_number
         self.col_number = col_number
-        self.position_in_grid = Position(x_coordinate=col_number, y_coordinate=row_number)
+        self.grid_coordinate = GridCoordinate(row_number, col_number)
         self.initial_value = initial_value
-        self.cell_location = cell_location
         self.screen = screen
 
         self.is_clickable = self.initial_value is None
         self.cell_state = CellState.EMPTY
 
-        self.rect = self.get_rect()
+        self.rect = self.get_rect(pixel_position)
         self.draw_initial_value()
 
         self.neighbor_cell_map: Optional[dict[Direction, Cell]] = None
 
-    def get_rect(self) -> pygame.Rect:
+    def get_rect(self, pixel_position: PixelPosition) -> pygame.Rect:
         width = self.screen.cell_width
         height = self.screen.cell_width
-        return pygame.Rect(self.cell_location.x_coordinate, self.cell_location.y_coordinate, width, height)
+        return pygame.Rect(pixel_position.x_coordinate, pixel_position.y_coordinate, width, height)
 
     def draw_initial_value(self) -> None:
         text = None if self.initial_value is None else str(self.initial_value)
@@ -52,7 +52,7 @@ class Cell:
     def set_neighbor_map(self, neighbor_cell_map: dict[Direction, Cell]) -> None:
         self.neighbor_cell_map = neighbor_cell_map
 
-    def is_inside_cell(self, event_position: Position) -> bool:
+    def is_inside_cell(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
 
     def handle_cell_click(self) -> Optional[CellChangeInfo]:

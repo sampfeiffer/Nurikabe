@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from dataclasses import dataclass
 
 
 class Direction(Enum):
@@ -15,13 +16,19 @@ class Direction(Enum):
 ADJACENT_DIRECTIONS = (Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT)
 
 
+@dataclass
+class GridOffset:
+    row_offset: int
+    col_offset: int
+
+
 OFFSET_MAP = {
-    Direction.UP: (0, -1),
-    Direction.DOWN: (0, 1),
-    Direction.RIGHT: (1, 0),
-    Direction.LEFT: (-1, 0),
-    Direction.RIGHT_UP: (1, -1),
-    Direction.LEFT_UP: (-1, -1),
-    Direction.RIGHT_DOWN: (1, 1),
-    Direction.LEFT_DOWN: (-1, 1)
+    Direction.UP: GridOffset(row_offset=0, col_offset=-1),
+    Direction.DOWN: GridOffset(row_offset=0, col_offset=1),
+    Direction.RIGHT: GridOffset(row_offset=1, col_offset=0),
+    Direction.LEFT: GridOffset(row_offset=-1, col_offset=0),
+    Direction.RIGHT_UP: GridOffset(row_offset=1, col_offset=-1),
+    Direction.LEFT_UP: GridOffset(row_offset=-1, col_offset=-1),
+    Direction.RIGHT_DOWN: GridOffset(row_offset=1, col_offset=1),
+    Direction.LEFT_DOWN: GridOffset(row_offset=-1, col_offset=1)
 }

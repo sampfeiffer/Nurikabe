@@ -5,7 +5,7 @@ import pygame
 from screen import Screen
 from level import Level
 from board import Board
-from position import Position
+from pixel_position import PixelPosition
 from game_status_checker import GameStatusChecker
 
 logger = logging.getLogger(__name__)
@@ -36,7 +36,7 @@ class Nurikabe:
         if event_type == pygame.QUIT:
             self.process_quit()
         elif event_type == pygame.MOUSEBUTTONDOWN and event.button == LEFT_BUTTON:
-            event_position = Position.from_tuple(event.pos)
+            event_position = PixelPosition.from_tuple(event.pos)
             self.process_left_click_down(event_position)
         else:
             pass  # ignore all other events
@@ -46,6 +46,6 @@ class Nurikabe:
         logger.info('exiting')
         sys.exit()
 
-    def process_left_click_down(self, event_position: Position) -> None:
+    def process_left_click_down(self, event_position: PixelPosition) -> None:
         cell_change_info = self.board.handle_board_click(event_position)
         self.game_status_checker.is_solution_correct(cell_change_info)

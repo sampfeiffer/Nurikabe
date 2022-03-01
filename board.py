@@ -4,10 +4,11 @@ import pygame
 from screen import Screen
 from level import Level
 from cell import Cell
-from position import Position
+from pixel_position import PixelPosition
 from color import Color
 from cell_change_info import CellChangeInfo
 from direction import Direction
+from grid_coordinate import GridCoordinate
 
 
 class Board:
@@ -27,9 +28,9 @@ class Board:
         height = self.screen.cell_width * self.level.height_in_cells
         return pygame.Rect(top_left_of_board.x_coordinate, top_left_of_board.y_coordinate, width, height)
 
-    def get_top_left_of_board(self) -> Position:
+    def get_top_left_of_board(self) -> PixelPosition:
         left_border_size = self.get_actual_left_border_size()
-        return Position(left_border_size, Screen.MIN_BORDER)
+        return PixelPosition(left_border_size, Screen.MIN_BORDER)
 
     def get_actual_left_border_size(self) -> int:
         actual_board_width = self.screen.cell_width * self.level.width_in_cells
@@ -43,8 +44,8 @@ class Board:
                 for row_number, row in enumerate(self.level.level_setup)]
 
     def create_cell(self, row_number: int, col_number: int, cell_value: Optional[int]) -> Cell:
-        cell_location = self.screen.get_cell_location(self.rect, row_number, col_number)
-        return Cell(row_number, col_number, cell_value, cell_location, self.screen)
+        cell_pixel_position = self.screen.get_cell_location(self.rect, row_number, col_number)
+        return Cell(row_number, col_number, cell_value, cell_pixel_position, self.screen)
 
     def get_flat_cell_list(self) -> list[Cell]:
         return [cell for row in self.cell_grid for cell in row]
@@ -62,21 +63,21 @@ class Board:
             cell.set_neighbor_map(neighbor_cell_map)
 
     def get_neighbor_cell(self, cell: Cell, direction: Direction) -> Optional[Cell]:
-        neighbor_coordinate = cell.position_in_grid.get_offset(direction)
+        neighbor_coordinate = cell.grid_coordinate.get_offset(direction)
         if self.is_valid_cell_coordinate(neighbor_coordinate):
-            return self.get_cell_from_grid(row_number=neighbor_coordinate.y_coordinate,
-                                           col_number=neighbor_coordinate.x_coordinate)
+            return self.get_cell_from_grid(row_number=neighbor_coordinate.row_number,
+                                           col_number=neighbor_coordinate.col_number)
 
-    def is_valid_cell_coordinate(self, coordinate: Position) -> bool:
-        return 0 <= coordinate.x_coordinate < self.level.width_in_cells and \
-            0 <= coordinate.y_coordinate < self.level.height_in_cells
+    def is_valid_cell_coordinate(self, grid_coordinate: GridCoordinate) -> bool:
+        return 0 <= grid_coordinate.row_number < self.level.height_in_cells and \
+            0 <= grid_coordinate.col_number < self.level.width_in_cells
 
-    def handle_board_click(self, event_position: Position) -> Optional[CellChangeInfo]:
+    def handle_board_click(self, event_position: PixelPosition) -> Optional[CellChangeInfo]:
         if not self.is_inside_board(event_position):
             return
         for cell in self.flat_cell_list:
             if cell.is_inside_cell(event_position):
                 return cell.handle_cell_click()
 
-    def is_inside_board(self, event_position: Position) -> bool:
+    def is_inside_board(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
