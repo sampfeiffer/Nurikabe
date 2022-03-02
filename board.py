@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Callable
 import pygame
 
 from screen import Screen
@@ -81,3 +81,35 @@ class Board:
 
     def is_inside_board(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
+
+    def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool],
+                            connected_cells: Optional[set[Cell]] = None) -> set[Cell]:
+        """
+        Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
+        returns True.
+        """
+        if connected_cells is None:
+            connected_cells = set()
+        if starting_cell in connected_cells:
+            # Already visited this cell
+            return connected_cells
+        if cell_criteria_func(starting_cell):
+            connected_cells.add(starting_cell)
+            for neighbor_cell in starting_cell.get_adjacent_neighbors():
+                connected_cells.union(self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells))
+
+        return connected_cells
+
+    def get_all_gardens(self) -> list[set[Cell]]:
+        gardens: list[set[Cell]] = []
+        cells_in_gardens: set[Cell] = set()  # to prevent double counting
+        for cell in self.flat_cell_list:
+            if cell in cells_in_gardens or cell.cell_state.is_wall():
+                continue
+            garden = self.get_garden(starting_cell=cell)
+            gardens.append(garden)
+            cells_in_gardens.union(garden)
+        return gardens
+
+    def get_garden(self, starting_cell: Cell) -> set[Cell]:
+        return self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: not cell.cell_state.is_wall())

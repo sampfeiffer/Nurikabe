@@ -48,4 +48,5 @@ class Nurikabe:
 
     def process_left_click_down(self, event_position: PixelPosition) -> None:
         cell_change_info = self.board.handle_board_click(event_position)
+        self.screen.update_screen()
         self.game_status_checker.is_solution_correct(cell_change_info)

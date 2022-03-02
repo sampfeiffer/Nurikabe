@@ -7,7 +7,7 @@ from cell_state import CellState
 from pixel_position import PixelPosition
 from color import Color
 from cell_change_info import CellChangeInfo
-from direction import Direction
+from direction import Direction, ADJACENT_DIRECTIONS
 from grid_coordinate import GridCoordinate
 
 
@@ -78,6 +78,10 @@ class Cell:
         cell_change_info = CellChangeInfo(before_state=self.cell_state, after_state=new_cell_state)
         self.cell_state = new_cell_state
         return cell_change_info
+
+    def get_adjacent_neighbors(self) -> list[Cell]:
+        return [self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
+                if direction in self.neighbor_cell_map.keys()]
 
     def get_neighbors(self, directions: Iterable[Direction]) -> list[Cell]:
         return [self.get_neighbor(direction) for direction in directions]

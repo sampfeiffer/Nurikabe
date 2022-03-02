@@ -3,7 +3,7 @@ import logging
 from board import Board
 from game_status import GameStatus
 from cell_change_info import CellChangeInfo
-from direction import Direction
+from cell import Cell
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class GameStatusChecker:
         elif self.has_two_by_two_wall():
             logger.debug('has two by two wall')
             game_status = GameStatus.IN_PROGRESS
-        elif not self.do_gardens_have_exactly_one_clue():
+        elif not self.do_all_gardens_have_exactly_one_clue():
             logger.debug('gardens must have exactly one clue')
             game_status = GameStatus.IN_PROGRESS
         elif not self.are_gardens_appropriately_sized():
@@ -58,8 +58,15 @@ class GameStatusChecker:
                 return True
         return False
 
-    def do_gardens_have_exactly_one_clue(self) -> bool:
-        return True  # TODO
+    def do_all_gardens_have_exactly_one_clue(self) -> bool:
+        for garden in self.board.get_all_gardens():
+            if not self.does_garden_have_exactly_one_clue(garden):
+                return False
+        return True
+
+    @staticmethod
+    def does_garden_have_exactly_one_clue(garden: set[Cell]) -> bool:
+        return len([cell for cell in garden if cell.initial_value is not None]) == 1
 
     def are_gardens_appropriately_sized(self) -> bool:
         return True  # TODO
