@@ -11,6 +11,10 @@ from direction import Direction
 from grid_coordinate import GridCoordinate
 
 
+class NonExistentNeighbor(Exception):
+    pass
+
+
 class Cell:
     CENTER_DOT = '\u2022'
 
@@ -79,7 +83,23 @@ class Cell:
         return [self.get_neighbor(direction) for direction in directions]
 
     def get_neighbor(self, direction: Direction) -> Cell:
-        return self.neighbor_cell_map[direction]
+        try:
+            return self.neighbor_cell_map[direction]
+        except KeyError:
+            raise NonExistentNeighbor(f'{str(self)} has no neighbor in {direction}')
+
+    def does_form_two_by_two_walls(self) -> bool:
+        """Returns True if this cell is the top left corner of a two by two section of walls."""
+        directions = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
+        if self.cell_state.is_wall():
+            try:
+                neighbor_cells = self.get_neighbors(directions)
+                return all(neighbor_cell.cell_state.is_wall() for neighbor_cell in neighbor_cells)
+            except NonExistentNeighbor:
+                # Can't be top-left of two by two since this is on the right or lower edge of board so the required
+                # neighbors do not exist
+                pass
+        return False
 
     def __str__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '

@@ -53,13 +53,9 @@ class GameStatusChecker:
         return len([cell for cell in self.board.flat_cell_list if cell.cell_state.is_wall()])
 
     def has_two_by_two_wall(self) -> bool:
-        directions = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
-        for row in self.board.cell_grid[:-1]:
-            for cell in row[:-1]:
-                if cell.cell_state.is_wall():
-                    neighbor_cells = cell.get_neighbors(directions)
-                    if all(neighbor_cell.cell_state.is_wall() for neighbor_cell in neighbor_cells):
-                        return True
+        for cell in self.board.flat_cell_list:
+            if cell.does_form_two_by_two_walls():
+                return True
         return False
 
     def do_gardens_have_exactly_one_clue(self) -> bool:
