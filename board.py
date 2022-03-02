@@ -96,7 +96,7 @@ class Board:
         if cell_criteria_func(starting_cell):
             connected_cells.add(starting_cell)
             for neighbor_cell in starting_cell.get_adjacent_neighbors():
-                connected_cells.union(self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells))
+                self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells)
 
         return connected_cells
 
@@ -108,7 +108,7 @@ class Board:
                 continue
             garden = self.get_garden(starting_cell=cell)
             gardens.append(garden)
-            cells_in_gardens.union(garden)
+            cells_in_gardens = cells_in_gardens.union(garden)
         return gardens
 
     def get_garden(self, starting_cell: Cell) -> set[Cell]:
