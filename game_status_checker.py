@@ -32,18 +32,20 @@ class GameStatusChecker:
         elif self.has_two_by_two_wall():
             logger.debug('has two by two wall')
             game_status = GameStatus.IN_PROGRESS
-        elif not self.do_all_gardens_have_exactly_one_clue():
-            logger.debug('gardens must have exactly one clue')
-            game_status = GameStatus.IN_PROGRESS
-        elif not self.are_gardens_appropriately_sized():
-            logger.debug('garden size must equal the clue value')
-            game_status = GameStatus.IN_PROGRESS
-        elif not self.are_all_walls_connected():
-            logger.debug('walls are not all connected')
-            game_status = GameStatus.IN_PROGRESS
         else:
-            logger.debug('correct solution!')
-            game_status = GameStatus.GAME_OVER
+            gardens = self.board.get_all_gardens()
+            if not self.do_all_gardens_have_exactly_one_clue(gardens):
+                logger.debug('gardens must have exactly one clue')
+                game_status = GameStatus.IN_PROGRESS
+            elif not self.are_all_gardens_correct_size(gardens):
+                logger.debug('garden size must equal the clue value')
+                game_status = GameStatus.IN_PROGRESS
+            elif not self.are_all_walls_connected():
+                logger.debug('walls are not all connected')
+                game_status = GameStatus.IN_PROGRESS
+            else:
+                logger.debug('correct solution!')
+                game_status = GameStatus.GAME_OVER
 
         return game_status
 
@@ -59,14 +61,13 @@ class GameStatusChecker:
                 return True
         return False
 
-    def do_all_gardens_have_exactly_one_clue(self) -> bool:
-        for garden in self.board.get_all_gardens():
-            if not garden.does_have_exactly_one_clue():
-                return False
-        return True
+    @staticmethod
+    def do_all_gardens_have_exactly_one_clue(gardens: set[Garden]) -> bool:
+        return all(garden.does_have_exactly_one_clue() for garden in gardens)
 
-    def are_gardens_appropriately_sized(self) -> bool:
-        return True  # TODO
+    @staticmethod
+    def are_all_gardens_correct_size(gardens: set[Garden]) -> bool:
+        return all(garden.is_garden_correct_size() for garden in gardens)
 
     def are_all_walls_connected(self) -> bool:
         return True  # TODO
