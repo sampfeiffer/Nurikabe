@@ -9,6 +9,7 @@ from color import Color
 from cell_change_info import CellChangeInfo
 from direction import Direction
 from grid_coordinate import GridCoordinate
+from garden import Garden
 
 
 class Board:
@@ -100,16 +101,17 @@ class Board:
 
         return connected_cells
 
-    def get_all_gardens(self) -> list[set[Cell]]:
-        gardens: list[set[Cell]] = []
+    def get_all_gardens(self) -> set[Garden]:
+        gardens: set[Garden] = set()
         cells_in_gardens: set[Cell] = set()  # to prevent double counting
         for cell in self.flat_cell_list:
             if cell in cells_in_gardens or cell.cell_state.is_wall():
                 continue
             garden = self.get_garden(starting_cell=cell)
-            gardens.append(garden)
-            cells_in_gardens = cells_in_gardens.union(garden)
+            gardens.add(garden)
+            cells_in_gardens = cells_in_gardens.union(garden.cells)
         return gardens
 
-    def get_garden(self, starting_cell: Cell) -> set[Cell]:
-        return self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
+    def get_garden(self, starting_cell: Cell) -> Garden:
+        cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
+        return Garden(cells)

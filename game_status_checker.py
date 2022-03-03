@@ -4,6 +4,7 @@ from board import Board
 from game_status import GameStatus
 from cell_change_info import CellChangeInfo
 from cell import Cell
+from garden import Garden
 
 logger = logging.getLogger(__name__)
 
@@ -60,13 +61,9 @@ class GameStatusChecker:
 
     def do_all_gardens_have_exactly_one_clue(self) -> bool:
         for garden in self.board.get_all_gardens():
-            if not self.does_garden_have_exactly_one_clue(garden):
+            if not garden.does_have_exactly_one_clue():
                 return False
         return True
-
-    @staticmethod
-    def does_garden_have_exactly_one_clue(garden: set[Cell]) -> bool:
-        return len([cell for cell in garden if cell.initial_value is not None]) == 1
 
     def are_gardens_appropriately_sized(self) -> bool:
         return True  # TODO
