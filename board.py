@@ -115,3 +115,6 @@ class Board:
     def get_garden(self, starting_cell: Cell) -> Garden:
         cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
         return Garden(cells)
+
+    def get_connected_wall_section(self, starting_cell: Cell) -> set[Cell]:
+        return self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: cell.cell_state.is_wall())

@@ -3,7 +3,6 @@ import logging
 from board import Board
 from game_status import GameStatus
 from cell_change_info import CellChangeInfo
-from cell import Cell
 from garden import Garden
 
 logger = logging.getLogger(__name__)
@@ -32,6 +31,9 @@ class GameStatusChecker:
         elif self.has_two_by_two_wall():
             logger.debug('has two by two wall')
             game_status = GameStatus.IN_PROGRESS
+        elif not self.are_all_walls_connected():
+            logger.debug('walls are not all connected')
+            game_status = GameStatus.IN_PROGRESS
         else:
             gardens = self.board.get_all_gardens()
             if not self.do_all_gardens_have_exactly_one_clue(gardens):
@@ -39,9 +41,6 @@ class GameStatusChecker:
                 game_status = GameStatus.IN_PROGRESS
             elif not self.are_all_gardens_correct_size(gardens):
                 logger.debug('garden size must equal the clue value')
-                game_status = GameStatus.IN_PROGRESS
-            elif not self.are_all_walls_connected():
-                logger.debug('walls are not all connected')
                 game_status = GameStatus.IN_PROGRESS
             else:
                 logger.debug('correct solution!')
@@ -61,6 +60,13 @@ class GameStatusChecker:
                 return True
         return False
 
+    def are_all_walls_connected(self) -> bool:
+        all_walls = [cell for cell in self.board.flat_cell_list if cell.cell_state.is_wall()]
+        if len(all_walls) == 0:
+            return True
+        first_wall_section = self.board.get_connected_wall_section(starting_cell=all_walls[0])
+        return first_wall_section == set(all_walls)
+
     @staticmethod
     def do_all_gardens_have_exactly_one_clue(gardens: set[Garden]) -> bool:
         return all(garden.does_have_exactly_one_clue() for garden in gardens)
@@ -68,6 +74,3 @@ class GameStatusChecker:
     @staticmethod
     def are_all_gardens_correct_size(gardens: set[Garden]) -> bool:
         return all(garden.is_garden_correct_size() for garden in gardens)
-
-    def are_all_walls_connected(self) -> bool:
-        return True  # TODO
