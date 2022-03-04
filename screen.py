@@ -10,6 +10,7 @@ class Screen:
     SCREEN_WIDTH = 300
     SCREEN_HEIGHT = 500
     MIN_BORDER = 5
+    SHOULD_APPLY_ANTI_ALIAS = True
 
     def __init__(self, level: Level):
         self.screen = pygame.display.set_mode(size=(Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT))
@@ -55,7 +56,7 @@ class Screen:
         if text is not None:
             if text_color is None:
                 raise RuntimeError('text_color must be provided if text is provided')
-            text = self.font.render(text, True, text_color.value)
+            text = self.font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
             text_rect = text.get_rect(center=rect.center)
             self.screen.blit(text, text_rect)
 

@@ -41,12 +41,17 @@ class Board:
         return Cell(row_number, col_number, cell_value, cell_pixel_position, self.screen)
 
     def get_flat_cell_list(self) -> list[Cell]:
+        """Get a one dimensional list of cells. This is useful for easier looping."""
         return [cell for row in self.cell_grid for cell in row]
 
     def get_cell_from_grid(self, row_number: int, col_number: int) -> Cell:
         return self.cell_grid[row_number][col_number]
 
     def set_cell_neighbors(self) -> None:
+        """
+        For each cell, set a mapping of Direction->Cell. Cells on the edges/corners of the board will have fewer
+        neighbors in this mapping.
+        """
         for cell in self.flat_cell_list:
             neighbor_cell_map: dict[Direction, Cell] = {}
             for direction in Direction:
