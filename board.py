@@ -83,7 +83,7 @@ class Board:
         return self.rect.collidepoint(event_position.coordinates)
 
     def update_painted_gardens(self) -> None:
-        self.draw_all_cells()  # first redraw the board to "unpaint"
+        self.draw_all_cells()  # first redraw the board to "unpaint" gardens
         self.paint_completed_gardens()
 
     def draw_all_cells(self) -> None:
