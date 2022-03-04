@@ -40,10 +40,13 @@ class Screen:
         top = board_rect.top + self.cell_width * row_number
         return PixelPosition(left, top)
 
-    def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: Optional[str] = None) -> None:
+    def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: Optional[str] = None,
+                  text_color: Optional[Color] = None) -> None:
         pygame.draw.rect(surface=self.screen, color=color.value, rect=rect, width=width)
         if text is not None:
-            text = self.font.render(text, True, Color.BLACK.value)
+            if text_color is None:
+                raise RuntimeError('text_color must be provided if text is provided')
+            text = self.font.render(text, True, text_color.value)
             text_rect = text.get_rect(center=rect.center)
             self.screen.blit(text, text_rect)
 

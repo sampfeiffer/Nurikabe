@@ -11,22 +11,17 @@ logger = logging.getLogger(__name__)
 class GameStatusChecker:
     def __init__(self, board: Board):
         self.board = board
-        self.expected_number_of_walls = self.get_expected_number_of_walls()
-
-    def get_expected_number_of_walls(self) -> int:
-        total_number_of_cells = self.board.level.width_in_cells * self.board.level.height_in_cells
-        expected_number_of_garden_cells = self.get_expected_number_of_garden_cells()
-        return total_number_of_cells - expected_number_of_garden_cells
+        self.expected_number_of_garden_cells = self.get_expected_number_of_garden_cells()
 
     def get_expected_number_of_garden_cells(self) -> int:
-        return sum(cell.initial_value for cell in self.board.flat_cell_list if cell.initial_value is not None)
+        return sum(cell.initial_value for cell in self.board.flat_cell_list if cell.has_clue)
 
     def is_solution_correct(self, cell_change_info: CellChangeInfo) -> GameStatus:
         if not cell_change_info.is_wall_change():
             logger.debug('no wall changes')
             game_status = GameStatus.IN_PROGRESS
-        elif not self.has_expected_number_of_walls():
-            logger.debug('not correct number of walls')
+        elif not self.has_expected_number_of_garden_cells():
+            logger.debug('not correct number of garden cells')
             game_status = GameStatus.IN_PROGRESS
         elif self.has_two_by_two_wall():
             logger.debug('has two by two wall')
@@ -48,11 +43,11 @@ class GameStatusChecker:
 
         return game_status
 
-    def has_expected_number_of_walls(self) -> bool:
-        return self.get_number_of_walls() == self.expected_number_of_walls
+    def has_expected_number_of_garden_cells(self) -> bool:
+        return self.get_number_of_garden_cells() == self.expected_number_of_garden_cells
 
-    def get_number_of_walls(self) -> int:
-        return len([cell for cell in self.board.flat_cell_list if cell.cell_state.is_wall()])
+    def get_number_of_garden_cells(self) -> int:
+        return len([cell for cell in self.board.flat_cell_list if not cell.cell_state.is_wall()])
 
     def has_two_by_two_wall(self) -> bool:
         for cell in self.board.flat_cell_list:

@@ -7,6 +7,7 @@ from level import Level
 from board import Board
 from pixel_position import PixelPosition
 from game_status_checker import GameStatusChecker
+from game_status import GameStatus
 
 logger = logging.getLogger(__name__)
 
@@ -49,4 +50,10 @@ class Nurikabe:
     def process_left_click_down(self, event_position: PixelPosition) -> None:
         cell_change_info = self.board.handle_board_click(event_position)
         self.screen.update_screen()
-        self.game_status_checker.is_solution_correct(cell_change_info)
+        if cell_change_info is not None:
+            game_status = self.game_status_checker.is_solution_correct(cell_change_info)
+            if game_status is GameStatus.GAME_OVER:
+                self.handle_game_over()
+
+    def handle_game_over(self) -> None:
+        pass

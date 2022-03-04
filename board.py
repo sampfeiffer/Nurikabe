@@ -78,28 +78,25 @@ class Board:
             return
         for cell in self.flat_cell_list:
             if cell.is_inside_cell(event_position):
-                return cell.handle_cell_click()
+                cell_change_info = cell.handle_cell_click()
+                self.update_painted_gardens()
+                return cell_change_info
 
     def is_inside_board(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
 
-    def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool],
-                            connected_cells: Optional[set[Cell]] = None) -> set[Cell]:
-        """
-        Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
-        returns True.
-        """
-        if connected_cells is None:
-            connected_cells = set()
-        if starting_cell in connected_cells:
-            # Already visited this cell
-            return connected_cells
-        if cell_criteria_func(starting_cell):
-            connected_cells.add(starting_cell)
-            for neighbor_cell in starting_cell.get_adjacent_neighbors():
-                self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells)
+    def update_painted_gardens(self) -> None:
+        self.draw_all_cells()  # first redraw the board to "unpaint"
+        self.paint_completed_gardens()
 
-        return connected_cells
+    def draw_all_cells(self) -> None:
+        for cell in self.flat_cell_list:
+            cell.draw_cell(is_in_completed_garden=False)
+
+    def paint_completed_gardens(self) -> None:
+        gardens = self.get_all_gardens()
+        for garden in gardens:
+            garden.paint_garden_if_completed()
 
     def get_all_gardens(self) -> set[Garden]:
         gardens: set[Garden] = set()
@@ -118,3 +115,21 @@ class Board:
 
     def get_connected_wall_section(self, starting_cell: Cell) -> set[Cell]:
         return self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: cell.cell_state.is_wall())
+
+    def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool],
+                            connected_cells: Optional[set[Cell]] = None) -> set[Cell]:
+        """
+        Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
+        returns True.
+        """
+        if connected_cells is None:
+            connected_cells = set()
+        if starting_cell in connected_cells:
+            # Already visited this cell
+            return connected_cells
+        if cell_criteria_func(starting_cell):
+            connected_cells.add(starting_cell)
+            for neighbor_cell in starting_cell.get_adjacent_neighbors():
+                self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells)
+
+        return connected_cells

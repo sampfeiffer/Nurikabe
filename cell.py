@@ -26,11 +26,12 @@ class Cell:
         self.initial_value = initial_value
         self.screen = screen
 
-        self.is_clickable = self.initial_value is None
+        self.has_clue = self.initial_value is not None
+        self.is_clickable = not self.has_clue
         self.cell_state = CellState.EMPTY
 
         self.rect = self.get_rect(pixel_position)
-        self.draw_initial_value()
+        self.draw_cell(is_in_completed_garden=False)
 
         self.neighbor_cell_map: Optional[dict[Direction, Cell]] = None
 
@@ -39,19 +40,42 @@ class Cell:
         height = self.screen.cell_width
         return pygame.Rect(pixel_position.x_coordinate, pixel_position.y_coordinate, width, height)
 
-    def draw_initial_value(self) -> None:
-        text = None if self.initial_value is None else str(self.initial_value)
-        self.draw_empty_cell(text)
+    def draw_cell(self, is_in_completed_garden: bool) -> None:
+        if self.has_clue:
+            self.draw_initial_value(is_in_completed_garden)
+        elif self.cell_state is CellState.EMPTY:
+            self.draw_garden_cell()
+        elif self.cell_state is CellState.WALL:
+            self.draw_wall_cell()
+        elif self.cell_state is CellState.NON_WALL:
+            self.draw_non_wall_cell(is_in_completed_garden)
+        else:
+            raise RuntimeError('This should not be possible')
 
-    def draw_empty_cell(self, text: Optional[str] = None) -> None:
-        self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)  # background
-        self.screen.draw_rect(color=Color.BLACK, rect=self.rect, width=1, text=text)  # border (and text if provided)
+    def draw_initial_value(self, is_in_completed_garden: bool) -> None:
+        text = None if self.initial_value is None else str(self.initial_value)
+        self.draw_garden_cell(text, is_in_completed_garden)
+
+    def draw_garden_cell(self, text: Optional[str] = None, is_in_completed_garden: Optional[bool] = None) -> None:
+        if text is not None and is_in_completed_garden is None:
+            raise RuntimeError('is_in_completed_garden must be provided if text is provided')
+
+        # background
+        self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)
+
+        # border (and text if provided)
+        text_color = Color.GRAY if is_in_completed_garden else Color.BLACK
+        self.screen.draw_rect(color=Color.BLACK, rect=self.rect, width=1, text=text, text_color=text_color)
 
     def draw_wall_cell(self) -> None:
         self.screen.draw_rect(color=Color.BLACK, rect=self.rect, width=0)
 
-    def draw_non_wall_cell(self) -> None:
-        self.draw_empty_cell(text=self.CENTER_DOT)
+    def draw_non_wall_cell(self, is_in_completed_garden: bool) -> None:
+        text = self.CENTER_DOT
+        self.draw_garden_cell(text, is_in_completed_garden)
+
+    def paint_completed_cell(self) -> None:
+        self.draw_cell(is_in_completed_garden=True)
 
     def set_neighbor_map(self, neighbor_cell_map: dict[Direction, Cell]) -> None:
         self.neighbor_cell_map = neighbor_cell_map
@@ -67,17 +91,10 @@ class Cell:
         return self.update_cell_state(new_cell_state)
 
     def update_cell_state(self, new_cell_state: CellState) -> Optional[CellChangeInfo]:
-        if new_cell_state is CellState.EMPTY:
-            self.draw_empty_cell()
-        elif new_cell_state is CellState.WALL:
-            self.draw_wall_cell()
-        elif new_cell_state is CellState.NON_WALL:
-            self.draw_non_wall_cell()
-        else:
-            raise RuntimeError('This should not be possible')
-        cell_change_info = CellChangeInfo(before_state=self.cell_state, after_state=new_cell_state)
+        old_cell_state = self.cell_state
         self.cell_state = new_cell_state
-        return cell_change_info
+        self.draw_cell(is_in_completed_garden=False)
+        return CellChangeInfo(before_state=old_cell_state, after_state=self.cell_state)
 
     def get_adjacent_neighbors(self) -> list[Cell]:
         return [self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
