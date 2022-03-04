@@ -7,8 +7,8 @@ class Level:
     def __init__(self, level_number: int):
         self.level_number = level_number
         self.level_setup = self.read_level_setup()
-        self.width_in_cells = len(self.level_setup[0])
-        self.height_in_cells = len(self.level_setup)
+        self.number_of_columns = len(self.level_setup[0])
+        self.number_of_rows = len(self.level_setup)
 
     def read_level_setup(self) -> list[list[Optional[int]]]:
         level_filename = self.get_level_filename()

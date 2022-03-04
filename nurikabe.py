@@ -18,7 +18,7 @@ class Nurikabe:
     def __init__(self, level_number: int):
         level = Level(level_number)
         self.screen = Screen(level)
-        self.board = Board(self.screen, level)
+        self.board = Board(level, self.screen)
         self.game_status_checker = GameStatusChecker(self.board)
         self.start_game_loop()
 

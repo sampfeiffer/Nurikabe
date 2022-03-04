@@ -13,9 +13,9 @@ from garden import Garden
 
 
 class Board:
-    def __init__(self, screen: Screen, level: Level):
-        self.screen = screen
+    def __init__(self, level: Level, screen: Screen):
         self.level = level
+        self.screen = screen
 
         self.rect = self.get_board_rect()
         self.draw_board_rect()
@@ -24,18 +24,10 @@ class Board:
         self.set_cell_neighbors()
 
     def get_board_rect(self) -> pygame.Rect:
-        top_left_of_board = self.get_top_left_of_board()
-        width = self.screen.cell_width * self.level.width_in_cells
-        height = self.screen.cell_width * self.level.height_in_cells
+        top_left_of_board = self.screen.top_left_of_board
+        width = self.screen.cell_width * self.level.number_of_columns
+        height = self.screen.cell_width * self.level.number_of_rows
         return pygame.Rect(top_left_of_board.x_coordinate, top_left_of_board.y_coordinate, width, height)
-
-    def get_top_left_of_board(self) -> PixelPosition:
-        left_border_size = self.get_actual_left_border_size()
-        return PixelPosition(left_border_size, Screen.MIN_BORDER)
-
-    def get_actual_left_border_size(self) -> int:
-        actual_board_width = self.screen.cell_width * self.level.width_in_cells
-        return int((self.screen.SCREEN_WIDTH - actual_board_width) / 2)
 
     def draw_board_rect(self) -> None:
         self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)
@@ -70,8 +62,8 @@ class Board:
                                            col_number=neighbor_coordinate.col_number)
 
     def is_valid_cell_coordinate(self, grid_coordinate: GridCoordinate) -> bool:
-        return 0 <= grid_coordinate.row_number < self.level.height_in_cells and \
-            0 <= grid_coordinate.col_number < self.level.width_in_cells
+        return 0 <= grid_coordinate.row_number < self.level.number_of_rows and \
+            0 <= grid_coordinate.col_number < self.level.number_of_columns
 
     def handle_board_click(self, event_position: PixelPosition) -> Optional[CellChangeInfo]:
         if not self.is_inside_board(event_position):
