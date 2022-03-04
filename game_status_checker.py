@@ -14,7 +14,7 @@ class GameStatusChecker:
         self.expected_number_of_garden_cells = self.get_expected_number_of_garden_cells()
 
     def get_expected_number_of_garden_cells(self) -> int:
-        return sum(cell.initial_value for cell in self.board.flat_cell_list if cell.has_clue)
+        return sum(cell.clue for cell in self.board.flat_cell_list if cell.has_clue)
 
     def is_solution_correct(self, cell_change_info: CellChangeInfo) -> GameStatus:
         if not cell_change_info.is_wall_change():

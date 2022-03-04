@@ -33,12 +33,12 @@ class Board:
         self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)
 
     def create_cell_grid(self) -> list[list[Cell]]:
-        return [[self.create_cell(row_number, col_number, cell_value) for col_number, cell_value in enumerate(row)]
+        return [[self.create_cell(row_number, col_number, cell_clue) for col_number, cell_clue in enumerate(row)]
                 for row_number, row in enumerate(self.level.level_setup)]
 
-    def create_cell(self, row_number: int, col_number: int, cell_value: Optional[int]) -> Cell:
+    def create_cell(self, row_number: int, col_number: int, cell_clue: Optional[int]) -> Cell:
         cell_pixel_position = self.screen.get_cell_location(self.rect, row_number, col_number)
-        return Cell(row_number, col_number, cell_value, cell_pixel_position, self.screen)
+        return Cell(row_number, col_number, cell_clue, cell_pixel_position, self.screen)
 
     def get_flat_cell_list(self) -> list[Cell]:
         """Get a one dimensional list of cells. This is useful for easier looping."""

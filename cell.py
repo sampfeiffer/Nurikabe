@@ -18,15 +18,15 @@ class NonExistentNeighbor(Exception):
 class Cell:
     CENTER_DOT = '\u2022'
 
-    def __init__(self, row_number: int, col_number: int, initial_value: Optional[int], pixel_position: PixelPosition,
+    def __init__(self, row_number: int, col_number: int, clue: Optional[int], pixel_position: PixelPosition,
                  screen: Screen):
         self.row_number = row_number
         self.col_number = col_number
         self.grid_coordinate = GridCoordinate(row_number, col_number)
-        self.initial_value = initial_value
+        self.clue = clue
         self.screen = screen
 
-        self.has_clue = self.initial_value is not None
+        self.has_clue = self.clue is not None
         self.is_clickable = not self.has_clue
         self.cell_state = CellState.EMPTY
 
@@ -42,7 +42,7 @@ class Cell:
 
     def draw_cell(self, is_in_completed_garden: bool) -> None:
         if self.has_clue:
-            self.draw_initial_value(is_in_completed_garden)
+            self.draw_clue(is_in_completed_garden)
         elif self.cell_state is CellState.EMPTY:
             self.draw_garden_cell()
         elif self.cell_state is CellState.WALL:
@@ -52,8 +52,8 @@ class Cell:
         else:
             raise RuntimeError('This should not be possible')
 
-    def draw_initial_value(self, is_in_completed_garden: bool) -> None:
-        text = None if self.initial_value is None else str(self.initial_value)
+    def draw_clue(self, is_in_completed_garden: bool) -> None:
+        text = None if self.clue is None else str(self.clue)
         self.draw_garden_cell(text, is_in_completed_garden)
 
     def draw_garden_cell(self, text: Optional[str] = None, is_in_completed_garden: Optional[bool] = None) -> None:
@@ -124,4 +124,4 @@ class Cell:
 
     def __str__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
-                f'initial_value={self.initial_value})')
+                f'clue={self.clue})')

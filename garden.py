@@ -26,7 +26,7 @@ class Garden:
             raise IncorrectGardenNumOfClues('Garden does not have exactly one clue')
         for cell in self.cells:
             if cell.has_clue:
-                return cell.initial_value
+                return cell.clue
 
     def paint_garden_if_completed(self) -> None:
         if self.does_have_exactly_one_clue() and self.is_garden_correct_size() and self.is_garden_full_of_non_walls():
