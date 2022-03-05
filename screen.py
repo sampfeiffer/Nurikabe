@@ -4,6 +4,7 @@ import pygame
 from level import Level
 from pixel_position import PixelPosition
 from color import Color
+from text_type import TextType
 
 
 class Screen:
@@ -11,21 +12,37 @@ class Screen:
     SCREEN_HEIGHT = 500
     MIN_BORDER = 5
     SHOULD_APPLY_ANTI_ALIAS = True
+    GAME_STATUS_RECT_WIDTH = int(0.75 * SCREEN_WIDTH)
+    GAME_STATUS_RECT_HEIGHT = 30
+    PUZZLE_SOLVED_FONT_SIZE = 25
+    FONT = 'Courier'
 
     def __init__(self, level: Level):
         self.screen = pygame.display.set_mode(size=(Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT))
         pygame.display.set_caption('Nurikabe')
         self.screen.fill(Color.GRAY.value)
 
+        self.top_left_of_game_status = self.get_top_left_of_game_status()
         self.cell_width = self.get_cell_width(level.number_of_rows, level.number_of_columns)
         self.top_left_of_board = self.get_top_left_of_board(level.number_of_columns)
-        self.font = self.get_font()
+
+        self.cell_font = self.get_cell_font()
+        self.puzzle_solved_font = pygame.font.SysFont(self.FONT, self.PUZZLE_SOLVED_FONT_SIZE)
+        self.font_map = {
+            TextType.CELL: self.cell_font,
+            TextType.PUZZLE_SOLVED: self.puzzle_solved_font
+        }
+
+    def get_top_left_of_game_status(self) -> PixelPosition:
+        left = int((self.SCREEN_WIDTH - self.GAME_STATUS_RECT_WIDTH) / 2)
+        top = self.SCREEN_HEIGHT - (self.GAME_STATUS_RECT_HEIGHT + self.MIN_BORDER)
+        return PixelPosition(x_coordinate=left, y_coordinate=top)
 
     def get_cell_width(self, number_of_rows: int, number_of_columns: int) -> int:
         max_board_width = self.SCREEN_WIDTH - 2 * self.MIN_BORDER
         max_cell_width = int(max_board_width / number_of_columns)
 
-        max_board_height = self.SCREEN_HEIGHT - 2 * self.MIN_BORDER
+        max_board_height = self.SCREEN_HEIGHT - (2 * self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT)
         max_cell_height = int(max_board_height / number_of_rows)
 
         return min((max_cell_width, max_cell_height))
@@ -38,11 +55,11 @@ class Screen:
         actual_board_width = self.cell_width * number_of_columns
         return int((self.SCREEN_WIDTH - actual_board_width) / 2)
 
-    def get_font(self) -> pygame.font.SysFont:
-        font_size = self.get_font_size()
-        return pygame.font.SysFont('Courier', font_size)
+    def get_cell_font(self) -> pygame.font.SysFont:
+        font_size = self.get_cell_font_size()
+        return pygame.font.SysFont(self.FONT, font_size)
 
-    def get_font_size(self) -> int:
+    def get_cell_font_size(self) -> int:
         return int(0.8 * self.cell_width)
 
     def get_cell_location(self, board_rect: pygame.Rect, row_number: int, col_number: int) -> PixelPosition:
@@ -51,12 +68,13 @@ class Screen:
         return PixelPosition(x_coordinate=left, y_coordinate=top)
 
     def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: Optional[str] = None,
-                  text_color: Optional[Color] = None) -> None:
+                  text_color: Optional[Color] = None, text_type: TextType = TextType.CELL) -> None:
         pygame.draw.rect(surface=self.screen, color=color.value, rect=rect, width=width)
         if text is not None:
             if text_color is None:
                 raise RuntimeError('text_color must be provided if text is provided')
-            text = self.font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
+            font = self.font_map[text_type]
+            text = font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
             text_rect = text.get_rect(center=rect.center)
             self.screen.blit(text, text_rect)
 

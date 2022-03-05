@@ -39,7 +39,7 @@ class GameStatusChecker:
                 game_status = GameStatus.IN_PROGRESS
             else:
                 logger.debug('correct solution!')
-                game_status = GameStatus.GAME_OVER
+                game_status = GameStatus.PUZZLE_SOLVED
 
         return game_status
 

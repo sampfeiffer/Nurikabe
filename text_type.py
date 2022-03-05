@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
 
-class GameStatus(Enum):
-    IN_PROGRESS = auto()
+class TextType(Enum):
+    CELL = auto()
     PUZZLE_SOLVED = auto()

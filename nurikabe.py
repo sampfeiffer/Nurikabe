@@ -8,6 +8,7 @@ from board import Board
 from pixel_position import PixelPosition
 from game_status_checker import GameStatusChecker
 from game_status import GameStatus
+from game_status_display import GameStatusDisplay
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +20,7 @@ class Nurikabe:
         level = Level(level_number)
         self.screen = Screen(level)
         self.board = Board(level, self.screen)
+        self.game_status_display = GameStatusDisplay(self.screen)
         self.game_status_checker = GameStatusChecker(self.board)
         self.start_game_loop()
 
@@ -52,8 +54,8 @@ class Nurikabe:
         self.screen.update_screen()
         if cell_change_info is not None:
             game_status = self.game_status_checker.is_solution_correct(cell_change_info)
-            if game_status is GameStatus.GAME_OVER:
-                self.handle_game_over()
+            if game_status is GameStatus.PUZZLE_SOLVED:
+                self.handle_solved_puzzle()
 
-    def handle_game_over(self) -> None:
-        pass
+    def handle_solved_puzzle(self) -> None:
+        self.game_status_display.show_puzzle_solved_message()
