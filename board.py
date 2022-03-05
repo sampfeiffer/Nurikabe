@@ -22,6 +22,7 @@ class Board:
         self.cell_grid = self.create_cell_grid()
         self.flat_cell_list = self.get_flat_cell_list()
         self.set_cell_neighbors()
+        self.is_board_frozen = False
 
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.screen.top_left_of_board
@@ -71,6 +72,8 @@ class Board:
             0 <= grid_coordinate.col_number < self.level.number_of_columns
 
     def handle_board_click(self, event_position: PixelPosition) -> Optional[CellChangeInfo]:
+        if self.is_board_frozen:
+            return
         if not self.is_inside_board(event_position):
             return
         for cell in self.flat_cell_list:
@@ -130,3 +133,6 @@ class Board:
                 self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells)
 
         return connected_cells
+
+    def freeze_cells(self) -> None:
+        self.is_board_frozen = True

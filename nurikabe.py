@@ -59,3 +59,4 @@ class Nurikabe:
 
     def handle_solved_puzzle(self) -> None:
         self.game_status_display.show_puzzle_solved_message()
+        self.board.freeze_cells()
