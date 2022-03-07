@@ -31,7 +31,7 @@ class Cell:
         self.cell_state = CellState.EMPTY
 
         self.rect = self.get_rect(pixel_position)
-        self.draw_cell(is_in_completed_garden=False)
+        self.draw_cell()
 
         self.neighbor_cell_map: Optional[dict[Direction, Cell]] = None
 
@@ -40,7 +40,7 @@ class Cell:
         height = self.screen.cell_width
         return pygame.Rect(pixel_position.x_coordinate, pixel_position.y_coordinate, width, height)
 
-    def draw_cell(self, is_in_completed_garden: bool) -> None:
+    def draw_cell(self, is_in_completed_garden: bool = False) -> None:
         if self.has_clue:
             self.draw_clue(is_in_completed_garden)
         elif self.cell_state is CellState.EMPTY:
@@ -93,7 +93,7 @@ class Cell:
     def update_cell_state(self, new_cell_state: CellState) -> Optional[CellChangeInfo]:
         old_cell_state = self.cell_state
         self.cell_state = new_cell_state
-        self.draw_cell(is_in_completed_garden=False)
+        self.draw_cell()
         return CellChangeInfo(before_state=old_cell_state, after_state=self.cell_state)
 
     def get_adjacent_neighbors(self) -> list[Cell]:

@@ -91,7 +91,7 @@ class Board:
 
     def draw_all_cells(self) -> None:
         for cell in self.flat_cell_list:
-            cell.draw_cell(is_in_completed_garden=False)
+            cell.draw_cell()
 
     def paint_completed_gardens(self) -> None:
         gardens = self.get_all_gardens()
