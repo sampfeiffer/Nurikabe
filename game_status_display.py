@@ -12,7 +12,6 @@ class GameStatusDisplay:
         self.screen = screen
 
         self.rect = self.get_display_rect()
-        print(self.rect)
 
     def get_display_rect(self) -> pygame.Rect:
         location = self.screen.top_left_of_game_status
