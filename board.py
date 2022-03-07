@@ -10,6 +10,7 @@ from cell_change_info import CellChangeInfo
 from direction import Direction
 from grid_coordinate import GridCoordinate
 from garden import Garden
+from wall_section import WallSection
 
 
 class Board:
@@ -113,8 +114,20 @@ class Board:
         cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
         return Garden(cells)
 
-    def get_connected_wall_section(self, starting_cell: Cell) -> set[Cell]:
-        return self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: cell.cell_state.is_wall())
+    def get_all_wall_sections(self) -> set[WallSection]:
+        wall_sections: set[WallSection] = set()
+        cells_in_wall_section: set[Cell] = set()  # to prevent double counting
+        for cell in self.flat_cell_list:
+            if cell in cells_in_wall_section or not cell.cell_state.is_wall():
+                continue
+            wall_section = self.get_wall_section(starting_cell=cell)
+            wall_sections.add(wall_section)
+            cells_in_wall_section = cells_in_wall_section.union(wall_section.cells)
+        return wall_sections
+
+    def get_wall_section(self, starting_cell: Cell) -> WallSection:
+        cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: cell.cell_state.is_wall())
+        return WallSection(cells)
 
     def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool],
                             connected_cells: Optional[set[Cell]] = None) -> set[Cell]:

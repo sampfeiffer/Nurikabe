@@ -59,8 +59,8 @@ class GameStatusChecker:
         all_walls = [cell for cell in self.board.flat_cell_list if cell.cell_state.is_wall()]
         if len(all_walls) == 0:
             return True
-        first_wall_section = self.board.get_connected_wall_section(starting_cell=all_walls[0])
-        return first_wall_section == set(all_walls)
+        first_wall_section = self.board.get_wall_section(starting_cell=all_walls[0])
+        return first_wall_section.cells == set(all_walls)
 
     @staticmethod
     def do_all_gardens_have_exactly_one_clue(gardens: set[Garden]) -> bool:

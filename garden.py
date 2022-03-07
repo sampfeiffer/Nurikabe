@@ -1,4 +1,4 @@
-from cell import Cell
+from cell_group import CellGroup
 from cell_state import CellState
 
 
@@ -6,14 +6,11 @@ class IncorrectGardenNumOfClues(Exception):
     pass
 
 
-class Garden:
+class Garden(CellGroup):
     """
     A garden is an isolated section of cells that are not walls (either empty or marked as non-wall). Being connected to
     something diagonally does not impact whether a garden is isolated
     """
-
-    def __init__(self, cells: set[Cell]):
-        self.cells = cells
 
     def does_have_exactly_one_clue(self) -> bool:
         return len([cell for cell in self.cells if cell.has_clue]) == 1
