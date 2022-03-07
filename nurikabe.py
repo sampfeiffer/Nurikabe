@@ -9,6 +9,7 @@ from pixel_position import PixelPosition
 from game_status_checker import GameStatusChecker
 from game_status import GameStatus
 from game_status_display import GameStatusDisplay
+from solver.solver import Solver
 
 logger = logging.getLogger(__name__)
 
@@ -16,19 +17,21 @@ LEFT_BUTTON = 1
 
 
 class Nurikabe:
-    def __init__(self, level_number: int):
+    def __init__(self, level_number: int, should_use_solver: bool):
         level = Level(level_number)
         self.screen = Screen(level)
         self.board = Board(level, self.screen)
         self.game_status_display = GameStatusDisplay(self.screen)
         self.game_status_checker = GameStatusChecker(self.board)
-        self.start_game_loop()
+        self.start_game_loop(should_use_solver)
 
-    def start_game_loop(self) -> None:
+    def start_game_loop(self, should_use_solver: bool) -> None:
         while True:
             self.process_event_queue()
             pygame.time.wait(20)  # milliseconds
             self.screen.update_screen()
+            if should_use_solver:
+                Solver(self.screen, self.board).run_solver()
 
     def process_event_queue(self) -> None:
         for event in pygame.event.get():
