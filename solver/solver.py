@@ -12,9 +12,10 @@ class Solver:
 
     def run_solver(self) -> None:
         self.separate_clues()
-        self.ensure_non_isolated_walls()
+        self.ensure_no_isolated_wall_sections()
         self.ensure_garden_can_expand()
         self.enclose_full_garden()
+        self.ensure_no_two_by_two_walls()
 
         self.board.update_painted_gardens()
         self.screen.update_screen()
@@ -31,7 +32,7 @@ class Solver:
             if len([cell for adjacent_cell in cell.get_adjacent_neighbors() if adjacent_cell.has_clue]) > 1:
                 self.set_cell_to_state(cell, CellState.WALL)
 
-    def ensure_non_isolated_walls(self) -> None:
+    def ensure_no_isolated_wall_sections(self) -> None:
         wall_sections = self.board.get_all_wall_sections()
         # TODO -  first ensure that there needs to be an "escape" for the wall section
         for wall_section in wall_sections:
@@ -63,3 +64,12 @@ class Solver:
                     empty_adjacent_neighbors = non_wall_cell_group.get_empty_adjacent_neighbors()
                     for cell in empty_adjacent_neighbors:
                         self.set_cell_to_state(cell, CellState.WALL)
+
+    def ensure_no_two_by_two_walls(self) -> None:
+        for row in self.board.cell_grid[:-1]:
+            for cell in row[:-1]:
+                two_by_two_section = cell.get_two_by_two_section()
+                if len([cell for cell in two_by_two_section if cell.cell_state.is_wall()]) == 3:
+                    for cell_corner in two_by_two_section:
+                        if cell_corner.cell_state is CellState.EMPTY and not cell_corner.has_clue:
+                            self.set_cell_to_state(cell_corner, CellState.NON_WALL)

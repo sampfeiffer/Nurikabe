@@ -111,16 +111,20 @@ class Cell:
 
     def does_form_two_by_two_walls(self) -> bool:
         """Returns True if this cell is the top left corner of a two by two section of walls."""
-        directions = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
-        if self.cell_state.is_wall():
-            try:
-                neighbor_cells = self.get_neighbors(directions)
-                return all(neighbor_cell.cell_state.is_wall() for neighbor_cell in neighbor_cells)
-            except NonExistentNeighbor:
-                # Can't be top-left of two by two since this is on the right or lower edge of board so the required
-                # neighbors do not exist
-                pass
+        try:
+            two_by_two_section = self.get_two_by_two_section()
+            return all(cell.cell_state.is_wall() for cell in two_by_two_section)
+        except NonExistentNeighbor:
+            # Can't be top-left of two by two since this is on the right or lower edge of board so the required
+            # neighbors do not exist
+            pass
         return False
+
+    def get_two_by_two_section(self) -> set[Cell]:
+        """Return the two-by-two section of cells where this cell is the top left corner."""
+        directions = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
+        neighbor_cells = set(self.get_neighbors(directions))
+        return neighbor_cells.union({self})
 
     def is_non_wall_or_has_clue(self) -> bool:
         return self.cell_state is CellState.NON_WALL or self.has_clue

@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from board import Board
 from game_status import GameStatus
@@ -16,11 +17,11 @@ class GameStatusChecker:
     def get_expected_number_of_garden_cells(self) -> int:
         return sum(cell.clue for cell in self.board.flat_cell_list if cell.has_clue)
 
-    def is_solution_correct(self, cell_change_info: CellChangeInfo) -> GameStatus:
-        if not cell_change_info.is_wall_change():
+    def is_solution_correct(self, cell_change_info: Optional[CellChangeInfo] = None) -> GameStatus:
+        if cell_change_info is not None and not cell_change_info.is_wall_change():
             logger.debug('no wall changes')
             game_status = GameStatus.IN_PROGRESS
-        elif not self.has_expected_number_of_garden_cells():
+        if not self.has_expected_number_of_garden_cells():
             logger.debug('not correct number of garden cells')
             game_status = GameStatus.IN_PROGRESS
         elif self.has_two_by_two_wall():

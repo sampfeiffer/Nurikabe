@@ -1,5 +1,6 @@
 import sys
 import logging
+from typing import Optional
 import pygame
 
 from screen import Screen
@@ -9,6 +10,7 @@ from pixel_position import PixelPosition
 from game_status_checker import GameStatusChecker
 from game_status import GameStatus
 from game_status_display import GameStatusDisplay
+from cell_change_info import CellChangeInfo
 from solver.solver import Solver
 
 logger = logging.getLogger(__name__)
@@ -23,6 +25,8 @@ class Nurikabe:
         self.board = Board(level, self.screen)
         self.game_status_display = GameStatusDisplay(self.screen)
         self.game_status_checker = GameStatusChecker(self.board)
+        self.should_use_solver = should_use_solver
+        self.solver = Solver(self.screen, self.board)
         self.start_game_loop(should_use_solver)
 
     def start_game_loop(self, should_use_solver: bool) -> None:
@@ -30,8 +34,6 @@ class Nurikabe:
             self.process_event_queue()
             pygame.time.wait(20)  # milliseconds
             self.screen.update_screen()
-            if should_use_solver:
-                Solver(self.screen, self.board).run_solver()
 
     def process_event_queue(self) -> None:
         for event in pygame.event.get():
@@ -53,12 +55,19 @@ class Nurikabe:
         sys.exit()
 
     def process_left_click_down(self, event_position: PixelPosition) -> None:
+        if not self.board.is_inside_board(event_position):
+            if self.should_use_solver:
+                self.solver.run_solver()
+                self.check_game_status()
         cell_change_info = self.board.handle_board_click(event_position)
         self.screen.update_screen()
         if cell_change_info is not None:
-            game_status = self.game_status_checker.is_solution_correct(cell_change_info)
-            if game_status is GameStatus.PUZZLE_SOLVED:
-                self.handle_solved_puzzle()
+            self.check_game_status(cell_change_info)
+
+    def check_game_status(self, cell_change_info: Optional[CellChangeInfo] = None) -> None:
+        game_status = self.game_status_checker.is_solution_correct(cell_change_info)
+        if game_status is GameStatus.PUZZLE_SOLVED:
+            self.handle_solved_puzzle()
 
     def handle_solved_puzzle(self) -> None:
         self.game_status_display.show_puzzle_solved_message()
