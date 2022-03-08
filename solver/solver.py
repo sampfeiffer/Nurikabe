@@ -32,11 +32,11 @@ class Solver:
         cell.update_cell_state(target_cell_state)
 
     def separate_clues(self) -> None:
-        non_clue_cells = [cell for cell in self.board.flat_cell_list if not cell.has_clue]
+        non_clue_cells = [cell for cell in self.board.flat_cell_list
+                          if not cell.has_clue and cell.cell_state is CellState.EMPTY]
         for cell in non_clue_cells:
             if len([cell for adjacent_cell in cell.get_adjacent_neighbors() if adjacent_cell.has_clue]) > 1:
-                if cell.cell_state is CellState.EMPTY:
-                    self.set_cell_to_state(cell, CellState.WALL, reason='separate clues')
+                self.set_cell_to_state(cell, CellState.WALL, reason='separate clues')
 
     def ensure_no_isolated_wall_sections(self) -> None:
         wall_sections = self.board.get_all_wall_sections()
