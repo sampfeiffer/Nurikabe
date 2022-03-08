@@ -11,10 +11,10 @@ class Solver:
         self.board = board
 
     def run_solver(self) -> None:
-        self.surround_ones()
         self.separate_clues()
         self.ensure_non_isolated_walls()
         self.ensure_garden_can_expand()
+        self.enclose_full_garden()
 
         self.board.update_painted_gardens()
         self.screen.update_screen()
@@ -24,13 +24,6 @@ class Solver:
         if not cell.is_clickable:
             raise RuntimeError(f'cell is not clickable: {cell}')
         cell.update_cell_state(target_cell_state)
-
-    def surround_ones(self) -> None:
-        cells_with_clue_of_1 = [cell for cell in self.board.flat_cell_list if cell.has_clue and cell.clue == 1]
-        for cell in cells_with_clue_of_1:
-            for adjacent_cell in cell.get_adjacent_neighbors():
-                if adjacent_cell.is_clickable:
-                    self.set_cell_to_state(adjacent_cell, CellState.WALL)
 
     def separate_clues(self) -> None:
         non_clue_cells = [cell for cell in self.board.flat_cell_list if not cell.has_clue]
@@ -60,3 +53,13 @@ class Solver:
 
     def get_all_non_wall_cell_groups(self) -> set[CellGroup]:
         return self.board.get_all_cell_groups(cell_criteria_func=lambda cell: cell.is_non_wall_or_has_clue())
+
+    def enclose_full_garden(self) -> None:
+        all_non_wall_cell_groups = self.get_all_non_wall_cell_groups()
+        for non_wall_cell_group in all_non_wall_cell_groups:
+            if non_wall_cell_group.does_contain_clue():
+                clue = non_wall_cell_group.get_clue_value()
+                if len(non_wall_cell_group.cells) == clue:
+                    empty_adjacent_neighbors = non_wall_cell_group.get_empty_adjacent_neighbors()
+                    for cell in empty_adjacent_neighbors:
+                        self.set_cell_to_state(cell, CellState.WALL)
