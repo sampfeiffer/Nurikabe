@@ -11,6 +11,7 @@ from direction import Direction
 from grid_coordinate import GridCoordinate
 from garden import Garden
 from wall_section import WallSection
+from cell_group import CellGroup
 
 
 class Board:
@@ -100,34 +101,35 @@ class Board:
             garden.paint_garden_if_completed()
 
     def get_all_gardens(self) -> set[Garden]:
-        gardens: set[Garden] = set()
-        cells_in_gardens: set[Cell] = set()  # to prevent double counting
+        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
+        return {Garden(cell_group.cells) for cell_group in all_cell_groups}
+
+    def get_all_wall_sections(self) -> set[WallSection]:
+        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=lambda cell: cell.cell_state.is_wall())
+        return {WallSection(cell_group.cells) for cell_group in all_cell_groups}
+
+    def get_all_cell_groups(self, cell_criteria_func: Callable[[Cell], bool]) -> set[CellGroup]:
+        all_cell_groups: set[CellGroup] = set()
+        calls_already_in_a_group: set[Cell] = set()  # to prevent double counting
         for cell in self.flat_cell_list:
-            if cell in cells_in_gardens or cell.cell_state.is_wall():
+            if cell in calls_already_in_a_group or not cell_criteria_func(cell):
                 continue
-            garden = self.get_garden(starting_cell=cell)
-            gardens.add(garden)
-            cells_in_gardens = cells_in_gardens.union(garden.cells)
-        return gardens
+            cell_group = self.get_cell_group(starting_cell=cell, cell_criteria_func=cell_criteria_func)
+            all_cell_groups.add(cell_group)
+            calls_already_in_a_group = calls_already_in_a_group.union(cell_group.cells)
+        return all_cell_groups
 
     def get_garden(self, starting_cell: Cell) -> Garden:
         cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
         return Garden(cells)
 
-    def get_all_wall_sections(self) -> set[WallSection]:
-        wall_sections: set[WallSection] = set()
-        cells_in_wall_section: set[Cell] = set()  # to prevent double counting
-        for cell in self.flat_cell_list:
-            if cell in cells_in_wall_section or not cell.cell_state.is_wall():
-                continue
-            wall_section = self.get_wall_section(starting_cell=cell)
-            wall_sections.add(wall_section)
-            cells_in_wall_section = cells_in_wall_section.union(wall_section.cells)
-        return wall_sections
-
     def get_wall_section(self, starting_cell: Cell) -> WallSection:
         cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: cell.cell_state.is_wall())
         return WallSection(cells)
+
+    def get_cell_group(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool]) -> CellGroup:
+        cells = self.get_connected_cells(starting_cell, cell_criteria_func)
+        return CellGroup(cells)
 
     def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool],
                             connected_cells: Optional[set[Cell]] = None) -> set[Cell]:
