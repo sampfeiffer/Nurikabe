@@ -8,8 +8,8 @@ class IncorrectGardenNumOfClues(Exception):
 
 class Garden(CellGroup):
     """
-    A garden is an isolated section of cells that are not walls (either empty or marked as non-wall). Being connected to
-    something diagonally does not impact whether a garden is isolated
+    A garden is a connected section of cells that are not walls (either empty or marked as non-wall). Being connected to
+    something diagonally does not count as connected.
     """
 
     def does_have_exactly_one_clue(self) -> bool:

@@ -2,6 +2,7 @@ from screen import Screen
 from board import Board
 from cell import Cell
 from cell_state import CellState
+from cell_group import CellGroup
 
 
 class Solver:
@@ -13,6 +14,7 @@ class Solver:
         self.surround_ones()
         self.separate_clues()
         self.ensure_non_isolated_walls()
+        self.ensure_garden_can_expand()
 
         self.board.update_painted_gardens()
         self.screen.update_screen()
@@ -40,7 +42,21 @@ class Solver:
         wall_sections = self.board.get_all_wall_sections()
         # TODO -  first ensure that there needs to be an "escape" for the wall section
         for wall_section in wall_sections:
-            escape_routes = wall_section.get_escape_routes()
+            escape_routes = wall_section.get_empty_adjacent_neighbors()
             if len(escape_routes) == 1:
                 only_escape_route = escape_routes[0]
                 self.set_cell_to_state(only_escape_route, CellState.WALL)
+
+    def ensure_garden_can_expand(self) -> None:
+        all_non_wall_cell_groups = self.get_all_non_wall_cell_groups()
+        for non_wall_cell_group in all_non_wall_cell_groups:
+            if non_wall_cell_group.does_contain_clue():
+                clue = non_wall_cell_group.get_clue_value()
+                if len(non_wall_cell_group.cells) < clue:
+                    escape_routes = non_wall_cell_group.get_empty_adjacent_neighbors()
+                    if len(escape_routes) == 1:
+                        only_escape_route = escape_routes[0]
+                        self.set_cell_to_state(only_escape_route, CellState.NON_WALL)
+
+    def get_all_non_wall_cell_groups(self) -> set[CellGroup]:
+        return self.board.get_all_cell_groups(cell_criteria_func=lambda cell: cell.is_non_wall_or_has_clue())

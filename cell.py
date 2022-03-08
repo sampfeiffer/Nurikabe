@@ -122,6 +122,9 @@ class Cell:
                 pass
         return False
 
+    def is_non_wall_or_has_clue(self) -> bool:
+        return self.cell_state is CellState.NON_WALL or self.has_clue
+
     def __str__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
                 f'clue={self.clue})')
