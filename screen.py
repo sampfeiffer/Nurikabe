@@ -12,6 +12,11 @@ class Screen:
     SCREEN_HEIGHT = 500
     MIN_BORDER = 5
     SHOULD_APPLY_ANTI_ALIAS = True
+
+    SOLVER_BUTTON_RECT_WIDTH = 150
+    SOLVER_BUTTON_RECT_HEIGHT = 20
+    SOLVER_BUTTON_FONT_SIZE = 12
+
     GAME_STATUS_RECT_WIDTH = int(0.75 * SCREEN_WIDTH)
     GAME_STATUS_RECT_HEIGHT = 30
     PUZZLE_SOLVED_FONT_SIZE = 25
@@ -26,11 +31,10 @@ class Screen:
         self.cell_width = self.get_cell_width(level.number_of_rows, level.number_of_columns)
         self.top_left_of_board = self.get_top_left_of_board(level.number_of_columns)
 
-        self.cell_font = self.get_cell_font()
-        self.puzzle_solved_font = pygame.font.SysFont(self.FONT, self.PUZZLE_SOLVED_FONT_SIZE)
         self.font_map = {
-            TextType.CELL: self.cell_font,
-            TextType.PUZZLE_SOLVED: self.puzzle_solved_font
+            TextType.CELL: self.get_cell_font(),
+            TextType.PUZZLE_SOLVED: pygame.font.SysFont(self.FONT, self.PUZZLE_SOLVED_FONT_SIZE),
+            TextType.SOLVER_BUTTON: pygame.font.SysFont(self.FONT, self.SOLVER_BUTTON_FONT_SIZE)
         }
 
     def get_top_left_of_game_status(self) -> PixelPosition:
@@ -42,7 +46,9 @@ class Screen:
         max_board_width = self.SCREEN_WIDTH - 2 * self.MIN_BORDER
         max_cell_width = int(max_board_width / number_of_columns)
 
-        max_board_height = self.SCREEN_HEIGHT - (2 * self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT)
+        height_for_non_board_components = 2 * self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT + \
+            self.SOLVER_BUTTON_RECT_HEIGHT
+        max_board_height = self.SCREEN_HEIGHT - height_for_non_board_components
         max_cell_height = int(max_board_height / number_of_rows)
 
         return min((max_cell_width, max_cell_height))

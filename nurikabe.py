@@ -9,6 +9,7 @@ from board import Board
 from pixel_position import PixelPosition
 from game_status_checker import GameStatusChecker
 from game_status import GameStatus
+from solver_button_display import SolverButtonDisplay
 from game_status_display import GameStatusDisplay
 from cell_change_info import CellChangeInfo
 from solver.solver import Solver
@@ -23,13 +24,14 @@ class Nurikabe:
         level = Level(level_number)
         self.screen = Screen(level)
         self.board = Board(level, self.screen)
+        self.solver_button_display = SolverButtonDisplay(self.screen, self.board, should_use_solver)
         self.game_status_display = GameStatusDisplay(self.screen)
         self.game_status_checker = GameStatusChecker(self.board)
         self.should_use_solver = should_use_solver
         self.solver = Solver(self.screen, self.board)
-        self.start_game_loop(should_use_solver)
+        self.start_game_loop()
 
-    def start_game_loop(self, should_use_solver: bool) -> None:
+    def start_game_loop(self) -> None:
         while True:
             self.process_event_queue()
             pygame.time.wait(20)  # milliseconds
@@ -55,10 +57,9 @@ class Nurikabe:
         sys.exit()
 
     def process_left_click_down(self, event_position: PixelPosition) -> None:
-        if not self.board.is_inside_board(event_position):
-            if self.should_use_solver:
-                self.solver.run_solver()
-                self.check_game_status()
+        if self.solver_button_display.should_run_solver(event_position):
+            self.solver.run_solver()
+            self.check_game_status()
         cell_change_info = self.board.handle_board_click(event_position)
         self.screen.update_screen()
         if cell_change_info is not None:
@@ -72,3 +73,4 @@ class Nurikabe:
     def handle_solved_puzzle(self) -> None:
         self.game_status_display.show_puzzle_solved_message()
         self.board.freeze_cells()
+        self.solver_button_display.make_unclickable()
