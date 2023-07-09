@@ -21,7 +21,7 @@ class GameStatusChecker:
         if cell_change_info is not None and not cell_change_info.is_wall_change():
             logger.debug('no wall changes')
             game_status = GameStatus.IN_PROGRESS
-        if not self.has_expected_number_of_garden_cells():
+        elif not self.has_expected_number_of_garden_cells():
             logger.debug('not correct number of garden cells')
             game_status = GameStatus.IN_PROGRESS
         elif self.has_two_by_two_wall():
