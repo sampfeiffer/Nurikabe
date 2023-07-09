@@ -5,3 +5,4 @@ class TextType(Enum):
     CELL = auto()
     PUZZLE_SOLVED = auto()
     SOLVER_BUTTON = auto()
+    GRID_NUMBERING = auto()

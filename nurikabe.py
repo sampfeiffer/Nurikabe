@@ -16,13 +16,13 @@ from solver.solver import Solver
 
 logger = logging.getLogger(__name__)
 
-LEFT_BUTTON = 1
+LEFT_BUTTON = 1  # Pygame's representation of a left button click
 
 
 class Nurikabe:
-    def __init__(self, level_number: int, should_use_solver: bool):
+    def __init__(self, level_number: int, should_use_solver: bool, should_include_grid_numbers: bool):
         level = Level(level_number)
-        self.screen = Screen(level)
+        self.screen = Screen(level, should_include_grid_numbers)
         self.board = Board(level, self.screen)
         self.solver_button_display = SolverButtonDisplay(self.screen, self.board, should_use_solver)
         self.game_status_display = GameStatusDisplay(self.screen)
