@@ -18,7 +18,8 @@ class Screen:
     SOLVER_BUTTON_FONT_SIZE = 12
 
     GRID_NUMBERING_WIDTH = 17
-    GRID_NUMBERING_FONT_SIZE = 12
+    GRID_NUMBERING_MIN_FONT_SIZE = 7
+    GRID_NUMBERING_MAX_FONT_SIZE = 20
 
     GAME_STATUS_RECT_WIDTH = int(0.75 * SCREEN_WIDTH)
     GAME_STATUS_RECT_HEIGHT = 30
@@ -41,7 +42,7 @@ class Screen:
             TextType.CELL: self.get_cell_font(),
             TextType.PUZZLE_SOLVED: pygame.font.SysFont(self.FONT, self.PUZZLE_SOLVED_FONT_SIZE),
             TextType.SOLVER_BUTTON: pygame.font.SysFont(self.FONT, self.SOLVER_BUTTON_FONT_SIZE),
-            TextType.GRID_NUMBERING: pygame.font.SysFont(self.FONT, self.GRID_NUMBERING_FONT_SIZE)
+            TextType.GRID_NUMBERING: self.get_grid_numbering_font()
         }
 
         if should_include_grid_numbers:
@@ -94,6 +95,14 @@ class Screen:
 
     def get_cell_font_size(self) -> int:
         return int(0.8 * self.cell_width)
+
+    def get_grid_numbering_font(self) -> pygame.font.SysFont:
+        font_size = self.get_grid_numbering_font_size()
+        return pygame.font.SysFont(self.FONT, font_size)
+
+    def get_grid_numbering_font_size(self) -> int:
+        font_size = int(0.5 * self.get_cell_font_size())
+        return max(min(font_size, Screen.GRID_NUMBERING_MAX_FONT_SIZE), Screen.GRID_NUMBERING_MIN_FONT_SIZE)
 
     def display_grid_numbering(self, level: Level) -> None:
         for row_number in range(level.number_of_rows):
