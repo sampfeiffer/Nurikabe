@@ -97,11 +97,12 @@ class Cell:
         return CellChangeInfo(before_state=old_cell_state, after_state=self.cell_state)
 
     def get_adjacent_neighbors(self) -> list[Cell]:
+        """Get a list of adjacent (non-diagonal) Cells."""
         return [self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
                 if direction in self.neighbor_cell_map.keys()]
 
-    def get_neighbors(self, directions: Iterable[Direction]) -> list[Cell]:
-        return [self.get_neighbor(direction) for direction in directions]
+    def get_neighbor_list(self, direction_list: Iterable[Direction]) -> list[Cell]:
+        return [self.get_neighbor(direction) for direction in direction_list]
 
     def get_neighbor(self, direction: Direction) -> Cell:
         try:
@@ -117,13 +118,12 @@ class Cell:
         except NonExistentNeighbor:
             # Can't be top-left of two by two since this is on the right or lower edge of board so the required
             # neighbors do not exist
-            pass
-        return False
+            return False
 
     def get_two_by_two_section(self) -> set[Cell]:
-        """Return the two-by-two section of cells where this cell is the top left corner."""
-        directions = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
-        neighbor_cells = set(self.get_neighbors(directions))
+        """Return the two-by-two section of cells where this cell is the top-left corner."""
+        direction_list = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
+        neighbor_cells = set(self.get_neighbor_list(direction_list))
         return neighbor_cells.union({self})
 
     def is_non_wall_or_has_clue(self) -> bool:

@@ -47,9 +47,6 @@ class Board:
         """Get a one dimensional list of cells. This is useful for easier looping."""
         return [cell for row in self.cell_grid for cell in row]
 
-    def get_cell_from_grid(self, row_number: int, col_number: int) -> Cell:
-        return self.cell_grid[row_number][col_number]
-
     def set_cell_neighbors(self) -> None:
         """
         For each cell, set a mapping of Direction->Cell. Cells on the edges/corners of the board will have fewer
@@ -72,6 +69,9 @@ class Board:
     def is_valid_cell_coordinate(self, grid_coordinate: GridCoordinate) -> bool:
         return 0 <= grid_coordinate.row_number < self.level.number_of_rows and \
             0 <= grid_coordinate.col_number < self.level.number_of_columns
+
+    def get_cell_from_grid(self, row_number: int, col_number: int) -> Cell:
+        return self.cell_grid[row_number][col_number]
 
     def handle_board_click(self, event_position: PixelPosition) -> Optional[CellChangeInfo]:
         if self.is_board_frozen:

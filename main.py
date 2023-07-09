@@ -18,7 +18,7 @@ def parse_command_line_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Play Nurikabe')
     parser.add_argument('--level', default=1, type=int,
                         help='Which level to play (default: %(default)s)')
-    parser.add_argument('--log-level', default='debug', choices=('debug', 'info'),
+    parser.add_argument('--log-level', default='info', choices=('debug', 'info'),
                         help='Log level (default: %(default)s)')
     parser.add_argument('--use-solver', default=True, type=str_to_bool,
                         help='Should the solver be used (default: %(default)s)')
@@ -30,8 +30,11 @@ def parse_command_line_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_command_line_args()
     log_level = {'debug': logging.DEBUG, 'info': logging.INFO}[args.log_level]
-    logging.basicConfig(level=log_level, format='%(asctime)s %(levelname)s - %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
+    logging.basicConfig(
+        level=log_level,
+        format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s:%(funcName)s() - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
     pygame.init()
     Nurikabe(level_number=args.level, should_use_solver=args.use_solver,
              should_include_grid_numbers=args.include_grid_numbers)

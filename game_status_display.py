@@ -19,5 +19,5 @@ class GameStatusDisplay:
                            self.screen.GAME_STATUS_RECT_HEIGHT)
 
     def show_puzzle_solved_message(self) -> None:
-        self.screen.draw_rect(color=Color.GRAY, rect=self.rect, width=1, text=self.PUZZLE_SOLVED_MESSAGE,
+        self.screen.draw_rect(color=Color.GRAY, rect=self.rect, width=0, text=self.PUZZLE_SOLVED_MESSAGE,
                               text_color=Color.BLACK, text_type=TextType.PUZZLE_SOLVED)

@@ -24,9 +24,10 @@ class CellGroup:
         number_of_clues = self.get_number_of_clues()
         if number_of_clues == 0:
             raise RuntimeError('Cannot get clue value since there are no clues in this CellGroup')
-        if number_of_clues > 1:
+        elif number_of_clues > 1:
             raise RuntimeError('CellGroup has more than 1 clue')
-        for cell in self.cells:
-            if cell.has_clue:
-                return cell.clue
+        else:
+            for cell in self.cells:
+                if cell.has_clue:
+                    return cell.clue
         raise RuntimeError('It should not be possible to reach this code')
