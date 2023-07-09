@@ -26,6 +26,8 @@ class Board:
         self.set_cell_neighbors()
         self.is_board_frozen = False
 
+        self.ensure_no_adjacent_clues()
+
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.screen.top_left_of_board
         width = self.screen.cell_width * self.level.number_of_columns
@@ -72,6 +74,14 @@ class Board:
 
     def get_cell_from_grid(self, row_number: int, col_number: int) -> Cell:
         return self.cell_grid[row_number][col_number]
+
+    def ensure_no_adjacent_clues(self) -> None:
+        """
+        As a sanity check, ensure that there are no adjacent clue cells since that would break the rules of Nurikabe
+        and be impossible to solve"""
+        for cell in self.flat_cell_list:
+            if cell.has_clue and cell.has_any_clues_adjacent():
+                raise RuntimeError('This board setup is infeasible since there are adjacent clues')
 
     def handle_board_click(self, event_position: PixelPosition) -> Optional[CellChangeInfo]:
         if self.is_board_frozen:
