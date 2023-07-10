@@ -132,6 +132,10 @@ class Cell:
     def has_any_clues_adjacent(self) -> bool:
         return any([neighbor_cell for neighbor_cell in self.get_adjacent_neighbors() if neighbor_cell.has_clue])
 
+    def get_manhattan_distance(self, other_cell: Cell) -> int:
+        """Get the Manhattan distance between this cell and the other cell."""
+        return abs(self.row_number - other_cell.row_number) + abs(self.col_number - other_cell.col_number)
+
     def __str__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
                 f'clue={self.clue})')

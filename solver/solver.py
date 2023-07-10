@@ -29,6 +29,7 @@ class Solver:
         self.ensure_garden_can_expand()
         self.enclose_full_garden()
         self.ensure_no_two_by_two_walls()
+        self.mark_naively_unreachable_cells_as_walls()
 
         self.board.update_painted_gardens()
         self.screen.update_screen()
@@ -118,3 +119,23 @@ class Solver:
                             self.set_cell_to_state(cell_corner, CellState.NON_WALL, reason='no two-by-two walls')
                 elif len([cell for cell in two_by_two_section if cell.cell_state.is_wall()]) == 4:
                     raise NoPossibleSolutionFromCurrentState('There is a two-by-two section of walls')
+
+    def mark_naively_unreachable_cells_as_walls(self) -> None:
+        """
+        If there are any empty cells that are naively unreachable by a clue cell, it must be a wall. Here, naively means
+        using the Manhattan distance between cells ignoring the fact that the path between the cells may not be allowed.
+        This is a much cheaper check compared to proper path finding algorithms.
+        """
+
+        clue_cell_list = [cell for cell in self.board.flat_cell_list if cell.has_clue]
+
+        for cell in self.board.flat_cell_list:
+            if cell.cell_state is CellState.EMPTY:
+                is_cell_reachable_by_a_clue = False
+                for clue_cell in clue_cell_list:
+                    # Here we do the clue value minus 1 since one garden spot is already taken by the clue cell itself
+                    if cell.get_manhattan_distance(clue_cell) <= clue_cell.clue - 1:
+                        is_cell_reachable_by_a_clue = True
+                        break
+                if not is_cell_reachable_by_a_clue:
+                    self.set_cell_to_state(cell, CellState.WALL, reason='not Manhattan reachable by any clue cells')
