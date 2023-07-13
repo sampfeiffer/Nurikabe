@@ -10,7 +10,14 @@ class CellState(Enum):
     def is_wall(self) -> bool:
         return self is CellState.WALL
 
+    def is_non_wall(self) -> bool:
+        return self is CellState.NON_WALL
+
+    def is_empty(self) -> bool:
+        return self is CellState.EMPTY
+
     def get_next_in_cycle(self) -> CellState:
+        """When the user clicks on a cell, it cycles through these states."""
         if self is CellState.EMPTY:
             return CellState.WALL
         elif self is CellState.WALL:

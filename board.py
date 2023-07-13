@@ -10,6 +10,7 @@ from cell_change_info import CellChangeInfo
 from direction import Direction
 from grid_coordinate import GridCoordinate
 from garden import Garden
+from strict_garden import StrictGarden
 from wall_section import WallSection
 from cell_group import CellGroup
 
@@ -114,6 +115,12 @@ class Board:
         all_cell_groups = self.get_all_cell_groups(cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
         return {Garden(cell_group.cells) for cell_group in all_cell_groups}
 
+    def get_all_strict_gardens(self) -> set[StrictGarden]:
+        all_cell_groups = self.get_all_cell_groups(
+            cell_criteria_func=lambda cell: cell.is_non_wall_or_has_clue()
+        )
+        return {StrictGarden(cell_group.cells) for cell_group in all_cell_groups}
+
     def get_all_wall_sections(self) -> set[WallSection]:
         all_cell_groups = self.get_all_cell_groups(cell_criteria_func=lambda cell: cell.cell_state.is_wall())
         return {WallSection(cell_group.cells) for cell_group in all_cell_groups}
@@ -161,3 +168,9 @@ class Board:
 
     def freeze_cells(self) -> None:
         self.is_board_frozen = True
+
+    def filter_cells(self, cell_criteria_func: Callable[[Cell], bool]) -> set[Cell]:
+        return {cell for cell in self.flat_cell_list if cell_criteria_func(cell)}
+
+    def get_empty_non_clue_cells(self) -> set[Cell]:
+        return self.filter_cells(lambda cell: cell.cell_state.is_empty() and not cell.has_clue)
