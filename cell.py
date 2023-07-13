@@ -28,7 +28,7 @@ class Cell:
 
         self.has_clue = self.clue is not None
         self.is_clickable = not self.has_clue
-        self.cell_state = CellState.EMPTY
+        self.cell_state = CellState.CLUE if self.has_clue else CellState.EMPTY
 
         self.rect = self.get_rect(pixel_position)
         self.draw_cell()
@@ -43,11 +43,11 @@ class Cell:
     def draw_cell(self, is_in_completed_garden: bool = False) -> None:
         if self.has_clue:
             self.draw_clue(is_in_completed_garden)
-        elif self.cell_state is CellState.EMPTY:
+        elif self.cell_state.is_empty():
             self.draw_garden_cell()
-        elif self.cell_state is CellState.WALL:
+        elif self.cell_state.is_wall():
             self.draw_wall_cell()
-        elif self.cell_state is CellState.NON_WALL:
+        elif self.cell_state.is_non_wall():
             self.draw_non_wall_cell(is_in_completed_garden)
         else:
             raise RuntimeError('This should not be possible')
@@ -125,9 +125,6 @@ class Cell:
         direction_list = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
         neighbor_cells = set(self.get_neighbor_list(direction_list))
         return neighbor_cells.union({self})
-
-    def is_non_wall_or_has_clue(self) -> bool:
-        return self.cell_state is CellState.NON_WALL or self.has_clue
 
     def has_any_clues_adjacent(self) -> bool:
         return any([neighbor_cell for neighbor_cell in self.get_adjacent_neighbors() if neighbor_cell.has_clue])

@@ -117,7 +117,7 @@ class Board:
 
     def get_all_strict_gardens(self) -> set[StrictGarden]:
         all_cell_groups = self.get_all_cell_groups(
-            cell_criteria_func=lambda cell: cell.is_non_wall_or_has_clue()
+            cell_criteria_func=lambda cell: cell.cell_state.is_non_wall_or_clue()
         )
         return {StrictGarden(cell_group.cells) for cell_group in all_cell_groups}
 
@@ -172,5 +172,5 @@ class Board:
     def filter_cells(self, cell_criteria_func: Callable[[Cell], bool]) -> set[Cell]:
         return {cell for cell in self.flat_cell_list if cell_criteria_func(cell)}
 
-    def get_empty_non_clue_cells(self) -> set[Cell]:
-        return self.filter_cells(lambda cell: cell.cell_state.is_empty() and not cell.has_clue)
+    def get_empty_cells(self) -> set[Cell]:
+        return self.filter_cells(lambda cell: cell.cell_state.is_empty())

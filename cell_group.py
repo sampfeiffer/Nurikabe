@@ -1,5 +1,4 @@
 from cell import Cell
-from cell_state import CellState
 
 
 class CellGroup:
@@ -8,7 +7,7 @@ class CellGroup:
 
     def get_empty_adjacent_neighbors(self) -> set[Cell]:
         adjacent_neighbors = self.get_adjacent_neighbors()
-        return {cell for cell in adjacent_neighbors if cell.cell_state == CellState.EMPTY and not cell.has_clue}
+        return {cell for cell in adjacent_neighbors if cell.cell_state.is_empty()}
 
     def get_adjacent_neighbors(self) -> set[Cell]:
         list_neighbor_cell_list: list[list[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]

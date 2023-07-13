@@ -1,7 +1,6 @@
 from typing import Optional
 
 from cell_group import CellGroup
-from cell_state import CellState
 
 
 class Garden(CellGroup):
@@ -31,7 +30,7 @@ class Garden(CellGroup):
             self.paint_completed_garden()
 
     def is_garden_full_of_non_walls(self) -> bool:
-        return all(cell.cell_state is CellState.NON_WALL or cell.has_clue for cell in self.cells)
+        return all(cell.cell_state.is_non_wall_or_clue() for cell in self.cells)
 
     def paint_completed_garden(self) -> None:
         for cell in self.cells:

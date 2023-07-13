@@ -49,7 +49,7 @@ class Solver:
         A cell must be a wall if it is adjacent (non-diagonally) to more than one cell with a clue since gardens cannot
         have more than one clue.
         """
-        for cell in self.board.get_empty_non_clue_cells():
+        for cell in self.board.get_empty_cells():
             if len([cell for adjacent_cell in cell.get_adjacent_neighbors() if adjacent_cell.has_clue]) > 1:
                 self.set_cell_to_state(cell, CellState.WALL, reason='separate clues')
 
@@ -122,7 +122,7 @@ class Solver:
                 two_by_two_section = cell.get_two_by_two_section()
                 if len([cell for cell in two_by_two_section if cell.cell_state.is_wall()]) == 3:
                     for cell_corner in two_by_two_section:
-                        if cell_corner.cell_state is CellState.EMPTY and not cell_corner.has_clue:
+                        if cell_corner.cell_state.is_empty():
                             self.set_cell_to_state(cell_corner, CellState.NON_WALL, reason='no two-by-two walls')
                 elif len([cell for cell in two_by_two_section if cell.cell_state.is_wall()]) == 4:
                     raise NoPossibleSolutionFromCurrentState('There is a two-by-two section of walls')
@@ -135,7 +135,7 @@ class Solver:
         """
 
         clue_cell_list = [cell for cell in self.board.flat_cell_list if cell.has_clue]
-        for cell in self.board.get_empty_non_clue_cells():
+        for cell in self.board.get_empty_cells():
             is_cell_reachable_by_a_clue = False
             for clue_cell in clue_cell_list:
                 # Here we do the clue value minus 1 since one garden spot is already taken by the clue cell itself
@@ -159,7 +159,7 @@ class Solver:
             for incomplete_strict_garden in incomplete_strict_gardens
         ]
 
-        for cell in self.board.get_empty_non_clue_cells():
+        for cell in self.board.get_empty_cells():
             is_cell_reachable_by_a_clue = False
             for incomplete_strict_garden, remaining_garden_size, in incomplete_strict_gardens_and_remaining_sizes:
                 if incomplete_strict_garden.get_shortest_manhattan_distance_to_cell(cell) <= remaining_garden_size:
