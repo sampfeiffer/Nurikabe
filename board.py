@@ -68,6 +68,8 @@ class Board:
         if self.is_valid_cell_coordinate(neighbor_coordinate):
             return self.get_cell_from_grid(row_number=neighbor_coordinate.row_number,
                                            col_number=neighbor_coordinate.col_number)
+        else:
+            return None
 
     def is_valid_cell_coordinate(self, grid_coordinate: GridCoordinate) -> bool:
         return 0 <= grid_coordinate.row_number < self.level.number_of_rows and \
