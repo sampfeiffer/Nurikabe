@@ -33,6 +33,7 @@ class Solver:
         self.mark_naively_unreachable_cells_from_clue_cell_as_walls()
         self.mark_naively_unreachable_cells_from_garden_as_walls()
         self.separate_gardens_with_clues()
+        self.fill_weak_garden_if_appropriate_size()
 
         self.board.update_painted_gardens()
         self.screen.update_screen()
@@ -184,3 +185,16 @@ class Solver:
                 if cell in all_empty_adjacent_cells:
                     self.set_cell_to_state(cell, CellState.WALL, reason='Adjacent to multiple gardens')
                 all_empty_adjacent_cells.add(cell)
+
+    def fill_weak_garden_if_appropriate_size(self) -> None:
+        """
+        If there is a weak garden that is the correct size but has some empty cells, mark the empty cells as non-walls.
+        """
+        all_weak_gardens = self.board.get_all_weak_gardens()
+        for weak_garden in all_weak_gardens:
+            if weak_garden.does_have_exactly_one_clue() and weak_garden.is_garden_correct_size():
+                empty_cells = {cell for cell in weak_garden.cells if cell.cell_state.is_empty()}
+                for cell in empty_cells:
+                    self.set_cell_to_state(cell, CellState.NON_WALL, reason='Fill completed weak garden')
+
+
