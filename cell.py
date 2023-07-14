@@ -40,7 +40,7 @@ class Cell:
         height = self.screen.cell_width
         return pygame.Rect(pixel_position.x_coordinate, pixel_position.y_coordinate, width, height)
 
-    def draw_cell(self, is_in_completed_garden: bool = False) -> None:
+    def draw_cell(self, is_in_completed_garden: bool = False, perimeter_color: Optional[Color] = None) -> None:
         if self.has_clue:
             self.draw_clue(is_in_completed_garden)
         elif self.cell_state.is_empty():
@@ -51,6 +51,9 @@ class Cell:
             self.draw_non_wall_cell(is_in_completed_garden)
         else:
             raise RuntimeError('This should not be possible')
+
+        if perimeter_color is not None:
+            self.draw_perimeter(perimeter_color)
 
     def draw_clue(self, is_in_completed_garden: bool) -> None:
         text = None if self.clue is None else str(self.clue)
@@ -73,6 +76,9 @@ class Cell:
     def draw_non_wall_cell(self, is_in_completed_garden: bool) -> None:
         text = self.CENTER_DOT
         self.draw_garden_cell(text, is_in_completed_garden)
+
+    def draw_perimeter(self, perimeter_color: Color) -> None:
+        self.screen.draw_rect(color=perimeter_color, rect=self.rect, width=3)
 
     def paint_completed_cell(self) -> None:
         self.draw_cell(is_in_completed_garden=True)
