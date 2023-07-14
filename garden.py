@@ -1,36 +1,30 @@
-from typing import Optional
+from typing import Callable
 
-from cell_group import CellGroup
+from cell import Cell
+from weak_garden import WeakGarden
 
 
-class Garden(CellGroup):
+class Garden(WeakGarden):
     """
-    A garden is a connected section of cells that are not walls (either empty or marked as non-wall). Being connected to
-    something diagonally does not count as connected.
-
-    Some terminology:
-    A StrictGarden is a Garden that only includes cells marked as a non-wall and clue cells.
-    An incomplete strict Garden is a strict garden that is not fully enclosed by walls.
+    A garden is a connected section of cells that are strictly not walls (either empty or clues). Note that this is a
+    stricter version of a weak garden since a weak garden can also contain empty cells. Being connected to something
+    diagonally does not count as connected.
     """
 
-    def does_have_exactly_one_clue(self) -> bool:
-        return len([cell for cell in self.cells if cell.has_clue]) == 1
+    @staticmethod
+    def get_cell_criteria_func() -> Callable[[Cell], bool]:
+        return lambda cell: cell.cell_state.is_garden()
 
-    def is_garden_correct_size(self) -> bool:
-        return len(self.cells) == self.get_expected_garden_size()
-
-    def get_expected_garden_size(self) -> Optional[int]:
-        for cell in self.cells:
-            if cell.has_clue:
-                return cell.clue
-        return None
+    def get_num_of_remaining_garden_cells(self) -> int:
+        expected_garden_size = self.get_expected_garden_size()
+        return expected_garden_size - len(self.cells)
 
     def paint_garden_if_completed(self) -> None:
-        if self.does_have_exactly_one_clue() and self.is_garden_correct_size() and self.is_garden_full_of_non_walls():
+        if self.does_have_exactly_one_clue() and self.is_garden_correct_size() and self.is_garden_fully_enclosed():
             self.paint_completed_garden()
 
-    def is_garden_full_of_non_walls(self) -> bool:
-        return all(cell.cell_state.is_non_wall_or_clue() for cell in self.cells)
+    def is_garden_fully_enclosed(self) -> bool:
+        return all(cell.cell_state.is_wall() for cell in self.get_adjacent_neighbors())
 
     def paint_completed_garden(self) -> None:
         for cell in self.cells:

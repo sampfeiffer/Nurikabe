@@ -1,7 +1,13 @@
+from typing import Callable
+
 from cell import Cell
 
 
 class CellGroup:
+    @staticmethod
+    def get_cell_criteria_func() -> Callable[[Cell], bool]:
+        raise NotImplementedError('Unknown criteria for general CellGroup')
+
     def __init__(self, cells: set[Cell]):
         self.cells = cells
 
@@ -11,7 +17,7 @@ class CellGroup:
 
     def get_adjacent_neighbors(self) -> set[Cell]:
         list_neighbor_cell_list: list[list[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]
-        return {cell for neighbor_list in list_neighbor_cell_list for cell in neighbor_list}
+        return {cell for neighbor_list in list_neighbor_cell_list for cell in neighbor_list if cell not in self.cells}
 
     def does_contain_clue(self) -> bool:
         return self.get_number_of_clues() > 0

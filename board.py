@@ -10,7 +10,7 @@ from cell_change_info import CellChangeInfo
 from direction import Direction
 from grid_coordinate import GridCoordinate
 from garden import Garden
-from strict_garden import StrictGarden
+from weak_garden import WeakGarden
 from wall_section import WallSection
 from cell_group import CellGroup
 
@@ -107,22 +107,19 @@ class Board:
             cell.draw_cell()
 
     def paint_completed_gardens(self) -> None:
-        gardens = self.get_all_gardens()
-        for garden in gardens:
+        for garden in self.get_all_gardens():
             garden.paint_garden_if_completed()
 
     def get_all_gardens(self) -> set[Garden]:
-        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
+        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=Garden.get_cell_criteria_func())
         return {Garden(cell_group.cells) for cell_group in all_cell_groups}
 
-    def get_all_strict_gardens(self) -> set[StrictGarden]:
-        all_cell_groups = self.get_all_cell_groups(
-            cell_criteria_func=lambda cell: cell.cell_state.is_non_wall_or_clue()
-        )
-        return {StrictGarden(cell_group.cells) for cell_group in all_cell_groups}
+    def get_all_weak_gardens(self) -> set[WeakGarden]:
+        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=WeakGarden.get_cell_criteria_func())
+        return {Garden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_wall_sections(self) -> set[WallSection]:
-        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=lambda cell: cell.cell_state.is_wall())
+        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=WallSection.get_cell_criteria_func())
         return {WallSection(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_cell_groups(self, cell_criteria_func: Callable[[Cell], bool]) -> set[CellGroup]:
@@ -137,11 +134,11 @@ class Board:
         return all_cell_groups
 
     def get_garden(self, starting_cell: Cell) -> Garden:
-        cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: not cell.cell_state.is_wall())
+        cells = self.get_connected_cells(starting_cell, cell_criteria_func=Garden.get_cell_criteria_func())
         return Garden(cells)
 
     def get_wall_section(self, starting_cell: Cell) -> WallSection:
-        cells = self.get_connected_cells(starting_cell, cell_criteria_func=lambda cell: cell.cell_state.is_wall())
+        cells = self.get_connected_cells(starting_cell, cell_criteria_func=WallSection.get_cell_criteria_func())
         return WallSection(cells)
 
     def get_cell_group(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool]) -> CellGroup:

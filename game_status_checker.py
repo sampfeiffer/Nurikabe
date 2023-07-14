@@ -4,7 +4,7 @@ from typing import Optional
 from board import Board
 from game_status import GameStatus
 from cell_change_info import CellChangeInfo
-from garden import Garden
+from weak_garden import WeakGarden
 
 logger = logging.getLogger(__name__)
 
@@ -21,8 +21,8 @@ class GameStatusChecker:
         if cell_change_info is not None and not cell_change_info.is_wall_change():
             logger.debug('no wall changes')
             game_status = GameStatus.IN_PROGRESS
-        elif not self.has_expected_number_of_garden_cells():
-            logger.debug('not correct number of garden cells')
+        elif not self.has_expected_number_of_weak_garden_cells():
+            logger.debug('not correct number of weak garden cells')
             game_status = GameStatus.IN_PROGRESS
         elif self.has_two_by_two_wall():
             logger.debug('has two by two wall')
@@ -31,12 +31,12 @@ class GameStatusChecker:
             logger.debug('walls are not all connected')
             game_status = GameStatus.IN_PROGRESS
         else:
-            gardens = self.board.get_all_gardens()
-            if not self.do_all_gardens_have_exactly_one_clue(gardens):
-                logger.debug('gardens must have exactly one clue')
+            weak_gardens = self.board.get_all_weak_gardens()
+            if not self.do_all_weak_gardens_have_exactly_one_clue(weak_gardens):
+                logger.debug('weak gardens must have exactly one clue')
                 game_status = GameStatus.IN_PROGRESS
-            elif not self.are_all_gardens_correct_size(gardens):
-                logger.debug('garden size must equal the clue value')
+            elif not self.are_all_weak_gardens_correct_size(weak_gardens):
+                logger.debug('weak garden size must equal the clue value')
                 game_status = GameStatus.IN_PROGRESS
             else:
                 logger.debug('correct solution!')
@@ -44,11 +44,11 @@ class GameStatusChecker:
 
         return game_status
 
-    def has_expected_number_of_garden_cells(self) -> bool:
-        return self.get_number_of_garden_cells() == self.expected_number_of_garden_cells
+    def has_expected_number_of_weak_garden_cells(self) -> bool:
+        return self.get_number_of_weak_garden_cells() == self.expected_number_of_garden_cells
 
-    def get_number_of_garden_cells(self) -> int:
-        return len([cell for cell in self.board.flat_cell_list if not cell.cell_state.is_wall()])
+    def get_number_of_weak_garden_cells(self) -> int:
+        return len([cell for cell in self.board.flat_cell_list if cell.cell_state.is_weak_garden()])
 
     def has_two_by_two_wall(self) -> bool:
         for cell in self.board.flat_cell_list:
@@ -64,9 +64,9 @@ class GameStatusChecker:
         return first_wall_section.cells == set(all_walls)
 
     @staticmethod
-    def do_all_gardens_have_exactly_one_clue(gardens: set[Garden]) -> bool:
-        return all(garden.does_have_exactly_one_clue() for garden in gardens)
+    def do_all_weak_gardens_have_exactly_one_clue(weak_gardens: set[WeakGarden]) -> bool:
+        return all(weak_garden.does_have_exactly_one_clue() for weak_garden in weak_gardens)
 
     @staticmethod
-    def are_all_gardens_correct_size(gardens: set[Garden]) -> bool:
-        return all(garden.is_garden_correct_size() for garden in gardens)
+    def are_all_weak_gardens_correct_size(weak_gardens: set[WeakGarden]) -> bool:
+        return all(weak_garden.is_garden_correct_size() for weak_garden in weak_gardens)

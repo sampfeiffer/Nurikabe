@@ -20,8 +20,11 @@ class CellState(Enum):
     def is_clue(self) -> bool:
         return self is CellState.CLUE
 
-    def is_non_wall_or_clue(self) -> bool:
+    def is_garden(self) -> bool:
         return self.is_non_wall() or self.is_clue()
+
+    def is_weak_garden(self) -> bool:
+        return self.is_garden() or self.is_empty()
 
     def get_next_in_cycle(self) -> CellState:
         """When the user clicks on a cell, it cycles through these states."""
