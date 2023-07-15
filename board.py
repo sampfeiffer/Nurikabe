@@ -173,3 +173,9 @@ class Board:
 
     def get_empty_cells(self) -> set[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_empty())
+
+    def get_wall_cells(self) -> set[Cell]:
+        return self.filter_cells(lambda cell: cell.cell_state.is_wall())
+
+    def get_non_wall_cells(self) -> set[Cell]:
+        return self.filter_cells(lambda cell: cell.cell_state.is_non_wall())

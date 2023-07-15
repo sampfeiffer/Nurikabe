@@ -6,6 +6,7 @@ from cell import Cell
 from cell_state import CellState
 from cell_group import CellGroup
 from garden import Garden
+from color import Color
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ class Solver:
         self.mark_naively_unreachable_cells_from_garden_as_walls()
         self.separate_gardens_with_clues()
         self.fill_weak_garden_if_appropriate_size()
+        self.mark_unreachable_cells_from_garden_as_walls()
 
         self.board.update_painted_gardens()
         self.screen.update_screen()
@@ -61,7 +63,7 @@ class Solver:
             escape_routes = wall_section.get_empty_adjacent_neighbors()
             if len(escape_routes) == 1:
                 only_escape_route = list(escape_routes)[0]
-                self.set_cell_to_state(only_escape_route, CellState.WALL, reason='ensure no isolated wall sections')
+                self.set_cell_to_state(only_escape_route, CellState.WALL, reason='Ensure no isolated wall sections')
                 return  # wall_sections is no longer valid
 
     def ensure_garden_can_expand(self) -> None:
@@ -89,7 +91,7 @@ class Solver:
         escape_routes = non_wall_cell_group.get_empty_adjacent_neighbors()
         if len(escape_routes) == 1:
             only_escape_route = list(escape_routes)[0]
-            self.set_cell_to_state(only_escape_route, CellState.NON_WALL, reason='ensure garden can expand')
+            self.set_cell_to_state(only_escape_route, CellState.NON_WALL, reason='Ensure garden can expand')
             return True
         else:
             return False
@@ -107,7 +109,7 @@ class Solver:
                 if len(garden.cells) == clue:
                     empty_adjacent_neighbors = garden.get_empty_adjacent_neighbors()
                     for cell in empty_adjacent_neighbors:
-                        self.set_cell_to_state(cell, CellState.WALL, reason='enclose full garden')
+                        self.set_cell_to_state(cell, CellState.WALL, reason='Enclose full garden')
             else:
                 raise NoPossibleSolutionFromCurrentState('Garden contains more than one clue')
 
@@ -124,7 +126,7 @@ class Solver:
                 if len([cell for cell in two_by_two_section if cell.cell_state.is_wall()]) == 3:
                     for cell_corner in two_by_two_section:
                         if cell_corner.cell_state.is_empty():
-                            self.set_cell_to_state(cell_corner, CellState.NON_WALL, reason='no two-by-two walls')
+                            self.set_cell_to_state(cell_corner, CellState.NON_WALL, reason='No two-by-two walls')
                 elif len([cell for cell in two_by_two_section if cell.cell_state.is_wall()]) == 4:
                     raise NoPossibleSolutionFromCurrentState('There is a two-by-two section of walls')
 
@@ -144,7 +146,7 @@ class Solver:
                     is_cell_reachable_by_a_clue = True
                     break
             if not is_cell_reachable_by_a_clue:
-                self.set_cell_to_state(cell, CellState.WALL, reason='not Manhattan reachable by any clue cells')
+                self.set_cell_to_state(cell, CellState.WALL, reason='Not Manhattan reachable by any clue cells')
 
     def mark_naively_unreachable_cells_from_garden_as_walls(self) -> None:
         """
@@ -167,7 +169,7 @@ class Solver:
                     is_cell_reachable_by_a_clue = True
                     break
             if not is_cell_reachable_by_a_clue:
-                self.set_cell_to_state(cell, CellState.WALL, reason='not Manhattan reachable by any gardens')
+                self.set_cell_to_state(cell, CellState.WALL, reason='Not Manhattan reachable by any gardens')
 
     def get_incomplete_gardens(self, with_clue_only: bool) -> set[Garden]:
         all_gardens = self.board.get_all_gardens()
@@ -197,4 +199,75 @@ class Solver:
                 for cell in empty_cells:
                     self.set_cell_to_state(cell, CellState.NON_WALL, reason='Fill completed weak garden')
 
+    def mark_unreachable_cells_from_garden_as_walls(self) -> None:
+        """
+        If there are any empty cells that are unreachable by a garden, it must be a wall. For any incomplete garden
+        with a clue, this detects the reachable cells. If there are empty cells that are not reachable by all gardens
+        with clues, then those empty cells must be walls.
+        """
 
+        gardens_with_clue = self.get_all_gardens_with_clue()
+        incomplete_gardens_with_clue = {garden for garden in gardens_with_clue if not garden.is_garden_correct_size()}
+        all_reachable_cells: set[Cell] = set()
+        for incomplete_garden_with_clue in incomplete_gardens_with_clue:
+            other_gardens_with_clues = gardens_with_clue - {incomplete_garden_with_clue}
+            reachable_from_garden = self.get_cells_reachable_from_garden(incomplete_garden_with_clue,
+                                                                         other_gardens_with_clues)
+            all_reachable_cells = all_reachable_cells.union(reachable_from_garden)
+        for cell in self.board.get_empty_cells():
+            if cell not in all_reachable_cells:
+                self.set_cell_to_state(cell, CellState.WALL,
+                                       reason='Not reachable by any incomplete gardens with clues')
+
+    def get_cells_reachable_from_garden(self, source_garden: Garden,
+                                        other_gardens_with_clues: set[Garden]) -> set[Cell]:
+        if not source_garden.does_have_exactly_one_clue():
+            raise RuntimeError('Cannot determine reach of garden since there is not exactly one clue')
+        num_of_remaining_garden_cells = source_garden.get_num_of_remaining_garden_cells()
+
+        # Determine which cells are not able to be a part of the source_garden
+        off_limits_cells = self.board.get_wall_cells()
+        for garden in other_gardens_with_clues:
+            off_limits_cells = off_limits_cells.union(garden.cells)
+            off_limits_cells = off_limits_cells.union(garden.get_adjacent_neighbors())
+
+        # Get the cells that can be accessed from source_garden without going through a cell in off_limits_cells
+        reachable_cells = self.board.get_connected_cells(
+            starting_cell=source_garden.get_clue_cell(),
+            cell_criteria_func=lambda x: x not in off_limits_cells
+        )
+
+        # Remove cells that are not Manhattan reachable from the source_garden given the number of remaining garden
+        # left in this incomplete source_garden
+        reachable_cells = {
+            cell for cell in reachable_cells
+            if source_garden.get_shortest_manhattan_distance_to_cell(cell) <= num_of_remaining_garden_cells
+        }
+
+        return reachable_cells
+
+    def get_cells_reachable_from_clue_cell(self, clue_cell: Cell) -> set[Cell]:
+        if not clue_cell.has_clue:
+            raise
+        gardens_with_clues = self.get_all_gardens_with_clue()
+        other_gardens_with_clues = {garden for garden in gardens_with_clues if clue_cell not in garden.cells}
+        off_limits_cells = self.board.get_wall_cells()
+        for garden in other_gardens_with_clues:
+            off_limits_cells = off_limits_cells.union(garden.cells)
+            off_limits_cells = off_limits_cells.union(garden.get_adjacent_neighbors())
+        reachable_cells = self.board.get_connected_cells(
+            clue_cell,
+            cell_criteria_func=lambda x: x not in off_limits_cells
+        )
+        reachable_cells = {cell for cell in reachable_cells
+                           if clue_cell.get_shortest_naive_path_length(cell) <= clue_cell.clue}
+        return reachable_cells
+
+    def get_all_gardens_with_clue(self) -> set[Garden]:
+        all_gardens = self.board.get_all_gardens()
+        return {garden for garden in all_gardens if garden.does_contain_clue()}
+
+    def color_group(self, cells: set[Cell]) -> None:
+        for cell in cells:
+            cell.draw_perimeter(Color.YELLOW)
+        self.screen.update_screen()

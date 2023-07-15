@@ -25,3 +25,12 @@ class WeakGarden(CellGroup):
             if cell.has_clue:
                 return cell.clue
         return None
+
+    def get_clue_cell(self) -> Cell:
+        if not self.does_have_exactly_one_clue():
+            raise RuntimeError('Does not contain exactly one clue')
+        for cell in self.cells:
+            if cell.has_clue:
+                return cell
+
+        raise RuntimeError('This should not be reachable code')

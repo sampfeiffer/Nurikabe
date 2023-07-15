@@ -77,8 +77,10 @@ class Cell:
         text = self.CENTER_DOT
         self.draw_garden_cell(text, is_in_completed_garden)
 
-    def draw_perimeter(self, perimeter_color: Color) -> None:
+    def draw_perimeter(self, perimeter_color: Color, should_update_screen_immediately: bool = False) -> None:
         self.screen.draw_rect(color=perimeter_color, rect=self.rect, width=3)
+        if should_update_screen_immediately:
+            self.screen.update_screen()
 
     def paint_completed_cell(self) -> None:
         self.draw_cell(is_in_completed_garden=True)
@@ -138,6 +140,9 @@ class Cell:
     def get_manhattan_distance(self, other_cell: Cell) -> int:
         """Get the Manhattan distance between this cell and the other cell."""
         return abs(self.row_number - other_cell.row_number) + abs(self.col_number - other_cell.col_number)
+
+    def get_shortest_naive_path_length(self, other_cell: Cell) -> int:
+        return self.get_manhattan_distance(other_cell) + 1
 
     def __str__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
