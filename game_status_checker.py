@@ -1,9 +1,8 @@
 import logging
-from typing import Optional
 
 from board import Board
 from game_status import GameStatus
-from cell_change_info import CellChangeInfo
+from cell_change_info import CellChanges
 from weak_garden import WeakGarden
 
 logger = logging.getLogger(__name__)
@@ -17,8 +16,11 @@ class GameStatusChecker:
     def get_expected_number_of_garden_cells(self) -> int:
         return sum(cell.clue for cell in self.board.flat_cell_list if cell.has_clue)
 
-    def is_solution_correct(self, cell_change_info: Optional[CellChangeInfo]) -> GameStatus:
-        if cell_change_info is not None and not cell_change_info.is_wall_change():
+    def is_solution_correct(self, cell_changes: CellChanges) -> GameStatus:
+        if not cell_changes.has_any_changes():
+            logger.debug('no changes')
+            game_status = GameStatus.IN_PROGRESS
+        elif not cell_changes.has_any_wall_changes():
             logger.debug('no wall changes')
             game_status = GameStatus.IN_PROGRESS
         elif not self.has_expected_number_of_weak_garden_cells():

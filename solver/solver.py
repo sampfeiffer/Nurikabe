@@ -28,7 +28,7 @@ class Solver:
         self.board = board
         self.undo_redo_control = undo_redo_control
 
-    def run_solver(self) -> None:
+    def run_solver(self) -> CellChanges:
         cell_changes = CellChanges()
 
         cell_changes.add_changes(self.separate_clues())
@@ -45,6 +45,7 @@ class Solver:
         self.board.update_painted_gardens()
         self.undo_redo_control.process_board_event(cell_changes)
         self.screen.update_screen()
+        return cell_changes
 
     @staticmethod
     def set_cell_to_state(cell: Cell, target_cell_state: CellState, reason: str) -> CellChangeInfo:

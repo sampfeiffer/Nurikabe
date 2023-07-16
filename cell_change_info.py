@@ -43,3 +43,6 @@ class CellChanges:
         """Useful for undoing changes"""
         cell_change_list = [cell_change_info.get_reversed_change() for cell_change_info in self.cell_change_list]
         return CellChanges(cell_change_list)
+
+    def has_any_wall_changes(self) -> bool:
+        return any(cell_change_info.is_wall_change() for cell_change_info in self.cell_change_list)

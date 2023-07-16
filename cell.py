@@ -98,7 +98,7 @@ class Cell:
         new_cell_state = self.cell_state.get_next_in_cycle()
         return self.update_cell_state(new_cell_state)
 
-    def update_cell_state(self, new_cell_state: CellState) -> Optional[CellChangeInfo]:
+    def update_cell_state(self, new_cell_state: CellState) -> CellChangeInfo:
         old_cell_state = self.cell_state
         self.cell_state = new_cell_state
         self.draw_cell()
