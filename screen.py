@@ -13,9 +13,9 @@ class Screen:
     MIN_BORDER = 5
     SHOULD_APPLY_ANTI_ALIAS = True
 
-    BUTTON_RECT_HEIGHT = 20
+    BUTTON_RECT_HEIGHT = 22
     BUTTON_FONT_SIZE = 12
-    UNDO_REDO_BUTTON_RECT_WIDTH = 40
+    UNDO_REDO_BUTTON_RECT_WIDTH = BUTTON_RECT_HEIGHT
     SOLVER_BUTTON_RECT_WIDTH = 150
     SPACE_BETWEEN_BUTTONS = 5
 
@@ -136,7 +136,12 @@ class Screen:
         return PixelPosition(x_coordinate=left, y_coordinate=top)
 
     def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: Optional[str] = None,
-                  text_color: Optional[Color] = None, text_type: TextType = TextType.CELL) -> None:
+                  text_color: Optional[Color] = None, text_type: TextType = TextType.CELL,
+                  image: Optional[pygame.Surface] = None) -> None:
+
+        if text is not None and image is not None:
+            raise ValueError('Cannot have both text and an image')
+
         pygame.draw.rect(surface=self.screen, color=color.value, rect=rect, width=width)
         if text is not None:
             if text_color is None:
@@ -145,6 +150,10 @@ class Screen:
             text = font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
             text_rect = text.get_rect(center=rect.center)
             self.screen.blit(text, text_rect)
+
+        if image is not None:
+            image_rect = image.get_rect(center=rect.center)
+            self.screen.blit(image, dest=image_rect.topleft)
 
     @staticmethod
     def update_screen() -> None:

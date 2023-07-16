@@ -1,3 +1,4 @@
+from typing import Optional
 import pygame
 
 from screen import Screen
@@ -7,10 +8,18 @@ from pixel_position import PixelPosition
 
 
 class Button:
-    def __init__(self, screen: Screen, left: int, top: int, width: int, height: int, text: str,
-                 is_clickable: bool = True):
+    ENABLED_TEXT_COLOR = Color.BLACK
+    DISABLED_TEXT_COLOR = Color.GRAY
+
+    def __init__(self, screen: Screen, left: int, top: int, width: int, height: int, text: Optional[str] = None,
+                 image: Optional[pygame.Surface] = None, is_clickable: bool = True):
         self.screen = screen
         self.text = text
+        self.image = image
+        self.image_disabled = self.get_disabled_button_image()
+
+        if self.text is not None and self.image is not None:
+            raise ValueError('Button cannot have both text and an image')
 
         self.rect = pygame.Rect(left, top, width, height)
         self.is_clickable = is_clickable
@@ -19,14 +28,27 @@ class Button:
 
         self.draw_button_rect()
 
+    def get_disabled_button_image(self) -> Optional[pygame.Surface]:
+        if self.image is None:
+            return None
+        else:
+            disabled_image = self.image.copy()
+            disabled_image.set_alpha(255 - Button.DISABLED_TEXT_COLOR.value[0])
+            return disabled_image
+
     def draw_button_rect(self) -> None:
         # Background
         self.screen.draw_rect(color=self.get_background_color(), rect=self.rect, width=0)
 
         # Text and border
-        color = Color.BLACK if self.is_clickable else Color.GRAY
+        if self.is_clickable:
+            color = Button.ENABLED_TEXT_COLOR
+            image = self.image
+        else:
+            color = Button.DISABLED_TEXT_COLOR
+            image = self.image_disabled
         self.screen.draw_rect(color=color, rect=self.rect, width=1, text=self.text,
-                              text_color=color, text_type=TextType.BUTTON)
+                              text_color=color, text_type=TextType.BUTTON, image=image)
 
     def get_background_color(self) -> Color:
         if not self.is_clickable or not self.is_mouse_on_button:

@@ -1,3 +1,6 @@
+from pathlib import Path
+import pygame
+
 from screen import Screen
 from board import Board
 from button import Button
@@ -17,10 +20,11 @@ class UndoRedoControl:
         self.redo_stack: list[CellChanges] = []
 
     def process_board_event(self, cell_changes: CellChanges) -> None:
-        self.undo_stack.append(cell_changes)
-        self.redo_stack.clear()
-        self.undo_button.make_clickable()
-        self.redo_button.make_unclickable()
+        if cell_changes.has_any_changes():
+            self.undo_stack.append(cell_changes)
+            self.redo_stack.clear()
+            self.undo_button.make_clickable()
+            self.redo_button.make_unclickable()
 
     def process_potential_left_click_down(self, event_position: PixelPosition) -> None:
         self.undo_button.process_potential_left_click_down(event_position)
@@ -72,11 +76,17 @@ class UndoButton(Button):
         left = self.get_left_coordinate(board)
         top = board.rect.bottom + screen.MIN_BORDER
         super().__init__(screen, left, top, width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
-                         height=Screen.BUTTON_RECT_HEIGHT, text='Undo', is_clickable=False)
+                         height=Screen.BUTTON_RECT_HEIGHT, image=self.get_image(), is_clickable=False)
 
     @staticmethod
     def get_left_coordinate(board: Board) -> int:
         return board.rect.left
+
+    @staticmethod
+    def get_image() -> pygame.Surface:
+        undo_image = pygame.image.load(Path(__file__).parent / 'icons/undo.png').convert_alpha()
+        image_square_length = Screen.BUTTON_RECT_HEIGHT - 4
+        return pygame.transform.smoothscale(undo_image, (image_square_length, image_square_length))
 
 
 class RedoButton(Button):
@@ -84,8 +94,14 @@ class RedoButton(Button):
         left = self.get_left_coordinate(board)
         top = board.rect.bottom + screen.MIN_BORDER
         super().__init__(screen, left, top, width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
-                         height=Screen.BUTTON_RECT_HEIGHT, text='Redo', is_clickable=False)
+                         height=Screen.BUTTON_RECT_HEIGHT, image=self.get_image(), is_clickable=False)
 
     @staticmethod
     def get_left_coordinate(board: Board) -> int:
         return board.rect.left + Screen.UNDO_REDO_BUTTON_RECT_WIDTH + Screen.MIN_BORDER
+
+    @staticmethod
+    def get_image() -> pygame.Surface:
+        redo_image = pygame.image.load(Path(__file__).parent / 'icons/redo.png').convert_alpha()
+        image_square_length = Screen.BUTTON_RECT_HEIGHT - 4
+        return pygame.transform.smoothscale(redo_image, (image_square_length, image_square_length))
