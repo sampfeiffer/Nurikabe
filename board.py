@@ -6,7 +6,7 @@ from level import Level
 from cell import Cell
 from pixel_position import PixelPosition
 from color import Color
-from cell_change_info import CellChangeInfo
+from cell_change_info import CellChangeInfo, CellChanges
 from direction import Direction
 from grid_coordinate import GridCoordinate
 from garden import Garden
@@ -179,3 +179,9 @@ class Board:
 
     def get_non_wall_cells(self) -> set[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_non_wall())
+
+    def apply_cell_changes(self, cell_changes: CellChanges) -> None:
+        for cell_change_info in cell_changes.cell_change_list:
+            cell = self.get_cell_from_grid(row_number=cell_change_info.grid_coordinate.row_number,
+                                           col_number=cell_change_info.grid_coordinate.col_number)
+            cell.update_cell_state(new_cell_state=cell_change_info.after_state)

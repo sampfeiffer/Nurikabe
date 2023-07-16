@@ -102,7 +102,8 @@ class Cell:
         old_cell_state = self.cell_state
         self.cell_state = new_cell_state
         self.draw_cell()
-        return CellChangeInfo(before_state=old_cell_state, after_state=self.cell_state)
+        return CellChangeInfo(grid_coordinate=self.grid_coordinate, before_state=old_cell_state,
+                              after_state=self.cell_state)
 
     def get_adjacent_neighbors(self) -> list[Cell]:
         """Get a list of adjacent (non-diagonal) Cells."""

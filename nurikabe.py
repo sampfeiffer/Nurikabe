@@ -10,8 +10,9 @@ from pixel_position import PixelPosition
 from game_status_checker import GameStatusChecker
 from game_status import GameStatus
 from solver_button_display import SolverButtonDisplay
+from undo_redo_control import UndoRedoControl
 from game_status_display import GameStatusDisplay
-from cell_change_info import CellChangeInfo
+from cell_change_info import CellChangeInfo, CellChanges
 from solver.solver import Solver
 
 logger = logging.getLogger(__name__)
@@ -24,11 +25,14 @@ class Nurikabe:
         level = Level(level_number)
         self.screen = Screen(level, should_include_grid_numbers)
         self.board = Board(level, self.screen)
-        self.solver_button_display = SolverButtonDisplay(self.screen, self.board, should_use_solver)
+        self.should_use_solver = should_use_solver
+        if self.should_use_solver:
+            self.solver_button_display = SolverButtonDisplay(self.screen, self.board)
+        self.undo_redo_control = UndoRedoControl(self.screen, self.board)
         self.game_status_display = GameStatusDisplay(self.screen)
         self.game_status_checker = GameStatusChecker(self.board)
         self.should_use_solver = should_use_solver
-        self.solver = Solver(self.screen, self.board)
+        self.solver = Solver(self.screen, self.board, self.undo_redo_control)
         self.start_game_loop()
 
     def start_game_loop(self) -> None:
@@ -57,13 +61,15 @@ class Nurikabe:
         sys.exit()
 
     def process_left_click_down(self, event_position: PixelPosition) -> None:
-        if self.solver_button_display.should_run_solver(event_position):
+        if self.should_use_solver and self.solver_button_display.should_run_solver(event_position):
             self.solver.run_solver()
             self.check_game_status()
+        self.undo_redo_control.process_potential_button_click(event_position)
         cell_change_info = self.board.handle_board_click(event_position)
         self.screen.update_screen()
         if cell_change_info is not None:
             self.check_game_status(cell_change_info)
+            self.undo_redo_control.process_board_event(CellChanges([cell_change_info]))
 
     def check_game_status(self, cell_change_info: Optional[CellChangeInfo] = None) -> None:
         game_status = self.game_status_checker.is_solution_correct(cell_change_info)
@@ -73,4 +79,6 @@ class Nurikabe:
     def handle_solved_puzzle(self) -> None:
         self.game_status_display.show_puzzle_solved_message()
         self.board.freeze_cells()
-        self.solver_button_display.make_unclickable()
+        self.undo_redo_control.make_unclickable()
+        if self.should_use_solver:
+            self.solver_button_display.make_unclickable()

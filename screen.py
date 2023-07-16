@@ -8,16 +8,18 @@ from text_type import TextType
 
 
 class Screen:
-    SCREEN_WIDTH = 300
-    SCREEN_HEIGHT = 500
+    SCREEN_WIDTH = 450
+    SCREEN_HEIGHT = 750
     MIN_BORDER = 5
     SHOULD_APPLY_ANTI_ALIAS = True
 
+    BUTTON_RECT_HEIGHT = 20
+    BUTTON_FONT_SIZE = 12
+    UNDO_REDO_BUTTON_RECT_WIDTH = 40
     SOLVER_BUTTON_RECT_WIDTH = 150
-    SOLVER_BUTTON_RECT_HEIGHT = 20
-    SOLVER_BUTTON_FONT_SIZE = 12
+    SPACE_BETWEEN_BUTTONS = 5
 
-    GRID_NUMBERING_WIDTH = 17
+    GRID_NUMBERING_WIDTH = 25
     GRID_NUMBERING_MIN_FONT_SIZE = 7
     GRID_NUMBERING_MAX_FONT_SIZE = 20
 
@@ -41,7 +43,7 @@ class Screen:
         self.font_map = {
             TextType.CELL: self.get_cell_font(),
             TextType.PUZZLE_SOLVED: pygame.font.SysFont(self.FONT, self.PUZZLE_SOLVED_FONT_SIZE),
-            TextType.SOLVER_BUTTON: pygame.font.SysFont(self.FONT, self.SOLVER_BUTTON_FONT_SIZE),
+            TextType.BUTTON: pygame.font.SysFont(self.FONT, self.BUTTON_FONT_SIZE),
             TextType.GRID_NUMBERING: self.get_grid_numbering_font()
         }
 
@@ -82,7 +84,7 @@ class Screen:
         return top_of_board_height
 
     def get_bottom_of_board_height(self) -> int:
-        return self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT + self.SOLVER_BUTTON_RECT_HEIGHT
+        return self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT + self.BUTTON_RECT_HEIGHT
 
     def get_top_left_of_board(self, should_include_grid_numbers: bool) -> PixelPosition:
         left_border_size = self.get_left_side_of_board_width(should_include_grid_numbers)
