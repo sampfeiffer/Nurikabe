@@ -19,12 +19,16 @@ class UndoRedoControl:
     def process_board_event(self, cell_changes: CellChanges) -> None:
         self.undo_stack.append(cell_changes)
         self.redo_stack.clear()
+        self.undo_button.make_clickable()
+        self.redo_button.make_unclickable()
 
     def process_potential_button_click(self, event_position: PixelPosition) -> None:
         if self.should_run_undo(event_position):
             self.handle_undo()
+            self.set_button_status()
         elif self.should_run_redo(event_position):
             self.handle_redo()
+            self.set_button_status()
 
     def should_run_undo(self, event_position: PixelPosition) -> bool:
         return self.undo_button.is_clickable and self.undo_button.is_inside_button(event_position)
@@ -47,6 +51,17 @@ class UndoRedoControl:
             self.board.apply_cell_changes(cell_changes)
             self.board.update_painted_gardens()
 
+    def set_button_status(self) -> None:
+        if len(self.undo_stack) > 0:
+            self.undo_button.make_clickable()
+        else:
+            self.undo_button.make_unclickable()
+
+        if len(self.redo_stack) > 0:
+            self.redo_button.make_clickable()
+        else:
+            self.redo_button.make_unclickable()
+
     def make_unclickable(self) -> None:
         for button in self.buttons:
             button.make_unclickable()
@@ -57,7 +72,7 @@ class UndoButton(Button):
         left = self.get_left_coordinate(board)
         top = board.rect.bottom + screen.MIN_BORDER
         super().__init__(screen, left, top, width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
-                         height=Screen.BUTTON_RECT_HEIGHT, text='Undo')
+                         height=Screen.BUTTON_RECT_HEIGHT, text='Undo', is_clickable=False)
 
     @staticmethod
     def get_left_coordinate(board: Board) -> int:
@@ -69,7 +84,7 @@ class RedoButton(Button):
         left = self.get_left_coordinate(board)
         top = board.rect.bottom + screen.MIN_BORDER
         super().__init__(screen, left, top, width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
-                         height=Screen.BUTTON_RECT_HEIGHT, text='Redo')
+                         height=Screen.BUTTON_RECT_HEIGHT, text='Redo', is_clickable=False)
 
     @staticmethod
     def get_left_coordinate(board: Board) -> int:
