@@ -77,8 +77,8 @@ class Nurikabe:
 
         cell_change_info = self.board.handle_board_click(event_position)
         if cell_change_info is not None:
-            self.check_game_status(CellChanges([cell_change_info]))
             self.undo_redo_control.process_board_event(CellChanges([cell_change_info]))
+            self.check_game_status(CellChanges([cell_change_info]))
         self.screen.update_screen()
 
     def process_left_click_up(self, event_position: PixelPosition) -> None:
@@ -102,6 +102,5 @@ class Nurikabe:
     def handle_solved_puzzle(self) -> None:
         self.game_status_display.show_puzzle_solved_message()
         self.board.freeze_cells()
-        self.undo_redo_control.make_unclickable()
-        if self.should_use_solver:
-            self.solver_button.make_unclickable()
+        for button in self.buttons:
+            button.make_unclickable()
