@@ -16,7 +16,7 @@ Solution criteria:
 
 For convenience, cells can be marked with a dot to represent that they are part of a garden.
 
-Below is an example of a solved Nurikabe puzzle
+Below is an example of a solved Nurikabe puzzle:
 
 ![solved_nurikabe_example](https://github.com/sampfeiffer/nurikabe/assets/10815714/978f09e8-631b-402e-b343-ba7aaab93d1b)
 
