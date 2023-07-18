@@ -1,5 +1,5 @@
 # Nurikabe
-## What is Nurikabe
+## What is Nurikabe?
 Nurikabe is a Japanese logic puzzle. The puzzle is presented as a rectangular grid of square cells, some of which contain a number clue. Connected white cells form "gardens". Connected black cells form "walls". The goal of the game is to correctly identify each non-clue cell as a wall or a garden.
 
 Here is an example of a Nurikabe puzzle:
