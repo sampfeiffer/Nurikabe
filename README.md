@@ -19,3 +19,12 @@ For convenience, cells can be marked with a dot to represent that they are part 
 Below is an example of a solved Nurikabe puzzle
 
 ![solved_nurikabe_example](https://github.com/sampfeiffer/nurikabe/assets/10815714/978f09e8-631b-402e-b343-ba7aaab93d1b)
+
+
+## Features
+This code is a Python implementation of Nurikabe using pygame as the user interface. This implementation also provides a solver. Note that the solver can currently handle easy to medium puzzles, but cannot yet handle all puzzles.
+
+![nurikabe_gui](https://github.com/sampfeiffer/nurikabe/assets/10815714/e0ae11d6-b414-4397-9b50-7833b5401ffd)
+
+## How to run the code
+Using Python 3.x, run `main.py --help` to see the options
