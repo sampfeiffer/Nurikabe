@@ -9,7 +9,7 @@ from .nurikabe import Nurikabe
 
 def str_to_bool(boolean_like_string: str) -> bool:
     """
-    Convert a string representation to a bool. This assumes that the user inputs one of "true", "yes", "1' to represent
+    Convert a string representation to a bool. This assumes that the user inputs one of "true", "yes", "1" to represent
     True.
     """
     first_char = boolean_like_string[0].lower()
