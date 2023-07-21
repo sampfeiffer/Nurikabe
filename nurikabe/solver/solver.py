@@ -44,7 +44,6 @@ class Solver:
 
         self.board.update_painted_gardens()
         self.undo_redo_control.process_board_event(cell_changes)
-        self.screen.update_screen()
         return cell_changes
 
     @staticmethod

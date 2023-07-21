@@ -79,7 +79,6 @@ class Nurikabe:
         if cell_change_info is not None:
             self.undo_redo_control.process_board_event(CellChanges([cell_change_info]))
             self.check_game_status(CellChanges([cell_change_info]))
-        self.screen.update_screen()
 
     def process_left_click_up(self, event_position: PixelPosition) -> None:
         self.undo_redo_control.process_potential_left_click_up(event_position)
@@ -87,12 +86,10 @@ class Nurikabe:
             self.solver_button.handle_left_click_up()
             cell_changes = self.solver.run_solver()
             self.check_game_status(cell_changes)
-        self.screen.update_screen()
 
     def process_mouse_motion(self, event_position: PixelPosition, is_left_mouse_down: bool) -> None:
         for button in self.buttons:
             button.process_mouse_motion(event_position, is_left_mouse_down)
-        self.screen.update_screen()
 
     def check_game_status(self, cell_changes: CellChanges) -> None:
         game_status = self.game_status_checker.is_solution_correct(cell_changes)
