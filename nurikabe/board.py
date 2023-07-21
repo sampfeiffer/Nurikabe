@@ -1,18 +1,18 @@
 from typing import Optional, Callable
 import pygame
 
-from screen import Screen
-from level import Level
-from cell import Cell
-from pixel_position import PixelPosition
-from color import Color
-from cell_change_info import CellChangeInfo, CellChanges
-from direction import Direction
-from grid_coordinate import GridCoordinate
-from garden import Garden
-from weak_garden import WeakGarden
-from wall_section import WallSection
-from cell_group import CellGroup
+from .screen import Screen
+from .level import Level
+from .cell import Cell
+from .pixel_position import PixelPosition
+from .color import Color
+from .cell_change_info import CellChangeInfo, CellChanges
+from .direction import Direction
+from .grid_coordinate import GridCoordinate
+from .garden import Garden
+from .weak_garden import WeakGarden
+from .wall_section import WallSection
+from .cell_group import CellGroup
 
 
 class Board:

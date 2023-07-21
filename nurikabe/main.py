@@ -1,8 +1,10 @@
+# To run, go up one directory and run python -m nurikabe.main
+
 import logging
 import argparse
 import pygame
 
-from nurikabe import Nurikabe
+from .nurikabe import Nurikabe
 
 
 def str_to_bool(boolean_like_string: str) -> bool:

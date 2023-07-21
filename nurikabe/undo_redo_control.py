@@ -1,11 +1,11 @@
 from pathlib import Path
 import pygame
 
-from screen import Screen
-from board import Board
-from button import Button
-from pixel_position import PixelPosition
-from cell_change_info import CellChanges
+from .screen import Screen
+from .board import Board
+from .button import Button
+from .pixel_position import PixelPosition
+from .cell_change_info import CellChanges
 
 
 class UndoRedoControl:

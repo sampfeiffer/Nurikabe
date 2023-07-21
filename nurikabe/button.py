@@ -1,10 +1,10 @@
 from typing import Optional
 import pygame
 
-from screen import Screen
-from color import Color
-from text_type import TextType
-from pixel_position import PixelPosition
+from .screen import Screen
+from .color import Color
+from .text_type import TextType
+from .pixel_position import PixelPosition
 
 
 class Button:

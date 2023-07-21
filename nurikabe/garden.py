@@ -1,7 +1,7 @@
 from typing import Callable
 
-from cell import Cell
-from weak_garden import WeakGarden
+from .cell import Cell
+from .weak_garden import WeakGarden
 
 
 class Garden(WeakGarden):

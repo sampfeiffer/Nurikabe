@@ -1,6 +1,6 @@
 from typing import Callable
 
-from cell import Cell
+from .cell import Cell
 
 
 class CellGroup:

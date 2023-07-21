@@ -1,14 +1,14 @@
 import logging
 
-from screen import Screen
-from board import Board
-from cell import Cell
-from cell_state import CellState
-from cell_group import CellGroup
-from garden import Garden
-from color import Color
-from cell_change_info import CellChangeInfo, CellChanges
-from undo_redo_control import UndoRedoControl
+from ..screen import Screen
+from ..board import Board
+from ..cell import Cell
+from ..cell_state import CellState
+from ..cell_group import CellGroup
+from ..garden import Garden
+from ..color import Color
+from ..cell_change_info import CellChangeInfo, CellChanges
+from ..undo_redo_control import UndoRedoControl
 
 logger = logging.getLogger(__name__)
 

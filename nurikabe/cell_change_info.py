@@ -2,8 +2,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-from cell_state import CellState
-from grid_coordinate import GridCoordinate
+from .cell_state import CellState
+from .grid_coordinate import GridCoordinate
 
 
 @dataclass

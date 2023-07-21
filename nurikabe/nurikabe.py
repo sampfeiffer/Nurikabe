@@ -2,18 +2,18 @@ import sys
 import logging
 import pygame
 
-from screen import Screen
-from level import Level
-from board import Board
-from pixel_position import PixelPosition
-from game_status_checker import GameStatusChecker
-from game_status import GameStatus
-from solver_button import SolverButton
-from undo_redo_control import UndoRedoControl
-from game_status_display import GameStatusDisplay
-from cell_change_info import CellChanges
-from solver.solver import Solver
-from button import Button
+from .screen import Screen
+from .level import Level
+from .board import Board
+from .pixel_position import PixelPosition
+from .game_status_checker import GameStatusChecker
+from .game_status import GameStatus
+from .solver_button import SolverButton
+from .undo_redo_control import UndoRedoControl
+from .game_status_display import GameStatusDisplay
+from .cell_change_info import CellChanges
+from .solver.solver import Solver
+from .button import Button
 
 logger = logging.getLogger(__name__)
 

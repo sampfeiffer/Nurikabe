@@ -1,8 +1,8 @@
 import pygame
 
-from screen import Screen
-from color import Color
-from text_type import TextType
+from .screen import Screen
+from .color import Color
+from .text_type import TextType
 
 
 class GameStatusDisplay:

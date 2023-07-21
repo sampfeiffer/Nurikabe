@@ -1,9 +1,9 @@
 import logging
 
-from board import Board
-from game_status import GameStatus
-from cell_change_info import CellChanges
-from weak_garden import WeakGarden
+from .board import Board
+from .game_status import GameStatus
+from .cell_change_info import CellChanges
+from .weak_garden import WeakGarden
 
 logger = logging.getLogger(__name__)
 

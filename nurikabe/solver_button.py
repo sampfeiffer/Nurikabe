@@ -1,6 +1,6 @@
-from screen import Screen
-from board import Board
-from button import Button
+from .screen import Screen
+from .board import Board
+from .button import Button
 
 
 class SolverButton(Button):

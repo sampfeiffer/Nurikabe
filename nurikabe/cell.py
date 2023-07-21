@@ -2,13 +2,13 @@ from __future__ import annotations
 from typing import Optional, Iterable
 import pygame
 
-from screen import Screen
-from cell_state import CellState
-from pixel_position import PixelPosition
-from color import Color
-from cell_change_info import CellChangeInfo
-from direction import Direction, ADJACENT_DIRECTIONS
-from grid_coordinate import GridCoordinate
+from .screen import Screen
+from .cell_state import CellState
+from .pixel_position import PixelPosition
+from .color import Color
+from .cell_change_info import CellChangeInfo
+from .direction import Direction, ADJACENT_DIRECTIONS
+from .grid_coordinate import GridCoordinate
 
 
 class NonExistentNeighbor(Exception):

@@ -1,10 +1,10 @@
 from typing import Optional
 import pygame
 
-from level import Level
-from pixel_position import PixelPosition
-from color import Color
-from text_type import TextType
+from .level import Level
+from .pixel_position import PixelPosition
+from .color import Color
+from .text_type import TextType
 
 
 class Screen:

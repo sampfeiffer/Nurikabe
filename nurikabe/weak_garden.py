@@ -1,7 +1,7 @@
 from typing import Optional, Callable
 
-from cell_group import CellGroup
-from cell import Cell
+from .cell_group import CellGroup
+from .cell import Cell
 
 
 class WeakGarden(CellGroup):
