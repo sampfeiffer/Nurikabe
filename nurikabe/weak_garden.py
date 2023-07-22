@@ -1,6 +1,6 @@
-from typing import Optional, Callable
+from typing import Callable
 
-from .cell_group import CellGroup, NoCluesInCellGroupError, MultipleCluesInCellGroupError
+from .cell_group import CellGroup
 from .cell import Cell
 
 
