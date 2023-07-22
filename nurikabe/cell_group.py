@@ -3,6 +3,14 @@ from typing import Callable
 from .cell import Cell
 
 
+class NoCluesInCellGroupError(Exception):
+    pass
+
+
+class MultipleCluesInCellGroupError(Exception):
+    pass
+
+
 class CellGroup:
     @staticmethod
     def get_cell_criteria_func() -> Callable[[Cell], bool]:
@@ -29,9 +37,9 @@ class CellGroup:
     def get_clue_value(self) -> int:
         number_of_clues = self.get_number_of_clues()
         if number_of_clues == 0:
-            raise RuntimeError('Cannot get clue value since there are no clues in this CellGroup')
+            raise NoCluesInCellGroupError('Cannot get clue value since there are no clues in this CellGroup')
         elif number_of_clues > 1:
-            raise RuntimeError('CellGroup has more than 1 clue')
+            raise MultipleCluesInCellGroupError('CellGroup has more than 1 clue')
         else:
             for cell in self.cells:
                 if cell.has_clue:
