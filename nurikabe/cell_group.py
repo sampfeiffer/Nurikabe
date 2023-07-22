@@ -35,15 +35,18 @@ class CellGroup:
         return len([cell for cell in self.cells if cell.has_clue])
 
     def get_clue_value(self) -> int:
+        return self.get_clue_cell().clue
+
+    def get_clue_cell(self) -> Cell:
         number_of_clues = self.get_number_of_clues()
         if number_of_clues == 0:
-            raise NoCluesInCellGroupError('Cannot get clue value since there are no clues in this CellGroup')
+            raise NoCluesInCellGroupError('Cannot get clue cell since there are no clues in this CellGroup')
         elif number_of_clues > 1:
             raise MultipleCluesInCellGroupError('CellGroup has more than 1 clue')
         else:
             for cell in self.cells:
                 if cell.has_clue:
-                    return cell.clue
+                    return cell
         raise RuntimeError('It should not be possible to reach this code')
 
     def get_shortest_manhattan_distance_to_cell(self, destination_cell: Cell) -> int:

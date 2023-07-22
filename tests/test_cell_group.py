@@ -22,15 +22,19 @@ class TestCellGroup(TestCase):
         self.assertFalse(cell_group_no_clues.does_contain_clue())
         self.assertEqual(cell_group_no_clues.get_number_of_clues(), 0)
         with self.assertRaises(NoCluesInCellGroupError):
+            cell_group_no_clues.get_clue_cell()
+        with self.assertRaises(NoCluesInCellGroupError):
             cell_group_no_clues.get_clue_value()
 
     def test_contains_one_clue(self) -> None:
         cells = {self.get_cell(clue=None) for _ in range(5)}
-        cells.add(self.get_cell(clue=10))
+        clue_cell = self.get_cell(clue=10)
+        cells.add(clue_cell)
         cell_group_one_clue = CellGroup(cells)
 
         self.assertTrue(cell_group_one_clue.does_contain_clue())
         self.assertEqual(cell_group_one_clue.get_number_of_clues(), 1)
+        self.assertEqual(cell_group_one_clue.get_clue_cell(), clue_cell)
         self.assertEqual(cell_group_one_clue.get_clue_value(), 10)
 
     def test_contains_multiple_clues(self) -> None:
@@ -41,6 +45,8 @@ class TestCellGroup(TestCase):
 
         self.assertTrue(cell_group_multiple_clues.does_contain_clue())
         self.assertEqual(cell_group_multiple_clues.get_number_of_clues(), 2)
+        with self.assertRaises(MultipleCluesInCellGroupError):
+            cell_group_multiple_clues.get_clue_cell()
         with self.assertRaises(MultipleCluesInCellGroupError):
             cell_group_multiple_clues.get_clue_value()
 
