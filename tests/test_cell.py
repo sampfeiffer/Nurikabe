@@ -8,9 +8,10 @@ from nurikabe.direction import Direction
 
 
 class TestCell(TestCase):
-    def setUp(self) -> None:
-        self.screen = MagicMock(name='Screen')
-        self.pixel_position = MagicMock(name='PixelPosition')
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.screen = MagicMock(name='Screen')
+        cls.pixel_position = MagicMock(name='PixelPosition')
 
     def get_cell(self, row_number: int = 0, col_number: int = 0, clue: Optional[int] = None) -> Cell:
         return Cell(row_number, col_number, clue, pixel_position=self.pixel_position, screen=self.screen)
