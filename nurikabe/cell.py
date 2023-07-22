@@ -105,13 +105,13 @@ class Cell:
         return CellChangeInfo(grid_coordinate=self.grid_coordinate, before_state=old_cell_state,
                               after_state=self.cell_state)
 
-    def get_adjacent_neighbors(self) -> list[Cell]:
+    def get_adjacent_neighbors(self) -> set[Cell]:
         """Get a list of adjacent (non-diagonal) Cells."""
-        return [self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
-                if direction in self.neighbor_cell_map.keys()]
+        return {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
+                if direction in self.neighbor_cell_map.keys()}
 
-    def get_neighbor_list(self, direction_list: Iterable[Direction]) -> list[Cell]:
-        return [self.get_neighbor(direction) for direction in direction_list]
+    def get_neighbor_set(self, direction_list: Iterable[Direction]) -> set[Cell]:
+        return {self.get_neighbor(direction) for direction in direction_list}
 
     def get_neighbor(self, direction: Direction) -> Cell:
         try:
@@ -132,7 +132,7 @@ class Cell:
     def get_two_by_two_section(self) -> set[Cell]:
         """Return the two-by-two section of cells where this cell is the top-left corner."""
         direction_list = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
-        neighbor_cells = set(self.get_neighbor_list(direction_list))
+        neighbor_cells = self.get_neighbor_set(direction_list)
         return neighbor_cells.union({self})
 
     def has_any_clues_adjacent(self) -> bool:

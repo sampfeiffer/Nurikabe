@@ -16,8 +16,9 @@ class CellGroup:
         return {cell for cell in adjacent_neighbors if cell.cell_state.is_empty()}
 
     def get_adjacent_neighbors(self) -> set[Cell]:
-        list_neighbor_cell_list: list[list[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]
-        return {cell for neighbor_list in list_neighbor_cell_list for cell in neighbor_list if cell not in self.cells}
+        list_of_neighbor_cell_sets: list[set[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]
+        return {cell for neighbor_cells in list_of_neighbor_cell_sets
+                for cell in neighbor_cells if cell not in self.cells}
 
     def does_contain_clue(self) -> bool:
         return self.get_number_of_clues() > 0
