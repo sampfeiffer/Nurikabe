@@ -34,7 +34,7 @@ class TestWeakGarden(TestCase):
         weak_garden_one_clue = WeakGarden(cells.union({clue_cell10}))
 
         self.assertTrue(weak_garden_one_clue.does_have_exactly_one_clue())
-        self.assertEquals(weak_garden_one_clue.get_expected_garden_size(), 10)
+        self.assertEqual(weak_garden_one_clue.get_expected_garden_size(), 10)
         self.assertFalse(weak_garden_one_clue.is_garden_correct_size())
 
         clue_cell6 = self.get_cell(clue=6)
