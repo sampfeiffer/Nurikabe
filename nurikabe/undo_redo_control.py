@@ -26,19 +26,15 @@ class UndoRedoControl:
             self.undo_button.make_clickable()
             self.redo_button.make_unclickable()
 
-    def process_potential_left_click_down(self, event_position: PixelPosition) -> None:
-        self.undo_button.process_potential_left_click_down(event_position)
-        self.redo_button.process_potential_left_click_down(event_position)
-
     def process_potential_left_click_up(self, event_position: PixelPosition) -> None:
         if self.undo_button.should_handle_mouse_event(event_position):
             self.undo_button.handle_left_click_up()
             self.handle_undo()
-            self.set_button_status()
         elif self.redo_button.should_handle_mouse_event(event_position):
             self.redo_button.handle_left_click_up()
             self.handle_redo()
-            self.set_button_status()
+
+        self.set_button_status()
 
     def handle_undo(self) -> None:
         if len(self.undo_stack) > 0:
@@ -65,10 +61,6 @@ class UndoRedoControl:
             self.redo_button.make_clickable()
         else:
             self.redo_button.make_unclickable()
-
-    def make_unclickable(self) -> None:
-        for button in self.buttons:
-            button.make_unclickable()
 
 
 class UndoButton(Button):

@@ -6,13 +6,13 @@ from pathlib import Path
 class Level:
     """
     Basic representation of a Nurikabe level. This is just a list of lists, where each cell value is either a
-    positive integer representing a clue or None which indicates and empty cell.
+    positive integer representing a clue or None which indicates an empty cell.
     """
     def __init__(self, level_number: int):
         self.level_number = level_number
         self.level_setup = self.read_level_setup()
-        self.number_of_columns = len(self.level_setup[0])
         self.number_of_rows = len(self.level_setup)
+        self.number_of_columns = len(self.level_setup[0])
 
     def read_level_setup(self) -> list[list[Optional[int]]]:
         level_filename = self.get_level_filename()
@@ -36,7 +36,7 @@ class Level:
     def __str__(self) -> str:
         """
         Format the level info as a printable string. Ensures that alignment is consistent to handle clues of varying
-        number of digits
+        number of digits.
         """
         printable_level_info = ''
         largest_clue_num_of_digits = len(str(self.get_largest_clue_value()))
