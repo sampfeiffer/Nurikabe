@@ -3,7 +3,7 @@ import logging
 import pygame
 
 from .screen import Screen
-from .level import Level
+from .level import LevelBuilderFromFile
 from .board import Board
 from .pixel_position import PixelPosition
 from .game_status_checker import GameStatusChecker
@@ -22,7 +22,7 @@ LEFT_MOUSE_BUTTON = 1  # Pygame's representation the left mouse button
 
 class Nurikabe:
     def __init__(self, level_number: int, should_use_solver: bool, should_include_grid_numbers: bool):
-        level = Level(level_number)
+        level = LevelBuilderFromFile(level_number).build_level()
         self.screen = Screen(level, should_include_grid_numbers)
         self.board = Board(level, self.screen)
         self.undo_redo_control = UndoRedoControl(self.screen, self.board)
