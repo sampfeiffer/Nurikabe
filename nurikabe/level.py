@@ -1,4 +1,5 @@
 import csv
+from abc import ABC, abstractmethod
 from typing import Optional
 from pathlib import Path
 
@@ -45,7 +46,20 @@ class Level:
         return cell_value_str.rjust(largest_clue_num_of_digits)
 
 
-class LevelBuilderFromFile:
+class LevelBuilder(ABC):
+    @abstractmethod
+    def build_level(self) -> Level:
+        raise NotImplementedError
+
+    @staticmethod
+    def parse_cell_value(cell_value_as_str: str) -> Optional[int]:
+        if cell_value_as_str == '':
+            return None
+        else:
+            return int(cell_value_as_str)
+
+
+class LevelBuilderFromFile(LevelBuilder):
     def __init__(self, level_number: int):
         self.level_number = level_number
 
@@ -62,9 +76,11 @@ class LevelBuilderFromFile:
     def get_level_filename(self) -> Path:
         return Path(__file__).parent / f'levels/level_{self.level_number}.csv'
 
-    @staticmethod
-    def parse_cell_value(cell_value_as_str: str) -> Optional[int]:
-        if cell_value_as_str == '':
-            return None
-        else:
-            return int(cell_value_as_str)
+
+class LevelBuilderFromStringList(LevelBuilder):
+    def __init__(self, level_details: list[str]):
+        self.level_details = level_details
+
+    def build_level(self) -> Level:
+        level_setup = [[self.parse_cell_value(value) for value in row.split(',')] for row in self.level_details]
+        return Level(level_setup)

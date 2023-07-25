@@ -15,6 +15,10 @@ from .wall_section import WallSection
 from .cell_group import CellGroup
 
 
+class AdjacentCluesError(Exception):
+    pass
+
+
 class Board:
     def __init__(self, level: Level, screen: Screen):
         self.level = level
@@ -84,7 +88,7 @@ class Board:
         and be impossible to solve"""
         for cell in self.flat_cell_list:
             if cell.has_clue and cell.has_any_clues_adjacent():
-                raise RuntimeError('This board setup is infeasible since there are adjacent clues')
+                raise AdjacentCluesError('This board setup is infeasible since there are adjacent clues')
 
     def handle_board_click(self, event_position: PixelPosition) -> Optional[CellChangeInfo]:
         if self.is_board_frozen:
@@ -118,7 +122,7 @@ class Board:
 
     def get_all_weak_gardens(self) -> set[WeakGarden]:
         all_cell_groups = self.get_all_cell_groups(cell_criteria_func=WeakGarden.get_cell_criteria_func())
-        return {Garden(cell_group.cells) for cell_group in all_cell_groups}
+        return {WeakGarden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_wall_sections(self) -> set[WallSection]:
         all_cell_groups = self.get_all_cell_groups(cell_criteria_func=WallSection.get_cell_criteria_func())
