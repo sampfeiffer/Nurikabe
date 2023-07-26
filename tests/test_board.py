@@ -19,6 +19,8 @@ class TestBoard(TestCase):
         level = self.create_level_from_string_list(level_details)
         return Board(level, self.screen)
 
+
+class TestBoardSetup(TestBoard):
     def test_vertically_adjacent_clues(self) -> None:
         level_details = [
             '1,',
@@ -70,6 +72,8 @@ class TestBoard(TestCase):
         for center_cell in center_cells:
             self.assertEqual(len(center_cell.neighbor_cell_map), 8)
 
+
+class TestCellGroups(TestBoard):
     def test_get_garden(self) -> None:
         level_details = [
             ',,,,,',
@@ -149,3 +153,32 @@ class TestBoard(TestCase):
                 self.assertEqual(weak_garden_cells, weak_garden2)
             else:
                 raise RuntimeError('Unexpected weak garden size')
+
+    def test_get_wall_section(self) -> None:
+        level_details = [
+            ',,,,,',
+            ',1,,,,',
+            ',,,,,'
+        ]
+        board = self.create_board(level_details)
+
+        # Mark some cells as walls
+        wall_cells = [
+            board.get_cell_from_grid(row_number=0, col_number=4),
+            board.get_cell_from_grid(row_number=1, col_number=4),
+            board.get_cell_from_grid(row_number=1, col_number=5),
+            board.get_cell_from_grid(row_number=2, col_number=3)  # This one is not adjacent to the others
+        ]
+        for wall_cell in wall_cells:
+            wall_cell.update_cell_state(CellState.WALL)
+
+        # Check that the wall section starting with the first wall cell contains the first 3 wall cells since they are
+        # connected
+        self.assertEqual(board.get_wall_section(wall_cells[0]).cells, set(wall_cells[:3]))
+
+        # Check there are two distinct wall sections
+        self.assertEqual(len(board.get_all_wall_sections()), 2)
+
+        # Now we connect those two wall sections via another wall, and they are merged into one large wall section
+        board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.WALL)
+        self.assertEqual(len(board.get_all_wall_sections()), 1)
