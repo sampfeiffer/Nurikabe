@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 from nurikabe.level import Level, LevelBuilderFromStringList
 from nurikabe.board import Board, AdjacentCluesError
 from nurikabe.cell_state import CellState
+from nurikabe.cell_group import CellGroup
 
 
 class TestBoard(TestCase):
@@ -182,3 +183,68 @@ class TestCellGroups(TestBoard):
         # Now we connect those two wall sections via another wall, and they are merged into one large wall section
         board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.WALL)
         self.assertEqual(len(board.get_all_wall_sections()), 1)
+
+    def test_cell_group_get_adjacent_neighbors(self) -> None:
+        level_details = [
+            ',,,,,',
+            ',1,,,,',
+            ',,,,,'
+        ]
+        board = self.create_board(level_details)
+        cell_group = CellGroup(cells={
+            board.get_cell_from_grid(row_number=0, col_number=1),
+            board.get_cell_from_grid(row_number=1, col_number=1),
+            board.get_cell_from_grid(row_number=1, col_number=2)
+        })
+        adjacent_neighbor_cells = cell_group.get_adjacent_neighbors()
+        expected_adjacent_neighbors = {
+            board.get_cell_from_grid(row_number=0, col_number=0),
+            board.get_cell_from_grid(row_number=0, col_number=2),
+            board.get_cell_from_grid(row_number=1, col_number=0),
+            board.get_cell_from_grid(row_number=1, col_number=3),
+            board.get_cell_from_grid(row_number=2, col_number=1),
+            board.get_cell_from_grid(row_number=2, col_number=2)
+        }
+        self.assertEqual(adjacent_neighbor_cells, expected_adjacent_neighbors)
+
+    def test_is_garden_fully_enclosed(self) -> None:
+        level_details = [
+            ',,,2,,',
+            ',5,,,,',
+            ',,,,,'
+        ]
+        board = self.create_board(level_details)
+
+        clue_cell = board.get_cell_from_grid(row_number=0, col_number=3)
+
+        # Set one cell next to the clue cell as a non-wall to make it a part of the garden
+        board.get_cell_from_grid(row_number=0, col_number=4).update_cell_state(CellState.NON_WALL)
+
+        wall_cells = [
+            board.get_cell_from_grid(row_number=0, col_number=2),
+            board.get_cell_from_grid(row_number=0, col_number=5),
+            board.get_cell_from_grid(row_number=1, col_number=3),
+            board.get_cell_from_grid(row_number=1, col_number=4),
+        ]
+
+        # At first, the garden is not fully enclosed
+        self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
+
+        # Mark the cell to the left and the cell to the right as walls
+        wall_cells[0].update_cell_state(CellState.WALL)
+        wall_cells[1].update_cell_state(CellState.WALL)
+
+        # The garden is still not fully enclosed
+        self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
+
+        # Mark one of the cells just below the garden as a wall
+        wall_cells[2].update_cell_state(CellState.WALL)
+
+        # The garden is still not fully enclosed
+        self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
+
+        # Mark the other cell just below the garden as a wall
+        wall_cells[3].update_cell_state(CellState.WALL)
+
+        # Now the garden should be fully enclosed
+        self.assertTrue(board.get_garden(clue_cell).is_garden_fully_enclosed())
