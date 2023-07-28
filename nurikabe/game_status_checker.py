@@ -11,9 +11,9 @@ logger = logging.getLogger(__name__)
 class GameStatusChecker:
     def __init__(self, board: Board):
         self.board = board
-        self.expected_number_of_garden_cells = self.get_expected_number_of_garden_cells()
+        self.expected_number_of_weak_garden_cells = self.get_expected_number_of_weak_garden_cells()
 
-    def get_expected_number_of_garden_cells(self) -> int:
+    def get_expected_number_of_weak_garden_cells(self) -> int:
         return sum(cell.clue for cell in self.board.get_clue_cells())
 
     def is_solution_correct(self, cell_changes: CellChanges) -> GameStatus:
@@ -47,7 +47,7 @@ class GameStatusChecker:
         return game_status
 
     def has_expected_number_of_weak_garden_cells(self) -> bool:
-        return self.get_number_of_weak_garden_cells() == self.expected_number_of_garden_cells
+        return self.get_number_of_weak_garden_cells() == self.expected_number_of_weak_garden_cells
 
     def get_number_of_weak_garden_cells(self) -> int:
         return len(self.board.get_weak_garden_cells())
