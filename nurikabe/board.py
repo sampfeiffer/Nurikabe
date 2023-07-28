@@ -184,6 +184,12 @@ class Board:
     def get_non_wall_cells(self) -> set[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_non_wall())
 
+    def get_clue_cells(self) -> set[Cell]:
+        return self.filter_cells(lambda cell: cell.cell_state.is_clue())
+
+    def get_weak_garden_cells(self) -> set[Cell]:
+        return self.filter_cells(lambda cell: cell.cell_state.is_weak_garden())
+
     def apply_cell_changes(self, cell_changes: CellChanges) -> None:
         for cell_change_info in cell_changes.cell_change_list:
             cell = self.get_cell_from_grid(row_number=cell_change_info.grid_coordinate.row_number,

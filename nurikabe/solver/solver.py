@@ -154,12 +154,11 @@ class Solver:
         This is a much cheaper check compared to proper path finding algorithms.
         """
         cell_changes = CellChanges()
-        clue_cell_list = [cell for cell in self.board.flat_cell_list if cell.has_clue]
+        clue_cells = self.board.get_clue_cells()
         for cell in self.board.get_empty_cells():
             is_cell_reachable_by_a_clue = False
-            for clue_cell in clue_cell_list:
-                # Here we do the clue value minus 1 since one garden spot is already taken by the clue cell itself
-                if cell.get_manhattan_distance(clue_cell) <= clue_cell.clue - 1:
+            for clue_cell in clue_cells:
+                if cell.get_shortest_naive_path_length(clue_cell) <= clue_cell.clue:
                     is_cell_reachable_by_a_clue = True
                     break
             if not is_cell_reachable_by_a_clue:

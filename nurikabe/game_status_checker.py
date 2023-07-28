@@ -14,7 +14,7 @@ class GameStatusChecker:
         self.expected_number_of_garden_cells = self.get_expected_number_of_garden_cells()
 
     def get_expected_number_of_garden_cells(self) -> int:
-        return sum(cell.clue for cell in self.board.flat_cell_list if cell.has_clue)
+        return sum(cell.clue for cell in self.board.get_clue_cells())
 
     def is_solution_correct(self, cell_changes: CellChanges) -> GameStatus:
         if not cell_changes.has_any_changes():
@@ -50,7 +50,7 @@ class GameStatusChecker:
         return self.get_number_of_weak_garden_cells() == self.expected_number_of_garden_cells
 
     def get_number_of_weak_garden_cells(self) -> int:
-        return len([cell for cell in self.board.flat_cell_list if cell.cell_state.is_weak_garden()])
+        return len(self.board.get_weak_garden_cells())
 
     def has_two_by_two_wall(self) -> bool:
         for cell in self.board.flat_cell_list:
@@ -59,11 +59,11 @@ class GameStatusChecker:
         return False
 
     def are_all_walls_connected(self) -> bool:
-        all_walls = [cell for cell in self.board.flat_cell_list if cell.cell_state.is_wall()]
+        all_walls = self.board.get_wall_cells()
         if len(all_walls) == 0:
             return True
-        first_wall_section = self.board.get_wall_section(starting_cell=all_walls[0])
-        return first_wall_section.cells == set(all_walls)
+        first_wall_section = self.board.get_wall_section(starting_cell=list(all_walls)[0])
+        return first_wall_section.cells == all_walls
 
     @staticmethod
     def do_all_weak_gardens_have_exactly_one_clue(weak_gardens: set[WeakGarden]) -> bool:
