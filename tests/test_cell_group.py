@@ -74,3 +74,42 @@ class TestCellGroup(TestCase):
         # Distance to a cell in the cell group should be 0
         destination_cell_in_cell_group = self.get_cell(row_number=5, col_number=5)
         self.assertEqual(cell_group.get_shortest_manhattan_distance_to_cell(destination_cell_in_cell_group), 0)
+
+    def test_get_shortest_manhattan_distance_to_cell_group(self) -> None:
+        cells_in_source_cell_group = {
+            self.get_cell(row_number=5, col_number=4),
+            self.get_cell(row_number=5, col_number=5),
+            self.get_cell(row_number=6, col_number=5)
+        }
+        source_cell_group = CellGroup(cells_in_source_cell_group)
+
+        cells_in_destination_cell_group1 = {
+            self.get_cell(row_number=5, col_number=2),
+            self.get_cell(row_number=6, col_number=2)
+        }
+        destination_cell_group1 = CellGroup(cells_in_destination_cell_group1)
+        self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group1), 2)
+
+        # Equidistant from more than one cell in the destination cell group
+        cells_in_destination_cell_group2 = {
+            self.get_cell(row_number=5, col_number=2),
+            self.get_cell(row_number=6, col_number=3)
+        }
+        destination_cell_group2 = CellGroup(cells_in_destination_cell_group2)
+        self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group2), 2)
+
+        # Equidistant from more than one cell in the source cell group
+        cells_in_destination_cell_group3 = {
+            self.get_cell(row_number=7, col_number=2),
+            self.get_cell(row_number=7, col_number=3)
+        }
+        destination_cell_group3 = CellGroup(cells_in_destination_cell_group3)
+        self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group3), 3)
+
+        # If the two cell groups contain any of the same cells, the distance should be zero
+        cells_in_destination_cell_group4 = {
+            self.get_cell(row_number=7, col_number=2),
+            self.get_cell(row_number=6, col_number=5)
+        }
+        destination_cell_group4 = CellGroup(cells_in_destination_cell_group4)
+        self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group4), 0)

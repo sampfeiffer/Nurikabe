@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Callable
 
 from .cell import Cell
@@ -51,3 +52,7 @@ class CellGroup:
 
     def get_shortest_manhattan_distance_to_cell(self, destination_cell: Cell) -> int:
         return min([source_cell.get_manhattan_distance(destination_cell) for source_cell in self.cells])
+
+    def get_shortest_manhattan_distance_to_cell_group(self, destination_cell_group: CellGroup) -> int:
+        return min([self.get_shortest_manhattan_distance_to_cell(cell_in_destination_group)
+                    for cell_in_destination_group in destination_cell_group.cells])
