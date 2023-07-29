@@ -148,3 +148,14 @@ class Cell:
     def __str__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
                 f'clue={self.clue})')
+
+    def as_simple_string(self) -> str:
+        """Useful for printing the board with each cell state shown as a simple string"""
+        if self.cell_state.is_clue():
+            return str(self.clue)
+        else:
+            return {
+                CellState.EMPTY: '_',
+                CellState.WALL: 'X',
+                CellState.NON_WALL: 'O',
+            }[self.cell_state]

@@ -74,6 +74,36 @@ class TestBoardSetup(TestBoard):
             self.assertEqual(len(center_cell.neighbor_cell_map), 8)
 
 
+class TestBoardAsSimpleStringList(TestBoard):
+    def setUp(self) -> None:
+        level_details = [
+            ',,,2',
+            ',1,,',
+            ',,,'
+        ]
+        self.board = self.create_board(level_details)
+
+    def test_initial_setup(self) -> None:
+        expected_simple_string_list = [
+            '_,_,_,2',
+            '_,1,_,_',
+            '_,_,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_simple_string_list)
+
+    def test_after_cell_changes(self) -> None:
+        self.board.get_cell_from_grid(row_number=0, col_number=1).update_cell_state(CellState.WALL)
+        self.board.get_cell_from_grid(row_number=0, col_number=2).update_cell_state(CellState.WALL)
+        self.board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.NON_WALL)
+        self.board.get_cell_from_grid(row_number=2, col_number=3).update_cell_state(CellState.WALL)
+        expected_simple_string_list = [
+            '_,X,X,2',
+            '_,1,_,O',
+            '_,_,_,X'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_simple_string_list)
+
+
 class TestCellGroups(TestBoard):
     def test_get_garden(self) -> None:
         level_details = [
@@ -100,6 +130,13 @@ class TestCellGroups(TestBoard):
         diagonal_cell = board.get_cell_from_grid(row_number=2, col_number=0)
         diagonal_cell.update_cell_state(CellState.NON_WALL)
 
+        expected_board_state = [
+            '_,O,_,_,_,_',
+            '_,1,O,_,_,_',
+            'O,_,_,_,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
+
         # Check that the garden contains the correct cells
         self.assertEqual(board.get_garden(clue_cell).cells, {clue_cell, adjacent_cell1, adjacent_cell2})
 
@@ -107,6 +144,13 @@ class TestCellGroups(TestBoard):
         # garden
         adjacent_cell3 = board.get_cell_from_grid(row_number=2, col_number=1)
         adjacent_cell3.update_cell_state(CellState.NON_WALL)
+
+        expected_board_state = [
+            '_,O,_,_,_,_',
+            '_,1,O,_,_,_',
+            'O,O,_,_,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
         # Check that the garden contains the all 5 cells
         self.assertEqual(board.get_garden(clue_cell).cells,
@@ -136,6 +180,13 @@ class TestCellGroups(TestBoard):
         }
         for wall_cell in wall_cells:
             wall_cell.update_cell_state(CellState.WALL)
+
+        expected_board_state = [
+            '_,_,_,_,X,_',
+            '_,1,_,_,X,_',
+            '_,_,_,_,_,X'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
         # There should now be two weak gardens
         all_weak_gardens = board.get_all_weak_gardens()
@@ -173,6 +224,13 @@ class TestCellGroups(TestBoard):
         for wall_cell in wall_cells:
             wall_cell.update_cell_state(CellState.WALL)
 
+        expected_board_state = [
+            '_,_,_,_,X,_',
+            '_,1,_,_,X,X',
+            '_,_,_,X,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
+
         # Check that the wall section starting with the first wall cell contains the first 3 wall cells since they are
         # connected
         self.assertEqual(board.get_wall_section(wall_cells[0]).cells, set(wall_cells[:3]))
@@ -182,6 +240,12 @@ class TestCellGroups(TestBoard):
 
         # Now we connect those two wall sections via another wall, and they are merged into one large wall section
         board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '_,_,_,_,X,_',
+            '_,1,_,X,X,X',
+            '_,_,_,X,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
         self.assertEqual(len(board.get_all_wall_sections()), 1)
 
     def test_cell_group_get_adjacent_neighbors(self) -> None:
@@ -228,6 +292,12 @@ class TestCellGroups(TestBoard):
         ]
 
         # At first, the garden is not fully enclosed
+        expected_board_state = [
+            '_,_,_,2,O,_',
+            '_,5,_,_,_,_',
+            '_,_,_,_,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
         self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
 
         # Mark the cell to the left and the cell to the right as walls
@@ -235,16 +305,34 @@ class TestCellGroups(TestBoard):
         wall_cells[1].update_cell_state(CellState.WALL)
 
         # The garden is still not fully enclosed
+        expected_board_state = [
+            '_,_,X,2,O,X',
+            '_,5,_,_,_,_',
+            '_,_,_,_,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
         self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
 
         # Mark one of the cells just below the garden as a wall
         wall_cells[2].update_cell_state(CellState.WALL)
 
         # The garden is still not fully enclosed
+        expected_board_state = [
+            '_,_,X,2,O,X',
+            '_,5,_,X,_,_',
+            '_,_,_,_,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
         self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
 
         # Mark the other cell just below the garden as a wall
         wall_cells[3].update_cell_state(CellState.WALL)
 
         # Now the garden should be fully enclosed
+        expected_board_state = [
+            '_,_,X,2,O,X',
+            '_,5,_,X,X,_',
+            '_,_,_,_,_,_'
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
         self.assertTrue(board.get_garden(clue_cell).is_garden_fully_enclosed())

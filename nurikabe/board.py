@@ -195,3 +195,16 @@ class Board:
             cell = self.get_cell_from_grid(row_number=cell_change_info.grid_coordinate.row_number,
                                            col_number=cell_change_info.grid_coordinate.col_number)
             cell.update_cell_state(new_cell_state=cell_change_info.after_state)
+
+    def as_simple_string_list(self) -> list[str]:
+        """
+        Useful for printing the board with each cell state shown as a simple string.
+
+        For example:
+        [
+            '_,_,X,2',
+            'X,1,_,O',
+            '_,_,_,X'
+        ]
+        """
+        return [','.join([cell.as_simple_string() for cell in row]) for row in self.cell_grid]

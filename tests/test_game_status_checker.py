@@ -37,7 +37,7 @@ class TestGameStatusChecker(TestCase):
         # Set 8 empty cells as walls
         weak_garden_cell_list = list(self.board.get_weak_garden_cells())
         for cell in weak_garden_cell_list[:8]:
-            cell.update_cell_state(new_cell_state=CellState.WALL)
+            cell.update_cell_state(CellState.WALL)
 
         # Now we should only have 4 weak garden cells
         self.assertTrue(self.game_status_checker.has_expected_number_of_weak_garden_cells())
@@ -46,7 +46,7 @@ class TestGameStatusChecker(TestCase):
         # weak garden cells. Cells do not need to be marked as non-walls for the board to be considered solved. It is
         # only required that wall cells are marked as walls.
         for cell in weak_garden_cell_list[-2:]:
-            cell.update_cell_state(new_cell_state=CellState.NON_WALL)
+            cell.update_cell_state(CellState.NON_WALL)
         self.assertTrue(self.game_status_checker.has_expected_number_of_weak_garden_cells())
 
     def test_has_two_by_two_wall(self) -> None:
@@ -63,13 +63,27 @@ class TestGameStatusChecker(TestCase):
 
         # Set 3 of the above cells as walls
         for cell in two_by_two_cell_list[:3]:
-            cell.update_cell_state(new_cell_state=CellState.WALL)
+            cell.update_cell_state(CellState.WALL)
+
+        expected_board_state = [
+            '1,X,X,_',
+            '_,X,_,_',
+            '_,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
 
         # There is still no two-by-two section of walls
         self.assertFalse(self.game_status_checker.has_two_by_two_wall())
 
         # Set the last of the 4 above cells as a wall
-        two_by_two_cell_list[3].update_cell_state(new_cell_state=CellState.WALL)
+        two_by_two_cell_list[3].update_cell_state(CellState.WALL)
+
+        expected_board_state = [
+            '1,X,X,_',
+            '_,X,X,_',
+            '_,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
 
         # Now all 4 cells in that two-by-two section are walls
         self.assertTrue(self.game_status_checker.has_two_by_two_wall())
@@ -79,20 +93,44 @@ class TestGameStatusChecker(TestCase):
         self.assertTrue(self.game_status_checker.are_all_walls_connected())
 
         # Set one cell as a wall. Since it's the only wall cell, all wall cells are connected.
-        self.board.get_cell_from_grid(row_number=0, col_number=1).update_cell_state(new_cell_state=CellState.WALL)
+        self.board.get_cell_from_grid(row_number=0, col_number=1).update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,_,_,_',
+            '_,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertTrue(self.game_status_checker.are_all_walls_connected())
 
         # Set another adjacent cell as a wall. All wall cells are still connected.
-        self.board.get_cell_from_grid(row_number=1, col_number=1).update_cell_state(new_cell_state=CellState.WALL)
+        self.board.get_cell_from_grid(row_number=1, col_number=1).update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,X,_,_',
+            '_,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertTrue(self.game_status_checker.are_all_walls_connected())
 
         # Set a non-adjacent cell as a wall. Now there are two separate sections of wall cells that are not connected.
-        self.board.get_cell_from_grid(row_number=2, col_number=2).update_cell_state(new_cell_state=CellState.WALL)
+        self.board.get_cell_from_grid(row_number=2, col_number=2).update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,X,_,_',
+            '_,3,X,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertFalse(self.game_status_checker.are_all_walls_connected())
 
         # Set another cell as a wall such that the new wall cell connects the two disjoint wall sections into one wall
         # section.
-        self.board.get_cell_from_grid(row_number=1, col_number=2).update_cell_state(new_cell_state=CellState.WALL)
+        self.board.get_cell_from_grid(row_number=1, col_number=2).update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,X,X,_',
+            '_,3,X,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertTrue(self.game_status_checker.are_all_walls_connected())
 
     def test_do_all_weak_gardens_have_exactly_one_clue(self) -> None:
@@ -111,19 +149,37 @@ class TestGameStatusChecker(TestCase):
         # Set some cells as walls. Since they don't completely disconnect the two clue cells, the clue cells are still
         # part of the same weak garden.
         for cell in cell_list[:2]:
-            cell.update_cell_state(new_cell_state=CellState.WALL)
+            cell.update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,X,_,_',
+            '_,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
         self.assertEqual(len(weak_gardens), 1)
         self.assertFalse(self.game_status_checker.do_all_weak_gardens_have_exactly_one_clue(weak_gardens))
 
         # Set another cell as a wall. Now the two clue cells are completely separated into two distinct weak gardens
-        cell_list[2].update_cell_state(new_cell_state=CellState.WALL)
+        cell_list[2].update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,X,_,_',
+            'X,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
         self.assertEqual(len(weak_gardens), 2)
         self.assertTrue(self.game_status_checker.do_all_weak_gardens_have_exactly_one_clue(weak_gardens))
 
         # Set that last cell as a non-wall and now the clue cells are once again part of the same weak garden
-        cell_list[2].update_cell_state(new_cell_state=CellState.NON_WALL)
+        cell_list[2].update_cell_state(CellState.NON_WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,X,_,_',
+            'O,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
         self.assertEqual(len(weak_gardens), 1)
         self.assertFalse(self.game_status_checker.do_all_weak_gardens_have_exactly_one_clue(weak_gardens))
@@ -142,7 +198,13 @@ class TestGameStatusChecker(TestCase):
             self.board.get_cell_from_grid(row_number=2, col_number=0)
         ]
         for cell in cell_list1:
-            cell.update_cell_state(new_cell_state=CellState.WALL)
+            cell.update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,_,_',
+            '_,X,_,_',
+            'X,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
 
         # Since each weak garden only has one clue, the check can be run. However, the weak gardens are not the right
@@ -157,25 +219,49 @@ class TestGameStatusChecker(TestCase):
             self.board.get_cell_from_grid(row_number=1, col_number=3)
         ]
         for cell in cell_list2:
-            cell.update_cell_state(new_cell_state=CellState.WALL)
+            cell.update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,X,X',
+            '_,X,X,X',
+            'X,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
 
         # Since one of the weak gardens is not the correct size, we expect this to be False
         self.assertFalse(self.game_status_checker.are_all_weak_gardens_correct_size(weak_gardens))
 
         # Set another cell as a wall in a way that makes both weak gardens the correct size
-        self.board.get_cell_from_grid(row_number=1, col_number=0).update_cell_state(new_cell_state=CellState.WALL)
+        self.board.get_cell_from_grid(row_number=1, col_number=0).update_cell_state(CellState.WALL)
+        expected_board_state = [
+            '1,X,X,X',
+            'X,X,X,X',
+            'X,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
         self.assertTrue(self.game_status_checker.are_all_weak_gardens_correct_size(weak_gardens))
 
         # Set one of the empty cells as a non-wall cell. This has no impact since cells do not need to be marked as
         # non-walls for the board to be considered solved. It is only required that wall cells are marked as walls.
-        self.board.get_cell_from_grid(row_number=2, col_number=2).update_cell_state(new_cell_state=CellState.NON_WALL)
+        self.board.get_cell_from_grid(row_number=2, col_number=2).update_cell_state(CellState.NON_WALL)
+        expected_board_state = [
+            '1,X,X,X',
+            'X,X,X,X',
+            'X,3,O,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
         self.assertTrue(self.game_status_checker.are_all_weak_gardens_correct_size(weak_gardens))
 
         # Set a cell as empty so that there is a weak garden with no clue
-        self.board.get_cell_from_grid(row_number=0, col_number=3).update_cell_state(new_cell_state=CellState.EMPTY)
+        self.board.get_cell_from_grid(row_number=0, col_number=3).update_cell_state(CellState.EMPTY)
+        expected_board_state = [
+            '1,X,X,_',
+            'X,X,X,X',
+            'X,3,O,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
 
         # Since this new weak garden has no clue, we cannot determine if it's the right size, so we expect an error.
         # Note that this error is only guaranteed to be thrown if all other weak gardens are determined to be the right
