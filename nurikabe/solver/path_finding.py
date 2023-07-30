@@ -11,6 +11,12 @@ class NoPathFoundError(Exception):
     pass
 
 
+@dataclass
+class PathInfo:
+    cell_list: list[Cell]
+    path_length: int
+
+
 @dataclass(order=True)
 class PrioritizedCell:
     priority: int
@@ -18,7 +24,7 @@ class PrioritizedCell:
 
 
 def find_shortest_path_between_cells(start_cell: Cell, end_cell: Cell, off_limits_cells: Optional[set[Cell]] = None,
-                                     max_path_length: Optional[int] = None) -> list[Cell]:
+                                     max_path_length: Optional[int] = None) -> PathInfo:
     start_cell_group = CellGroup(cells={start_cell})
     end_cell_group = CellGroup(cells={end_cell})
     return find_shortest_path_between_cell_groups(start_cell_group, end_cell_group, off_limits_cells, max_path_length)
@@ -26,21 +32,21 @@ def find_shortest_path_between_cells(start_cell: Cell, end_cell: Cell, off_limit
 
 def find_shortest_path_cell_group_to_cell(start_cell_group: CellGroup, end_cell: Cell,
                                           off_limits_cells: Optional[set[Cell]] = None,
-                                          max_path_length: Optional[int] = None) -> list[Cell]:
+                                          max_path_length: Optional[int] = None) -> PathInfo:
     end_cell_group = CellGroup(cells={end_cell})
     return find_shortest_path_between_cell_groups(start_cell_group, end_cell_group, off_limits_cells, max_path_length)
 
 
 def find_shortest_path_cell_to_cell_group(start_cell: Cell, end_cell_group: CellGroup,
                                           off_limits_cells: Optional[set[Cell]] = None,
-                                          max_path_length: Optional[int] = None) -> list[Cell]:
+                                          max_path_length: Optional[int] = None) -> PathInfo:
     start_cell_group = CellGroup(cells={start_cell})
     return find_shortest_path_between_cell_groups(start_cell_group, end_cell_group, off_limits_cells, max_path_length)
 
 
 def find_shortest_path_between_cell_groups(start_cell_group: CellGroup, end_cell_group: CellGroup,
                                            off_limits_cells: Optional[set[Cell]] = None,
-                                           max_path_length: Optional[int] = None) -> list[Cell]:
+                                           max_path_length: Optional[int] = None) -> PathInfo:
     """
     Uses A* algorithm. https://en.wikipedia.org/wiki/A*_search_algorithm
 
@@ -84,7 +90,10 @@ def find_shortest_path_between_cell_groups(start_cell_group: CellGroup, end_cell
 
         # If this cell is in the end_cell_group, then we have found the optimal path
         if current_cell in end_cell_group.cells:
-            return reconstruct_path(map_to_parent_cell, current_cell)
+            return PathInfo(
+                cell_list=reconstruct_path(map_to_parent_cell, current_cell),
+                path_length=path_length_from_start_cell[current_cell]
+            )
 
         # Get the list of non-off-limit cells that neighbor the current cell
         neighbor_cells_to_explore = [neighbor_cell for neighbor_cell in current_cell.get_adjacent_neighbors()
