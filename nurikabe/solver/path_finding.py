@@ -17,35 +17,40 @@ class PrioritizedCell:
     cell: Cell = field(compare=False)
 
 
-def find_shortest_path_between_cells(start_cell: Cell, end_cell: Cell, off_limits_cells: set[Cell],
+def find_shortest_path_between_cells(start_cell: Cell, end_cell: Cell, off_limits_cells: Optional[set[Cell]] = None,
                                      max_path_length: Optional[int] = None) -> list[Cell]:
     start_cell_group = CellGroup(cells={start_cell})
     end_cell_group = CellGroup(cells={end_cell})
     return find_shortest_path_between_cell_groups(start_cell_group, end_cell_group, off_limits_cells, max_path_length)
 
 
-def find_shortest_path_cell_group_to_cell(start_cell_group: CellGroup, end_cell: Cell, off_limits_cells: set[Cell],
+def find_shortest_path_cell_group_to_cell(start_cell_group: CellGroup, end_cell: Cell,
+                                          off_limits_cells: Optional[set[Cell]] = None,
                                           max_path_length: Optional[int] = None) -> list[Cell]:
     end_cell_group = CellGroup(cells={end_cell})
     return find_shortest_path_between_cell_groups(start_cell_group, end_cell_group, off_limits_cells, max_path_length)
 
 
-def find_shortest_path_cell_to_cell_group(start_cell: Cell, end_cell_group: CellGroup, off_limits_cells: set[Cell],
+def find_shortest_path_cell_to_cell_group(start_cell: Cell, end_cell_group: CellGroup,
+                                          off_limits_cells: Optional[set[Cell]] = None,
                                           max_path_length: Optional[int] = None) -> list[Cell]:
     start_cell_group = CellGroup(cells={start_cell})
     return find_shortest_path_between_cell_groups(start_cell_group, end_cell_group, off_limits_cells, max_path_length)
 
 
 def find_shortest_path_between_cell_groups(start_cell_group: CellGroup, end_cell_group: CellGroup,
-                                           off_limits_cells: set[Cell],
+                                           off_limits_cells: Optional[set[Cell]] = None,
                                            max_path_length: Optional[int] = None) -> list[Cell]:
     """
     Uses A* algorithm. https://en.wikipedia.org/wiki/A*_search_algorithm
 
     The heuristic get_shortest_naive_path_length_to_cell_group is admissible meaning that this length is never greater
-    than the actual shortest path length. The heuristic is also consistent since the when going from two neighboring
-    cells, the change in heuristic never overestimates the actual cost of the step.
+    than the actual shortest path length. The heuristic is also consistent since when going from two neighboring cells,
+    the change in heuristic never overestimates the actual cost of the step.
     """
+
+    if off_limits_cells is None:
+        off_limits_cells = set()
 
     if len(start_cell_group.cells.intersection(off_limits_cells)) > 0:
         raise NoPathFoundError('Cannot find path since a cell in the start cell group is off limits')
@@ -67,7 +72,7 @@ def find_shortest_path_between_cell_groups(start_cell_group: CellGroup, end_cell
     map_to_parent_cell: dict[Cell, Cell] = {}
 
     # Called g-score in the wiki page
-    path_length_from_start_cell: dict[Cell, int] = {start_cell: 0}
+    path_length_from_start_cell: dict[Cell, int] = {start_cell: 1}
 
     # For each cell, this is the current best guess for the shortest possible path length from start_cell_group to
     # end_cell_group that passes through this cell. Called f-score in the wiki page.
@@ -127,7 +132,7 @@ def get_distance_between_cells(current_cell: Cell, neighbor_cell: Cell, start_ce
     the distance is considered zero. Otherwise, the distance is one.
     """
 
-    if current_cell in start_cell_group and neighbor_cell in start_cell_group:
+    if current_cell in start_cell_group.cells and neighbor_cell in start_cell_group.cells:
         return 0
     else:
         return 1

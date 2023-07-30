@@ -62,3 +62,8 @@ class CellGroup:
 
     def get_shortest_naive_path_length_to_cell_group(self, destination_cell_group: CellGroup) -> int:
         return self.get_shortest_manhattan_distance_to_cell_group(destination_cell_group) + 1
+
+    def __str__(self) -> str:
+        class_name = self.__class__.__name__
+        cell_string_set = {str(cell) for cell in self.cells}
+        return f'{class_name}(cells={cell_string_set})'
