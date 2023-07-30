@@ -26,7 +26,7 @@ class GameStatusChecker:
         elif not self.has_expected_number_of_weak_garden_cells():
             logger.debug('not correct number of weak garden cells')
             game_status = GameStatus.IN_PROGRESS
-        elif self.has_two_by_two_wall():
+        elif self.board.has_two_by_two_wall():
             logger.debug('has two by two wall')
             game_status = GameStatus.IN_PROGRESS
         elif not self.are_all_walls_connected():
@@ -51,12 +51,6 @@ class GameStatusChecker:
 
     def get_number_of_weak_garden_cells(self) -> int:
         return len(self.board.get_weak_garden_cells())
-
-    def has_two_by_two_wall(self) -> bool:
-        for cell in self.board.flat_cell_list:
-            if cell.does_form_two_by_two_walls():
-                return True
-        return False
 
     def are_all_walls_connected(self) -> bool:
         all_walls = self.board.get_wall_cells()

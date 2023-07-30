@@ -104,6 +104,55 @@ class TestBoardAsSimpleStringList(TestBoard):
         self.assertEqual(self.board.as_simple_string_list(), expected_simple_string_list)
 
 
+class TestTwoByTwoWall(TestBoard):
+    def setUp(self) -> None:
+        level_details = [
+            '1,,,',
+            ',,,',
+            ',3,,'
+        ]
+        self.board = self.create_board(level_details)
+
+    def test_has_two_by_two_wall(self) -> None:
+        # The board starts off with no wall cells, so there is of course no two-by-two section of walls
+        self.assertFalse(self.board.has_two_by_two_wall())
+
+        # These 4 cells form a two-by-two section
+        two_by_two_cell_list = [
+            self.board.get_cell_from_grid(row_number=0, col_number=1),
+            self.board.get_cell_from_grid(row_number=0, col_number=2),
+            self.board.get_cell_from_grid(row_number=1, col_number=1),
+            self.board.get_cell_from_grid(row_number=1, col_number=2)
+        ]
+
+        # Set 3 of the above cells as walls
+        for cell in two_by_two_cell_list[:3]:
+            cell.update_cell_state(CellState.WALL)
+
+        expected_board_state = [
+            '1,X,X,_',
+            '_,X,_,_',
+            '_,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
+
+        # There is still no two-by-two section of walls
+        self.assertFalse(self.board.has_two_by_two_wall())
+
+        # Set the last of the 4 above cells as a wall
+        two_by_two_cell_list[3].update_cell_state(CellState.WALL)
+
+        expected_board_state = [
+            '1,X,X,_',
+            '_,X,X,_',
+            '_,3,_,_'
+        ]
+        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
+
+        # Now all 4 cells in that two-by-two section are walls
+        self.assertTrue(self.board.has_two_by_two_wall())
+
+
 class TestCellGroups(TestBoard):
     def test_get_garden(self) -> None:
         level_details = [

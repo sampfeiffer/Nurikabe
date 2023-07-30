@@ -196,6 +196,12 @@ class Board:
                                            col_number=cell_change_info.grid_coordinate.col_number)
             cell.update_cell_state(new_cell_state=cell_change_info.after_state)
 
+    def has_two_by_two_wall(self) -> bool:
+        for cell in self.flat_cell_list:
+            if cell.does_form_two_by_two_walls():
+                return True
+        return False
+
     def as_simple_string_list(self) -> list[str]:
         """
         Useful for printing the board with each cell state shown as a simple string.
