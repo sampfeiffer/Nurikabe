@@ -38,7 +38,7 @@ class Screen:
         self.top_left_of_game_status = self.get_top_left_of_game_status()
         self.cell_width = self.get_cell_width(level.number_of_rows, level.number_of_columns,
                                               should_include_grid_numbers)
-        self.top_left_of_board = self.get_top_left_of_board(should_include_grid_numbers)
+        self.top_left_of_board = self.get_top_left_of_board(level.number_of_columns, should_include_grid_numbers)
 
         self.font_map = {
             TextType.CELL: self.get_cell_font(),
@@ -56,7 +56,7 @@ class Screen:
         return PixelPosition(x_coordinate=left, y_coordinate=top)
 
     def get_cell_width(self, number_of_rows: int, number_of_columns: int, should_include_grid_numbers: bool) -> int:
-        width_for_non_board_components = self.get_left_side_of_board_width(should_include_grid_numbers) + \
+        width_for_non_board_components = self.get_suggested_left_side_of_board_width(should_include_grid_numbers) + \
             self.get_right_side_of_board_width()
         max_board_width = self.SCREEN_WIDTH - width_for_non_board_components
         max_cell_width = int(max_board_width / number_of_columns)
@@ -68,7 +68,11 @@ class Screen:
 
         return min((max_cell_width, max_cell_height))
 
-    def get_left_side_of_board_width(self, should_include_grid_numbers: bool) -> int:
+    def get_suggested_left_side_of_board_width(self, should_include_grid_numbers: bool) -> int:
+        """
+        This is only the "suggested" width, since after the cell width is calculated and all the spacing needed for the
+        left and right side of the board, the items are centered on the screen.
+        """
         left_side_of_board_width = self.MIN_BORDER
         if should_include_grid_numbers:
             left_side_of_board_width += self.GRID_NUMBERING_WIDTH
@@ -86,8 +90,14 @@ class Screen:
     def get_bottom_of_board_height(self) -> int:
         return self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT + self.BUTTON_RECT_HEIGHT
 
-    def get_top_left_of_board(self, should_include_grid_numbers: bool) -> PixelPosition:
-        left_border_size = self.get_left_side_of_board_width(should_include_grid_numbers)
+    def get_top_left_of_board(self, number_of_columns: int, should_include_grid_numbers: bool) -> PixelPosition:
+        suggested_left_border_size = self.get_suggested_left_side_of_board_width(should_include_grid_numbers)
+        if should_include_grid_numbers:
+            left_border_size = suggested_left_border_size
+        else:
+            # Ensure that the board is centered on the screen for cleanliness
+            board_width = self.cell_width * number_of_columns
+            left_border_size = int((Screen.SCREEN_WIDTH - board_width) / 2)
         top_border_size = self.get_top_of_board_height(should_include_grid_numbers)
         return PixelPosition(x_coordinate=left_border_size, y_coordinate=top_border_size)
 
