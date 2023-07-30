@@ -1,0 +1,34 @@
+import logging
+from abc import ABC, abstractmethod
+
+from ...board import Board
+from ...cell_change_info import CellChanges, CellChangeInfo
+from ...cell import Cell
+from ...cell_state import CellState
+from ...garden import Garden
+
+logger = logging.getLogger(__name__)
+
+
+class SolverRule(ABC):
+    def __init__(self, board: Board):
+        self.board = board
+
+    @abstractmethod
+    def apply_rule(self) -> CellChanges:
+        raise NotImplementedError
+
+    @staticmethod
+    def set_cell_to_state(cell: Cell, target_cell_state: CellState, reason: str) -> CellChangeInfo:
+        if not cell.is_clickable:
+            raise RuntimeError(f'cell is not clickable: {cell}')
+        logger.debug(f'Setting {cell} to {target_cell_state}. Reason: {reason}')
+        return cell.update_cell_state(target_cell_state)
+
+    def get_incomplete_gardens(self, with_clue_only: bool) -> set[Garden]:
+        all_gardens = self.board.get_all_gardens()
+        incomplete_gardens = {garden for garden in all_gardens
+                              if not garden.does_contain_clue() or not garden.is_garden_correct_size()}
+        if with_clue_only:
+            incomplete_gardens = {garden for garden in incomplete_gardens if garden.does_contain_clue()}
+        return incomplete_gardens
