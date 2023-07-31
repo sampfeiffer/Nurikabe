@@ -2,6 +2,7 @@ from .abstract_solver_rule import SolverRule
 from ..board_state_checker import NoPossibleSolutionFromCurrentState
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
+from ...cell_group import CellGroup
 
 
 class EnsureNoTwoByTwoWalls(SolverRule):
@@ -24,5 +25,8 @@ class EnsureNoTwoByTwoWalls(SolverRule):
                             cell_changes.add_change(self.set_cell_to_state(cell_corner, CellState.NON_WALL,
                                                                            reason='No two-by-two walls'))
                 elif two_by_two_section_num_of_walls == 4:
-                    raise NoPossibleSolutionFromCurrentState('There is a two-by-two section of walls')
+                    raise NoPossibleSolutionFromCurrentState(
+                        message='There is a two-by-two section of walls',
+                        problem_cell_groups={CellGroup(two_by_two_section)}
+                    )
         return cell_changes

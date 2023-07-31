@@ -2,6 +2,9 @@ from __future__ import annotations
 from typing import Callable
 
 from .cell import Cell
+from .rect_edge import RectEdge
+from .color import Color
+from .screen import Screen
 
 
 class NoCluesInCellGroupError(Exception):
@@ -62,6 +65,18 @@ class CellGroup:
 
     def get_shortest_naive_path_length_to_cell_group(self, destination_cell_group: CellGroup) -> int:
         return self.get_shortest_manhattan_distance_to_cell_group(destination_cell_group) + 1
+
+    def draw_edges(self, screen: Screen, color: Color) -> None:
+        for edge in self.get_edges():
+            screen.draw_edge(edge, color, width=2)
+
+    def get_edges(self) -> set[RectEdge]:
+        """
+        Get the set of edges of the cell group. Note that this just includes the outer edges. It does not include the
+        cell edges that are common to more than one cell in the cell group.
+        """
+        all_cell_edges = [rect_edge for cell in self.cells for rect_edge in cell.get_edges()]
+        return {cell_edges for cell_edges in all_cell_edges if all_cell_edges.count(cell_edges) == 1}
 
     def __str__(self) -> str:
         class_name = self.__class__.__name__

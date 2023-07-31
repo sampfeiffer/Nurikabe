@@ -5,6 +5,7 @@ from .level import Level
 from .pixel_position import PixelPosition
 from .color import Color
 from .text_type import TextType
+from .rect_edge import RectEdge
 
 
 class Screen:
@@ -164,6 +165,15 @@ class Screen:
         if image is not None:
             image_rect = image.get_rect(center=rect.center)
             self.screen.blit(image, dest=image_rect.topleft)
+
+    def draw_edge(self, rect_edge: RectEdge, color: Color, width: int) -> None:
+        pygame.draw.line(
+            surface=self.screen,
+            color=color.value,
+            start_pos=rect_edge.start_pixel_position.coordinates,
+            end_pos=rect_edge.end_pixel_position.coordinates,
+            width=width
+        )
 
     @staticmethod
     def update_screen() -> None:

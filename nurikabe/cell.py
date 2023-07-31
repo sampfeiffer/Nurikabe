@@ -9,6 +9,7 @@ from .color import Color
 from .cell_change_info import CellChangeInfo
 from .direction import Direction, ADJACENT_DIRECTIONS
 from .grid_coordinate import GridCoordinate
+from .rect_edge import RectEdge, get_rect_edges
 
 
 class NonExistentNeighbor(Exception):
@@ -144,6 +145,9 @@ class Cell:
 
     def get_shortest_naive_path_length(self, other_cell: Cell) -> int:
         return self.get_manhattan_distance(other_cell) + 1
+
+    def get_edges(self) -> set[RectEdge]:
+        return get_rect_edges(self.rect)
 
     def __str__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '

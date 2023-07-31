@@ -22,5 +22,8 @@ class EncloseFullGarden(SolverRule):
                         cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL,
                                                                        reason='Enclose full garden'))
             else:
-                raise NoPossibleSolutionFromCurrentState('Garden contains more than one clue')
+                raise NoPossibleSolutionFromCurrentState(
+                    message='Garden contains more than one clue',
+                    problem_cell_groups={garden}
+                )
         return cell_changes

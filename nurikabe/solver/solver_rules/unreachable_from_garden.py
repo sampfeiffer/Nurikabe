@@ -37,8 +37,10 @@ class UnreachableFromGarden(SolverRule):
     def get_cells_reachable_from_garden(self, source_garden: Garden,
                                         other_gardens_with_clues: set[Garden]) -> set[Cell]:
         if not source_garden.does_have_exactly_one_clue():
-            raise NoPossibleSolutionFromCurrentState('Cannot determine reach of garden since there is not exactly one '
-                                                     'clue')
+            raise NoPossibleSolutionFromCurrentState(
+                message='Cannot determine reach of garden since there is not exactly one clue',
+                problem_cell_groups={source_garden}
+            )
         num_of_remaining_garden_cells = source_garden.get_num_of_remaining_garden_cells()
 
         # Determine which cells are not able to be a part of the source_garden

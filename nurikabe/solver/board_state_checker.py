@@ -1,13 +1,24 @@
+from typing import Optional
+
 from ..board import Board
+from ..cell_group import CellGroup
 
 
 class NoPossibleSolutionFromCurrentState(Exception):
     """
     This exception indicates that given the current state of the board, there is no possible solution. This means that
-    cells that are marked as either clues, walls, or non-walls are breaking one or more of the rules of a solves
+    cells that are marked as either clues, walls, or non-walls are breaking one or more of the rules of a solved
     Nurikabe puzzle.
     """
-    pass
+
+    def __init__(self, message: str, problem_cell_groups: Optional[set[CellGroup]] = None):
+        """Optionally can include information about which cell groups are causing the problem"""
+        super().__init__(message)
+
+        if problem_cell_groups is None:
+            self.problem_cell_groups: set[CellGroup] = set()
+        else:
+            self.problem_cell_groups = problem_cell_groups
 
 
 class BoardStateChecker:
@@ -24,7 +35,10 @@ class BoardStateChecker:
 
     def check_for_two_by_two_section_of_walls(self) -> None:
         if self.board.has_two_by_two_wall():
-            raise NoPossibleSolutionFromCurrentState('There is a two-by-two section of walls')
+            raise NoPossibleSolutionFromCurrentState(
+                message='There is a two-by-two section of walls',
+                problem_cell_groups={CellGroup(self.board.get_two_by_two_wall_sections())}
+            )
 
     def check_for_isolated_walls(self) -> None:
         wall_cells = self.board.get_wall_cells()
@@ -41,13 +55,20 @@ class BoardStateChecker:
         )
         unreachable_wall_cells = wall_cells - connected_non_garden_cells
         if len(unreachable_wall_cells) > 0:
-            raise NoPossibleSolutionFromCurrentState('Wall cells cannot connect')
+            wall_sections = self.board.get_all_wall_sections()
+            raise NoPossibleSolutionFromCurrentState(
+                message='Wall cells cannot connect',
+                problem_cell_groups=wall_sections
+            )
 
     def check_for_garden_with_multiple_clues(self) -> None:
         gardens = self.board.get_all_gardens()
         for garden in gardens:
             if garden.get_number_of_clues() > 1:
-                raise NoPossibleSolutionFromCurrentState('A garden cannot contain more than one clue')
+                raise NoPossibleSolutionFromCurrentState(
+                    message='A garden cannot contain more than one clue',
+                    problem_cell_groups={garden}
+                )
 
     def check_for_too_small_garden(self) -> None:
         weak_gardens = self.board.get_all_weak_gardens()
@@ -56,4 +77,7 @@ class BoardStateChecker:
 
         for weak_garden in weak_gardens_with_one_clue:
             if len(weak_garden.cells) < weak_garden.get_expected_garden_size():
-                raise NoPossibleSolutionFromCurrentState('Garden is too small')
+                raise NoPossibleSolutionFromCurrentState(
+                    message='Garden is too small',
+                    problem_cell_groups={weak_garden}
+                )

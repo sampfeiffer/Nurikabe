@@ -22,7 +22,10 @@ class EnsureGardenCanExpand(SolverRule):
                 if len(garden.cells) < clue:
                     cell_changes.add_changes(self.handle_undersized_garden_escape_routes(garden))
             else:
-                raise NoPossibleSolutionFromCurrentState('Non-wall cell group contains more than one clue')
+                raise NoPossibleSolutionFromCurrentState(
+                    message='Non-wall cell group contains more than one clue',
+                    problem_cell_groups={garden}
+                )
             if cell_changes.has_any_changes():
                 # Since some cells were marked as non-walls, the previously calculated all_gardens is no longer valid
                 return cell_changes

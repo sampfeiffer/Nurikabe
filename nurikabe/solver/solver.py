@@ -2,11 +2,10 @@ import logging
 
 from ..screen import Screen
 from ..board import Board
-from ..cell import Cell
 from ..color import Color
 from ..cell_change_info import CellChanges
 from ..undo_redo_control import UndoRedoControl
-from .board_state_checker import BoardStateChecker
+from .board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentState
 
 from .solver_rules.separate_clues import SeparateClues
 from .solver_rules.no_isolated_wall_sections import NoIsolatedWallSections
@@ -45,26 +44,25 @@ class Solver:
     def run_solver(self) -> CellChanges:
         cell_changes = CellChanges()
 
-        self.board_state_checker.check_for_board_state_issue()
+        try:
+            self.board_state_checker.check_for_board_state_issue()
 
-        cell_changes.add_changes(self.separate_clues.apply_rule())
-        cell_changes.add_changes(self.no_isolated_wall_sections.apply_rule())
-        cell_changes.add_changes(self.ensure_garden_can_expand.apply_rule())
-        cell_changes.add_changes(self.enclose_full_garden.apply_rule())
-        cell_changes.add_changes(self.ensure_no_two_by_two_walls.apply_rule())
-        cell_changes.add_changes(self.naively_unreachable_from_clue_cell.apply_rule())
-        cell_changes.add_changes(self.naively_unreachable_from_garden.apply_rule())
-        cell_changes.add_changes(self.separate_gardens_with_clues.apply_rule())
-        cell_changes.add_changes(self.fill_correctly_sized_weak_garden.apply_rule())
-        cell_changes.add_changes(self.unreachable_from_garden.apply_rule())
+            cell_changes.add_changes(self.separate_clues.apply_rule())
+            cell_changes.add_changes(self.no_isolated_wall_sections.apply_rule())
+            cell_changes.add_changes(self.ensure_garden_can_expand.apply_rule())
+            cell_changes.add_changes(self.enclose_full_garden.apply_rule())
+            cell_changes.add_changes(self.ensure_no_two_by_two_walls.apply_rule())
+            cell_changes.add_changes(self.naively_unreachable_from_clue_cell.apply_rule())
+            cell_changes.add_changes(self.naively_unreachable_from_garden.apply_rule())
+            cell_changes.add_changes(self.separate_gardens_with_clues.apply_rule())
+            cell_changes.add_changes(self.fill_correctly_sized_weak_garden.apply_rule())
+            cell_changes.add_changes(self.unreachable_from_garden.apply_rule())
+        except NoPossibleSolutionFromCurrentState as error:
+            logger.error(error)
+            for i, cell_group in enumerate(error.problem_cell_groups):
+                cell_group.draw_edges(self.screen, color=Color.RED)
+            return cell_changes
 
         self.board.update_painted_gardens()
         self.undo_redo_control.process_board_event(cell_changes)
         return cell_changes
-
-
-
-    def color_group(self, cells: set[Cell]) -> None:
-        for cell in cells:
-            cell.draw_perimeter(Color.YELLOW)
-        self.screen.update_screen()

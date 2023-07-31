@@ -41,6 +41,15 @@ class Board:
 
     def draw_board_rect(self) -> None:
         self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)
+        self.draw_outline()
+
+    def draw_outline(self) -> None:
+        rect = self.rect.copy()
+        border_width = 2
+        rect.topleft = (rect.left - border_width, rect.top - border_width)
+        rect.width = rect.width + 2 * border_width
+        rect.height = rect.height + 2 * border_width
+        self.screen.draw_rect(color=Color.BLACK, rect=rect, width=border_width)
 
     def create_cell_grid(self) -> list[list[Cell]]:
         return [[self.create_cell(row_number, col_number, cell_clue) for col_number, cell_clue in enumerate(row)]
@@ -105,7 +114,10 @@ class Board:
         return self.rect.collidepoint(event_position.coordinates)
 
     def update_painted_gardens(self) -> None:
-        self.draw_all_cells()  # first redraw the board to "unpaint" gardens
+        # First redraw the board to "unpaint" gardens
+        self.draw_outline()
+        self.draw_all_cells()
+
         self.paint_completed_gardens()
 
     def draw_all_cells(self) -> None:
@@ -201,6 +213,13 @@ class Board:
             if cell.does_form_two_by_two_walls():
                 return True
         return False
+
+    def get_two_by_two_wall_sections(self) -> set[Cell]:
+        two_by_two_wall_section_cells: set[Cell] = set()
+        for cell in self.flat_cell_list:
+            if cell.does_form_two_by_two_walls():
+                two_by_two_wall_section_cells.update(cell.get_two_by_two_section())
+        return two_by_two_wall_section_cells
 
     def as_simple_string_list(self) -> list[str]:
         """
