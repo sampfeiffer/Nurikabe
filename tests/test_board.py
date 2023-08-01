@@ -70,82 +70,87 @@ class TestBoardSetup(TestBoard):
 
 
 class TestBoardAsSimpleStringList(TestBoard):
-    def setUp(self) -> None:
+    def test_initial_setup(self) -> None:
         board_details = [
             '_,_,_,2',
             '_,1,_,_',
             '_,_,_,_'
         ]
-        self.board = self.create_board(board_details)
-
-    def test_initial_setup(self) -> None:
+        board = self.create_board(board_details)
         expected_simple_string_list = [
             '_,_,_,2',
             '_,1,_,_',
             '_,_,_,_'
         ]
-        self.assertEqual(self.board.as_simple_string_list(), expected_simple_string_list)
+        self.assertEqual(board.as_simple_string_list(), expected_simple_string_list)
 
     def test_after_cell_changes(self) -> None:
-        self.board.get_cell_from_grid(row_number=0, col_number=1).update_cell_state(CellState.WALL)
-        self.board.get_cell_from_grid(row_number=0, col_number=2).update_cell_state(CellState.WALL)
-        self.board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.NON_WALL)
-        self.board.get_cell_from_grid(row_number=2, col_number=3).update_cell_state(CellState.WALL)
+        board_details = [
+            '_,_,_,2',
+            '_,1,_,_',
+            '_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+
+        board.get_cell_from_grid(row_number=0, col_number=1).update_cell_state(CellState.WALL)
+        board.get_cell_from_grid(row_number=0, col_number=2).update_cell_state(CellState.WALL)
+        board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.NON_WALL)
+        board.get_cell_from_grid(row_number=2, col_number=3).update_cell_state(CellState.WALL)
         expected_simple_string_list = [
             '_,X,X,2',
             '_,1,_,O',
             '_,_,_,X'
         ]
-        self.assertEqual(self.board.as_simple_string_list(), expected_simple_string_list)
+        self.assertEqual(board.as_simple_string_list(), expected_simple_string_list)
+
+    def test_build_board_with_cell_states(self) -> None:
+        board_details = [
+            '_,_,X,2',
+            'X,1,O,_',
+            'O,_,_,_'
+        ]
+        board = self.create_board(board_details)
+
+        cell_state_matrix = [[cell.cell_state for cell in row] for row in board.cell_grid]
+
+        expected_cell_state_matrix = [
+            [CellState.EMPTY, CellState.EMPTY, CellState.WALL, CellState.CLUE],
+            [CellState.WALL, CellState.CLUE, CellState.NON_WALL, CellState.EMPTY],
+            [CellState.NON_WALL, CellState.EMPTY, CellState.EMPTY, CellState.EMPTY]
+        ]
+
+        self.assertEqual(cell_state_matrix, expected_cell_state_matrix)
 
 
 class TestTwoByTwoWall(TestBoard):
-    def setUp(self) -> None:
+    def test_fresh_board_has_no_two_by_two_walls(self) -> None:
         board_details = [
             '1,_,_,_',
             '_,_,_,_',
             '_,3,_,_'
         ]
-        self.board = self.create_board(board_details)
+        board = self.create_board(board_details)
 
-    def test_has_two_by_two_wall(self) -> None:
         # The board starts off with no wall cells, so there is of course no two-by-two section of walls
-        self.assertFalse(self.board.has_two_by_two_wall())
+        self.assertFalse(board.has_two_by_two_wall())
 
-        # These 4 cells form a two-by-two section
-        two_by_two_cell_list = [
-            self.board.get_cell_from_grid(row_number=0, col_number=1),
-            self.board.get_cell_from_grid(row_number=0, col_number=2),
-            self.board.get_cell_from_grid(row_number=1, col_number=1),
-            self.board.get_cell_from_grid(row_number=1, col_number=2)
-        ]
-
-        # Set 3 of the above cells as walls
-        for cell in two_by_two_cell_list[:3]:
-            cell.update_cell_state(CellState.WALL)
-
-        expected_board_state = [
+    def test_board_has_three_of_four_walls(self) -> None:
+        board_details = [
             '1,X,X,_',
             '_,X,_,_',
             '_,3,_,_'
         ]
-        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
+        board = self.create_board(board_details)
+        self.assertFalse(board.has_two_by_two_wall())
 
-        # There is still no two-by-two section of walls
-        self.assertFalse(self.board.has_two_by_two_wall())
-
-        # Set the last of the 4 above cells as a wall
-        two_by_two_cell_list[3].update_cell_state(CellState.WALL)
-
-        expected_board_state = [
+    def test_board_has_two_by_two_walls(self) -> None:
+        board_details = [
             '1,X,X,_',
             '_,X,X,_',
             '_,3,_,_'
         ]
-        self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
-
-        # Now all 4 cells in that two-by-two section are walls
-        self.assertTrue(self.board.has_two_by_two_wall())
+        board = self.create_board(board_details)
+        self.assertTrue(board.has_two_by_two_wall())
 
 
 class TestCellGroups(TestBoard):
