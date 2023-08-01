@@ -32,6 +32,8 @@ class BoardStateChecker:
         self.check_for_isolated_walls()
         self.check_for_garden_with_multiple_clues()
         self.check_for_too_small_garden()
+        # TODO - check for garden that is too large
+        # TODO - check for enclosed garden that has no clue
 
     def check_for_two_by_two_section_of_walls(self) -> None:
         if self.board.has_two_by_two_wall():
