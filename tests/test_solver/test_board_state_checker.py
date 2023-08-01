@@ -1,0 +1,152 @@
+from unittest import TestCase
+from unittest.mock import MagicMock
+
+from nurikabe.solver.board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentState
+from tests.build_board import build_board
+
+
+class TestBoardStateChecker(TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.screen = MagicMock(name='Screen')
+
+    def create_board_state_checker(self, board_details: list[str]) -> BoardStateChecker:
+        board = build_board(self.screen, board_details)
+        return BoardStateChecker(board)
+
+
+class TestCheckForTwoByTwoSectionOfWalls(TestBoardStateChecker):
+    def test_no_two_by_two_section_of_walls(self) -> None:
+        """
+        Ensure that when there are no two-by-two sections of walls, NoPossibleSolutionFromCurrentState is not raised.
+        """
+        board_details = [
+            '1,_,_,X',
+            'X,_,X,_',
+            '_,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        try:
+            board_state_checker.check_for_two_by_two_section_of_walls()
+        except NoPossibleSolutionFromCurrentState:
+            self.fail('check_for_two_by_two_section_of_walls() raised NoPossibleSolutionFromCurrentState unexpectedly')
+
+    def test_has_two_by_two_section_of_walls(self) -> None:
+        """Check that when a there is a two-by-two section of walls, NoPossibleSolutionFromCurrentState is raised"""
+        board_details = [
+            '1,_,X,X',
+            'X,O,X,X',
+            '_,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+            board_state_checker.check_for_two_by_two_section_of_walls()
+
+
+class TestCheckForIsolatedWalls(TestBoardStateChecker):
+    def test_no_isolation(self) -> None:
+        """Ensure that when there are no isolated walls, NoPossibleSolutionFromCurrentState is not raised."""
+        board_details = [
+            '1,_,_,X',
+            'X,_,X,_',
+            '_,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        try:
+            board_state_checker.check_for_isolated_walls()
+        except NoPossibleSolutionFromCurrentState:
+            self.fail('check_for_isolated_walls() raised NoPossibleSolutionFromCurrentState unexpectedly')
+
+    def test_single_isolated_wall(self) -> None:
+        """Check that when a single wall is isolated, NoPossibleSolutionFromCurrentState is raised"""
+        board_details = [
+            '1,_,_,X',
+            'X,O,X,_',
+            '_,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+            board_state_checker.check_for_isolated_walls()
+
+    def test_multiple_isolated_wall(self) -> None:
+        """Check that when a single wall is isolated, NoPossibleSolutionFromCurrentState is raised"""
+        board_details = [
+            '1,_,_,X',
+            'X,O,X,_',
+            'X,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+            board_state_checker.check_for_isolated_walls()
+
+
+class TestCheckForGardenWithMultipleClues(TestBoardStateChecker):
+    def test_no_multiple_clue_gardens(self) -> None:
+        """
+        Ensure that when there are no gardens with multiple clues, NoPossibleSolutionFromCurrentState is not raised.
+        """
+        board_details = [
+            'O,_,_,_',
+            '1,_,_,_',
+            '_,3,O,_'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        try:
+            board_state_checker.check_for_garden_with_multiple_clues()
+        except NoPossibleSolutionFromCurrentState:
+            self.fail('check_for_garden_with_multiple_clues() raised NoPossibleSolutionFromCurrentState unexpectedly')
+
+    def test_has_multiple_clue_gardens(self) -> None:
+        """Check that when there is a garden with multiple clues, NoPossibleSolutionFromCurrentState is raised."""
+        board_details = [
+            'O,_,_,_',
+            '1,O,_,_',
+            '_,3,O,_'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+            board_state_checker.check_for_garden_with_multiple_clues()
+
+
+class TestCheckForTooSmallGarden(TestBoardStateChecker):
+    def test_no_too_small_gardens(self) -> None:
+        """
+        Ensure that when there are no gardens that are too small, NoPossibleSolutionFromCurrentState is not raised.
+        """
+        board_details = [
+            '_,_,O,_',
+            '1,_,_,_',
+            '_,3,O,_'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        try:
+            board_state_checker.check_for_too_small_garden()
+        except NoPossibleSolutionFromCurrentState:
+            self.fail('check_for_too_small_garden() raised NoPossibleSolutionFromCurrentState unexpectedly')
+
+    def test_has_too_small_garden(self) -> None:
+        """Check that when there is a garden that is too small, NoPossibleSolutionFromCurrentState is raised."""
+        board_details = [
+            '_,_,O,_',
+            '1,X,X,_',
+            'X,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+            board_state_checker.check_for_too_small_garden()
+
+    def test_garden_with_no_clue_is_ignored(self) -> None:
+        """
+        Ensure that when an enclosed garden that has no clue does not raise an error when calling
+        check_for_too_small_garden().
+        """
+        board_details = [
+            '_,X,O,O',
+            '1,_,X,X',
+            '_,3,O,_'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        try:
+            board_state_checker.check_for_too_small_garden()
+        except NoPossibleSolutionFromCurrentState:
+            self.fail('check_for_too_small_garden() raised NoPossibleSolutionFromCurrentState unexpectedly')
