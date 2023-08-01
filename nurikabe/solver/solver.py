@@ -58,7 +58,7 @@ class Solver:
             cell_changes.add_changes(self.fill_correctly_sized_weak_garden.apply_rule())
             cell_changes.add_changes(self.unreachable_from_garden.apply_rule())
         except NoPossibleSolutionFromCurrentState as error:
-            logger.error(error)
+            logger.error(f'Cannot solve from current state. Reason: {error}')
             for i, cell_group in enumerate(error.problem_cell_groups):
                 cell_group.draw_edges(self.screen, color=Color.RED)
             return cell_changes
