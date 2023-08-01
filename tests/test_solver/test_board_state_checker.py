@@ -44,6 +44,32 @@ class TestCheckForTwoByTwoSectionOfWalls(TestBoardStateChecker):
 
 
 class TestCheckForIsolatedWalls(TestBoardStateChecker):
+    def test_no_wall_cells(self) -> None:
+        """Ensure that when there are no walls, NoPossibleSolutionFromCurrentState is not raised."""
+        board_details = [
+            '1,_,_,_',
+            '_,_,_,O',
+            '_,3,O,_'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        try:
+            board_state_checker.check_for_isolated_walls()
+        except NoPossibleSolutionFromCurrentState:
+            self.fail('check_for_isolated_walls() raised NoPossibleSolutionFromCurrentState unexpectedly')
+
+    def test_one_wall_cell(self) -> None:
+        """Ensure that when there is one wall cell, NoPossibleSolutionFromCurrentState is not raised."""
+        board_details = [
+            '1,_,_,_',
+            '_,_,_,O',
+            '_,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        try:
+            board_state_checker.check_for_isolated_walls()
+        except NoPossibleSolutionFromCurrentState:
+            self.fail('check_for_isolated_walls() raised NoPossibleSolutionFromCurrentState unexpectedly')
+
     def test_no_isolation(self) -> None:
         """Ensure that when there are no isolated walls, NoPossibleSolutionFromCurrentState is not raised."""
         board_details = [
