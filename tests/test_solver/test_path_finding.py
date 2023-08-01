@@ -1,11 +1,11 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from nurikabe.level import Level, LevelBuilderFromStringList
 from nurikabe.board import Board
 from nurikabe.solver.path_finding import find_shortest_path_between_cells, find_shortest_path_between_cell_groups, \
     NoPathFoundError
 from nurikabe.cell_group import CellGroup
+from tests.build_board import build_board
 
 
 class TestPathFinding(TestCase):
@@ -13,35 +13,30 @@ class TestPathFinding(TestCase):
     def setUpClass(cls) -> None:
         cls.screen = MagicMock(name='Screen')
 
-    @staticmethod
-    def create_level_from_string_list(level_details: list[str]) -> Level:
-        return LevelBuilderFromStringList(level_details).build_level()
-
-    def create_board(self, level_details: list[str]) -> Board:
-        level = self.create_level_from_string_list(level_details)
-        return Board(level, self.screen)
+    def create_board(self, board_details: list[str]) -> Board:
+        return build_board(self.screen, board_details)
 
 
 class TestPathFindingBetweenCells(TestPathFinding):
     def test_same_cell(self) -> None:
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         cell = board.get_cell_from_grid(row_number=1, col_number=2)
         shortest_path_between_cells = find_shortest_path_between_cells(start_cell=cell, end_cell=cell)
         self.assertEqual(shortest_path_between_cells.cell_list, [cell])
 
     def test_path_too_long(self) -> None:
         """Set the max path length to zero. We expect NoPathFoundError to be thrown."""
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         cell = board.get_cell_from_grid(row_number=1, col_number=2)
 
         with self.assertRaises(NoPathFoundError):
@@ -49,12 +44,12 @@ class TestPathFindingBetweenCells(TestPathFinding):
 
     def test_start_cell_off_limits(self) -> None:
         """Since the start cell is off limits, we expect NoPathFoundError to be thrown."""
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
         end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
 
@@ -63,12 +58,12 @@ class TestPathFindingBetweenCells(TestPathFinding):
 
     def test_end_cell_off_limits(self) -> None:
         """Since the start cell is off limits, we expect NoPathFoundError to be thrown."""
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
         end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
 
@@ -77,12 +72,12 @@ class TestPathFindingBetweenCells(TestPathFinding):
 
     def test_straight_path_between_cells(self) -> None:
         """Test that the algorithm finds a straight path between cells when possible."""
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=1, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=1, col_number=3)
 
@@ -110,12 +105,12 @@ class TestPathFindingBetweenCells(TestPathFinding):
         have the same length as the shortest path - there is no one unique shortest path in this case. For this reason,
         we just test that the length of the shortest path is correct.
         """
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=2, col_number=2)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=1)
 
@@ -129,12 +124,12 @@ class TestPathFindingBetweenCells(TestPathFinding):
 
     def test_path_between_cells_with_off_limit_cells(self) -> None:
         """Test that the algorithm finds a path between cells when it has to go around some off limit cells."""
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=2, col_number=2)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=1)
         off_limit_cells = {
@@ -165,12 +160,12 @@ class TestPathFindingBetweenCells(TestPathFinding):
         Test that the algorithm finds a path between cells when there are off limit cells, but the off limit cells do
         not get in the way
         """
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=2, col_number=2)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=1)
         off_limit_cells = {
@@ -199,12 +194,12 @@ class TestPathFindingBetweenCells(TestPathFinding):
         Test that an error is thrown when trying to find a path between two cells if there is no possible path around
         the off limit cells.
         """
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=2, col_number=2)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=1)
         off_limit_cells = {
@@ -227,14 +222,14 @@ class TestPathFindingBetweenCells(TestPathFinding):
         Test that the algorithm finds a path between cells when it has to go around some off limit cells. Here, the
         off limit cells block the more direct route, so the algorithm has to go around
         """
-        level_details = [
-            ',,,,,,',
-            ',,,,,,',
-            ',,,,,,',
-            ',,,,,,',
-            ',,,,,,'
+        board_details = [
+            '_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=2, col_number=1)
         end_cell = board.get_cell_from_grid(row_number=4, col_number=4)
         off_limit_cells = {
@@ -301,12 +296,12 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
         Note that based on the design of the path finding algorithm, the exact cells included in this path are not
         guaranteed. Only the length of the path is guaranteed to be consistent
         """
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell_group = CellGroup(cells={
             board.get_cell_from_grid(row_number=1, col_number=2),
             board.get_cell_from_grid(row_number=2, col_number=2),
@@ -323,13 +318,13 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
         self.assertEqual(shortest_path_between_cell_groups.path_length, 1)
 
     def test_path_between_cell_groups(self) -> None:
-        level_details = [
-            ',,,,,',
-            ',,,,,',
-            ',,,,,',
-            ',,,,,'
+        board_details = [
+            '_,_,_,_,_,_',
+            '_,_,_,_,_,_',
+            '_,_,_,_,_,_',
+            '_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell_group = CellGroup(cells={
             board.get_cell_from_grid(row_number=0, col_number=3),
             board.get_cell_from_grid(row_number=1, col_number=3),
@@ -351,13 +346,13 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
         self.assertEqual(shortest_path_between_cell_groups.path_length, 4)
 
     def test_path_between_cell_groups_with_off_limits(self) -> None:
-        level_details = [
-            ',,,,,',
-            ',,,,,',
-            ',,,,,',
-            ',,,,,'
+        board_details = [
+            '_,_,_,_,_,_',
+            '_,_,_,_,_,_',
+            '_,_,_,_,_,_',
+            '_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         start_cell_group = CellGroup(cells={
             board.get_cell_from_grid(row_number=0, col_number=3),
             board.get_cell_from_grid(row_number=1, col_number=3),

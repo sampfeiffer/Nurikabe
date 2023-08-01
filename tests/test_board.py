@@ -1,10 +1,10 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from nurikabe.level import Level, LevelBuilderFromStringList
 from nurikabe.board import Board, AdjacentCluesError
 from nurikabe.cell_state import CellState
 from nurikabe.cell_group import CellGroup
+from tests.build_board import build_board
 
 
 class TestBoard(TestCase):
@@ -12,39 +12,34 @@ class TestBoard(TestCase):
     def setUpClass(cls) -> None:
         cls.screen = MagicMock(name='Screen')
 
-    @staticmethod
-    def create_level_from_string_list(level_details: list[str]) -> Level:
-        return LevelBuilderFromStringList(level_details).build_level()
-
-    def create_board(self, level_details: list[str]) -> Board:
-        level = self.create_level_from_string_list(level_details)
-        return Board(level, self.screen)
+    def create_board(self, board_details: list[str]) -> Board:
+        return build_board(self.screen, board_details)
 
 
 class TestBoardSetup(TestBoard):
     def test_vertically_adjacent_clues(self) -> None:
-        level_details = [
-            '1,',
-            '1,',
+        board_details = [
+            '1,_',
+            '1,_',
         ]
         with self.assertRaises(AdjacentCluesError):
-            self.create_board(level_details)
+            self.create_board(board_details)
 
     def test_horizontally_adjacent_clues(self) -> None:
-        level_details = [
-            ',',
+        board_details = [
+            '_,_',
             '1,1',
         ]
         with self.assertRaises(AdjacentCluesError):
-            self.create_board(level_details)
+            self.create_board(board_details)
 
     def test_cell_neighbor_count(self) -> None:
-        level_details = [
-            ',,,',
-            ',,,',
-            ',,,'
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
 
         corner_cells = (
             board.get_cell_from_grid(row_number=0, col_number=0),
@@ -76,12 +71,12 @@ class TestBoardSetup(TestBoard):
 
 class TestBoardAsSimpleStringList(TestBoard):
     def setUp(self) -> None:
-        level_details = [
-            ',,,2',
-            ',1,,',
-            ',,,'
+        board_details = [
+            '_,_,_,2',
+            '_,1,_,_',
+            '_,_,_,_'
         ]
-        self.board = self.create_board(level_details)
+        self.board = self.create_board(board_details)
 
     def test_initial_setup(self) -> None:
         expected_simple_string_list = [
@@ -106,12 +101,12 @@ class TestBoardAsSimpleStringList(TestBoard):
 
 class TestTwoByTwoWall(TestBoard):
     def setUp(self) -> None:
-        level_details = [
-            '1,,,',
-            ',,,',
-            ',3,,'
+        board_details = [
+            '1,_,_,_',
+            '_,_,_,_',
+            '_,3,_,_'
         ]
-        self.board = self.create_board(level_details)
+        self.board = self.create_board(board_details)
 
     def test_has_two_by_two_wall(self) -> None:
         # The board starts off with no wall cells, so there is of course no two-by-two section of walls
@@ -155,12 +150,12 @@ class TestTwoByTwoWall(TestBoard):
 
 class TestCellGroups(TestBoard):
     def test_get_garden(self) -> None:
-        level_details = [
-            ',,,,,',
-            ',1,,,,',
-            ',,,,,'
+        board_details = [
+            '_,_,_,_,_,_',
+            '_,1,_,_,_,_',
+            '_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
 
         clue_cell = board.get_cell_from_grid(row_number=1, col_number=1)
 
@@ -209,12 +204,12 @@ class TestCellGroups(TestBoard):
         self.assertEqual(board.get_garden(diagonal_cell).cells, board.get_garden(clue_cell).cells)
 
     def test_get_all_weak_gardens(self) -> None:
-        level_details = [
-            ',,,,,',
-            ',1,,,,',
-            ',,,,,'
+        board_details = [
+            '_,_,_,_,_,_',
+            '_,1,_,_,_,_',
+            '_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
 
         # There should only be one weak garden containing all cells in board
         all_weak_gardens = board.get_all_weak_gardens()
@@ -256,12 +251,12 @@ class TestCellGroups(TestBoard):
                 raise RuntimeError('Unexpected weak garden size')
 
     def test_get_wall_section(self) -> None:
-        level_details = [
-            ',,,,,',
-            ',1,,,,',
-            ',,,,,'
+        board_details = [
+            '_,_,_,_,_,_',
+            '_,1,_,_,_,_',
+            '_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
 
         # Mark some cells as walls
         wall_cells = [
@@ -298,12 +293,12 @@ class TestCellGroups(TestBoard):
         self.assertEqual(len(board.get_all_wall_sections()), 1)
 
     def test_cell_group_get_adjacent_neighbors(self) -> None:
-        level_details = [
-            ',,,,,',
-            ',1,,,,',
-            ',,,,,'
+        board_details = [
+            '_,_,_,_,_,_',
+            '_,1,_,_,_,_',
+            '_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
         cell_group = CellGroup(cells={
             board.get_cell_from_grid(row_number=0, col_number=1),
             board.get_cell_from_grid(row_number=1, col_number=1),
@@ -321,17 +316,17 @@ class TestCellGroups(TestBoard):
         self.assertEqual(adjacent_neighbor_cells, expected_adjacent_neighbors)
 
     def test_is_garden_fully_enclosed(self) -> None:
-        level_details = [
-            ',,,2,,',
-            ',5,,,,',
-            ',,,,,'
+        board_details = [
+            '_,_,_,2,O,_',
+            '_,5,_,_,_,_',
+            '_,_,_,_,_,_'
         ]
-        board = self.create_board(level_details)
+        board = self.create_board(board_details)
 
         clue_cell = board.get_cell_from_grid(row_number=0, col_number=3)
 
-        # Set one cell next to the clue cell as a non-wall to make it a part of the garden
-        board.get_cell_from_grid(row_number=0, col_number=4).update_cell_state(CellState.NON_WALL)
+        # At first, the garden is not fully enclosed
+        self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
 
         wall_cells = [
             board.get_cell_from_grid(row_number=0, col_number=2),
@@ -339,15 +334,6 @@ class TestCellGroups(TestBoard):
             board.get_cell_from_grid(row_number=1, col_number=3),
             board.get_cell_from_grid(row_number=1, col_number=4),
         ]
-
-        # At first, the garden is not fully enclosed
-        expected_board_state = [
-            '_,_,_,2,O,_',
-            '_,5,_,_,_,_',
-            '_,_,_,_,_,_'
-        ]
-        self.assertEqual(board.as_simple_string_list(), expected_board_state)
-        self.assertFalse(board.get_garden(clue_cell).is_garden_fully_enclosed())
 
         # Mark the cell to the left and the cell to the right as walls
         wall_cells[0].update_cell_state(CellState.WALL)
