@@ -264,3 +264,17 @@ class TestCheckForEnclosedGardenWithNoClue(TestBoardStateChecker):
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
             board_state_checker.check_for_enclosed_garden_with_no_clue()
+
+    def test_has_clueless_unenclosed_garden(self) -> None:
+        """
+        Check that when there is a garden that has no clue, even if it is not fully enclosed by walls,
+        NoPossibleSolutionFromCurrentState is raised if it cannot reach a clue cell since it's blocked by walls.
+        """
+        board_details = [
+            '_,X,O,O',
+            '1,_,X,_',
+            'X,3,O,X'
+        ]
+        board_state_checker = self.create_board_state_checker(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+            board_state_checker.check_for_enclosed_garden_with_no_clue()

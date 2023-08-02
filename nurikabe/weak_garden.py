@@ -22,3 +22,6 @@ class WeakGarden(CellGroup):
 
     def get_expected_garden_size(self) -> int:
         return self.get_clue_value()
+
+    def has_non_wall_cell(self) -> bool:
+        return any(cell.cell_state.is_non_wall() for cell in self.cells)

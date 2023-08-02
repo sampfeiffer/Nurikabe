@@ -95,11 +95,12 @@ class BoardStateChecker:
                 )
 
     def check_for_enclosed_garden_with_no_clue(self) -> None:
-        gardens = self.board.get_all_gardens()
-        gardens_with_no_clue = {garden for garden in gardens if not garden.does_contain_clue()}
-        for garden in gardens_with_no_clue:
-            if garden.is_garden_fully_enclosed():
-                raise NoPossibleSolutionFromCurrentState(
-                    message='Enclosed garden has no clue',
-                    problem_cell_groups={garden}
-                )
+        weak_gardens = self.board.get_all_weak_gardens()
+        gardens_with_no_clue = {weak_garden for weak_garden in weak_gardens
+                                if not weak_garden.does_contain_clue() and weak_garden.has_non_wall_cell()}
+
+        if len(gardens_with_no_clue) > 0:
+            raise NoPossibleSolutionFromCurrentState(
+                message='Garden has no clue',
+                problem_cell_groups=gardens_with_no_clue
+            )
