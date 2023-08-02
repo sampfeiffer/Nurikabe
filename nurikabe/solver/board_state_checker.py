@@ -32,8 +32,8 @@ class BoardStateChecker:
         self.check_for_isolated_walls()
         self.check_for_garden_with_multiple_clues()
         self.check_for_too_small_garden()
-        # TODO - check for garden that is too large
-        # TODO - check for enclosed garden that has no clue
+        self.check_for_too_large_garden()
+        self.check_for_enclosed_garden_with_no_clue()
 
     def check_for_two_by_two_section_of_walls(self) -> None:
         if self.board.has_two_by_two_wall():
@@ -82,4 +82,24 @@ class BoardStateChecker:
                 raise NoPossibleSolutionFromCurrentState(
                     message='Garden is too small',
                     problem_cell_groups={weak_garden}
+                )
+
+    def check_for_too_large_garden(self) -> None:
+        gardens = self.board.get_all_gardens()
+        gardens_with_one_clue = {garden for garden in gardens if garden.does_have_exactly_one_clue()}
+        for garden in gardens_with_one_clue:
+            if len(garden.cells) > garden.get_expected_garden_size():
+                raise NoPossibleSolutionFromCurrentState(
+                    message='Garden is too large',
+                    problem_cell_groups={garden}
+                )
+
+    def check_for_enclosed_garden_with_no_clue(self) -> None:
+        gardens = self.board.get_all_gardens()
+        gardens_with_no_clue = {garden for garden in gardens if not garden.does_contain_clue()}
+        for garden in gardens_with_no_clue:
+            if garden.is_garden_fully_enclosed():
+                raise NoPossibleSolutionFromCurrentState(
+                    message='Enclosed garden has no clue',
+                    problem_cell_groups={garden}
                 )
