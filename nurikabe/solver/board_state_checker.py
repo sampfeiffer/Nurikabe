@@ -43,24 +43,24 @@ class BoardStateChecker:
             )
 
     def check_for_isolated_walls(self) -> None:
-        wall_cells = self.board.get_wall_cells()
-        if len(wall_cells) == 0:
-            # Trivially, walls cannot be isolated if there are no wall cells
-            return
-
-        # Arbitrarily pick one wall cell, and ensure that if we flood adjacent cells while keeping garden cells off
-        # limits, we can reach every other wall cell
-        seed_wall_cell = list(wall_cells)[0]
-        connected_non_garden_cells = self.board.get_connected_cells(
-            starting_cell=seed_wall_cell,
+        non_garden_cell_groups = self.board.get_all_cell_groups(
             cell_criteria_func=lambda cell: not cell.cell_state.is_garden()
         )
-        unreachable_wall_cells = wall_cells - connected_non_garden_cells
-        if len(unreachable_wall_cells) > 0:
-            wall_sections = self.board.get_all_wall_sections()
+        non_garden_cell_groups_with_walls = {
+            non_garden_cell_group for non_garden_cell_group in non_garden_cell_groups
+            if non_garden_cell_group.does_contain_wall()
+        }
+        if len(non_garden_cell_groups_with_walls) > 1:
+            largest_non_garden_cell_group = max(non_garden_cell_groups_with_walls,
+                                                key=lambda cell_group: len(cell_group.cells))
+            problem_cell_groups = non_garden_cell_groups_with_walls - {largest_non_garden_cell_group}
+            problem_wall_groups = {
+                CellGroup(cells={cell for cell in problem_cell_group.cells if cell.cell_state.is_wall()})
+                for problem_cell_group in problem_cell_groups
+            }
             raise NoPossibleSolutionFromCurrentState(
                 message='Wall cells cannot connect',
-                problem_cell_groups=wall_sections
+                problem_cell_groups=problem_wall_groups
             )
 
     def check_for_garden_with_multiple_clues(self) -> None:

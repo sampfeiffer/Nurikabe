@@ -53,6 +53,9 @@ class CellGroup:
                     return cell
         raise RuntimeError('It should not be possible to reach this code')
 
+    def does_contain_wall(self) -> bool:
+        return any(cell.cell_state.is_wall() for cell in self.cells)
+
     def get_shortest_manhattan_distance_to_cell(self, destination_cell: Cell) -> int:
         return min([source_cell.get_manhattan_distance(destination_cell) for source_cell in self.cells])
 
