@@ -16,7 +16,9 @@ class TestEnsureGardenCanExpand(TestCase):
         return build_board(self.screen, board_details)
 
     def test_no_cell_changes(self) -> None:
-        """No gardens that that need to expand via a single cell, so the board is not impacted by this solver rule."""
+        """
+        There are no gardens that need to expand via a single cell, so the board is not impacted by this solver rule.
+        """
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
