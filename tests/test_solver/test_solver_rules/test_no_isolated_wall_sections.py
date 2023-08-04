@@ -88,7 +88,7 @@ class TestNoIsolatedWallSections(TestCase):
 
     def test_multiple_cells_in_only_escape_route(self) -> None:
         """
-        If the wall section must extend through multiple cells that make up the escape route, It requires multiple
+        If the wall section must extend through multiple cells that make up the escape route, it requires multiple
         iterations of this solver rule to mark all the escape route cells as walls. Each iteration can only mark one
         cell as a wall. The reason for this is that once a cell is marked as a wall, the set of wall sections can
         change. Therefore, the set of wall sections must be re-derived before potentially marking another cell as a
