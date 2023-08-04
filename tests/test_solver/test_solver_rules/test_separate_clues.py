@@ -6,7 +6,7 @@ from nurikabe.solver.solver_rules.separate_clues import SeparateClues
 from tests.build_board import build_board
 
 
-class TestBoardStateChecker(TestCase):
+class TestSeparateClues(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.screen = MagicMock(name='Screen')
