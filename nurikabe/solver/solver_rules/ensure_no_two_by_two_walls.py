@@ -8,10 +8,10 @@ from ...cell_group import CellGroup
 class EnsureNoTwoByTwoWalls(SolverRule):
     def apply_rule(self) -> CellChanges:
         """
-        If marking an empty cell as a wall would create a two-by-two section of walls, then it must be a non-wall.
-        We define a cell as being the start of a two-by-two section of walls if it is the top-left cell in the group of
-        walls. Because of this, don't bother checking any cell in the bottom row or the right most column since it
-        cannot be the start of a two-by-two group of walls.
+        If marking an empty cell as a wall would create a two-by-two section of walls, then that cell must be a
+        non-wall. We define a cell as being the start of a two-by-two section of walls if it is the top-left cell in the
+        group of walls. Because of this, we don't bother checking any cell in the bottom row or the right most column
+        since it cannot be the start of a two-by-two group of walls.
         """
         cell_changes = CellChanges()
         for row in self.board.cell_grid[:-1]:
