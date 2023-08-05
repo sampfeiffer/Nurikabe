@@ -2,7 +2,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.ensure_no_two_by_two_walls import EnsureNoTwoByTwoWalls
+from nurikabe.solver.solver_rules.ensure_no_two_by_two_walls import EnsureNoTwoByTwoWalls, \
+    NoPossibleSolutionFromCurrentState
 from tests.build_board import build_board
 
 
@@ -42,3 +43,16 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
             '_,O,X,O'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
+
+    def test_has_two_by_two_walls(self) -> None:
+        """
+        If there is already a two-by-two section of walls, the board is not in a solvable state, so an error is thrown.
+        """
+        board_details = [
+            '_,X,X,_',
+            'X,X,X,X',
+            '_,_,X,_'
+        ]
+        board = self.create_board(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+            EnsureNoTwoByTwoWalls(board).apply_rule()
