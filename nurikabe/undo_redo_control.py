@@ -30,11 +30,11 @@ class UndoRedoControl:
         if self.undo_button.should_handle_mouse_event(event_position):
             self.undo_button.handle_left_click_up()
             self.handle_undo()
+            self.set_button_status()
         elif self.redo_button.should_handle_mouse_event(event_position):
             self.redo_button.handle_left_click_up()
             self.handle_redo()
-
-        self.set_button_status()
+            self.set_button_status()
 
     def handle_undo(self) -> None:
         if len(self.undo_stack) > 0:
