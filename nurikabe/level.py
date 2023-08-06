@@ -4,6 +4,10 @@ from typing import Optional
 from pathlib import Path
 
 
+class BadLevelSetupError(Exception):
+    pass
+
+
 class Level:
     """
     Basic representation of a Nurikabe level. This is just a list of lists, where each cell value is either a
@@ -14,6 +18,14 @@ class Level:
         self.level_setup = level_setup
         self.number_of_rows = len(self.level_setup)
         self.number_of_columns = len(self.level_setup[0])
+
+        self.ensure_consistent_number_of_columns()
+
+    def ensure_consistent_number_of_columns(self) -> None:
+        """If there is an inconsistent number of columns per row, throw an error."""
+        for row in self.level_setup:
+            if len(row) != self.number_of_columns:
+                raise BadLevelSetupError('Inconsistent number of columns in level setup')
 
     def get_cell_value(self, row_number: int, col_number: int) -> Optional[int]:
         return self.level_setup[row_number][col_number]
@@ -55,8 +67,10 @@ class LevelBuilder(ABC):
     def parse_cell_value(cell_value_as_str: str) -> Optional[int]:
         if cell_value_as_str == '':
             return None
-        else:
+        elif cell_value_as_str.isnumeric():
             return int(cell_value_as_str)
+        else:
+            raise BadLevelSetupError(f'Unexpected character in level setup: {cell_value_as_str}')
 
 
 class LevelBuilderFromFile(LevelBuilder):
