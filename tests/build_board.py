@@ -4,6 +4,10 @@ from nurikabe.screen import Screen
 from nurikabe.cell_state import CellState
 
 
+class BadBoardSetupError(Exception):
+    pass
+
+
 def build_board(screen: Screen, board_details: list[str]) -> Board:
     """
     board_details is a list of strings where each string represents one row of the board. For example,
@@ -30,6 +34,14 @@ def build_board(screen: Screen, board_details: list[str]) -> Board:
                 cell.update_cell_state(CellState.WALL)
             elif cell_text == 'O':
                 cell.update_cell_state(CellState.NON_WALL)
+            elif cell_text.isnumeric():
+                # Clue cell
+                pass
+            elif cell_text == '_':
+                # Empty cell
+                pass
+            else:
+                raise BadBoardSetupError(f'Unexpected character in board setup: {cell_text}')
 
     return board
 

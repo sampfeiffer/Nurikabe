@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board, AdjacentCluesError
+from nurikabe.level import BadLevelSetupError
 from nurikabe.cell_state import CellState
 from nurikabe.cell_group import CellGroup
 from tests.build_board import build_board
@@ -120,6 +121,16 @@ class TestBoardAsSimpleStringList(TestBoard):
         ]
 
         self.assertEqual(cell_state_matrix, expected_cell_state_matrix)
+
+    def test_build_board_with_bad_char(self) -> None:
+        """If there is an unexpected character in the board details, an error should be thrown"""
+        board_details = [
+            '_,_,X,2',
+            'X,1,O,e',
+            'O,_,_,_'
+        ]
+        with self.assertRaises(BadLevelSetupError):
+            self.create_board(board_details)
 
 
 class TestTwoByTwoWall(TestBoard):
