@@ -23,12 +23,12 @@ class GridOffset:
 
 
 OFFSET_MAP = {
-    Direction.UP: GridOffset(row_offset=0, col_offset=-1),
-    Direction.DOWN: GridOffset(row_offset=0, col_offset=1),
-    Direction.RIGHT: GridOffset(row_offset=1, col_offset=0),
-    Direction.LEFT: GridOffset(row_offset=-1, col_offset=0),
-    Direction.RIGHT_UP: GridOffset(row_offset=1, col_offset=-1),
+    Direction.UP: GridOffset(row_offset=-1, col_offset=0),
+    Direction.DOWN: GridOffset(row_offset=1, col_offset=0),
+    Direction.RIGHT: GridOffset(row_offset=0, col_offset=1),
+    Direction.LEFT: GridOffset(row_offset=0, col_offset=-1),
+    Direction.RIGHT_UP: GridOffset(row_offset=-1, col_offset=1),
     Direction.LEFT_UP: GridOffset(row_offset=-1, col_offset=-1),
     Direction.RIGHT_DOWN: GridOffset(row_offset=1, col_offset=1),
-    Direction.LEFT_DOWN: GridOffset(row_offset=-1, col_offset=1)
+    Direction.LEFT_DOWN: GridOffset(row_offset=1, col_offset=-1)
 }
