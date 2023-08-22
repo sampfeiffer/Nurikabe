@@ -81,7 +81,10 @@ class CellGroup:
         all_cell_edges = [rect_edge for cell in self.cells for rect_edge in cell.get_edges()]
         return {cell_edges for cell_edges in all_cell_edges if all_cell_edges.count(cell_edges) == 1}
 
-    def __str__(self) -> str:
+    def does_include_cell(self, cells: set[Cell]) -> bool:
+        return len(self.cells.intersection(cells)) > 0
+
+    def __repr__(self) -> str:
         class_name = self.__class__.__name__
         cell_string_set = {str(cell) for cell in self.cells}
         return f'{class_name}(cells={cell_string_set})'

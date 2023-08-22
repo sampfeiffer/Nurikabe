@@ -149,7 +149,7 @@ class Cell:
     def get_edges(self) -> set[RectEdge]:
         return get_rect_edges(self.rect)
 
-    def __str__(self) -> str:
+    def __repr__(self) -> str:
         return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
                 f'clue={self.clue})')
 
