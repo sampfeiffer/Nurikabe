@@ -2,9 +2,10 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.path_finding import find_shortest_path_between_cells, find_shortest_path_between_cell_groups, \
-    NoPathFoundError
 from nurikabe.cell_group import CellGroup
+from nurikabe.cell import Cell
+from nurikabe.solver.path_finding import find_shortest_path_between_cells, find_shortest_path_between_cell_groups, \
+    PathSetupError, NoPathFoundError
 from tests.build_board import build_board
 
 
@@ -15,6 +16,105 @@ class TestPathFinding(TestCase):
 
     def create_board(self, board_details: list[str]) -> Board:
         return build_board(self.screen, board_details)
+
+
+class TestPathFindingSetup(TestPathFinding):
+    def test_start_cell_off_limits(self) -> None:
+        """Since the start cell is off limits, we expect PathSetupError to be thrown."""
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
+        end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
+
+        with self.assertRaises(PathSetupError):
+            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell, off_limits_cells={start_cell})
+
+    def test_end_cell_off_limits(self) -> None:
+        """Since the start cell is off limits, we expect PathSetupError to be thrown."""
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
+        end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
+
+        with self.assertRaises(PathSetupError):
+            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell, off_limits_cells={end_cell})
+
+    def test_other_cell_groups_contains_off_limits_cell(self) -> None:
+        """
+        The other cells groups contains a cell that is also marked as off limits, so we expect PathSetupError to be
+        thrown.
+        """
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
+        other_cell_groups = {CellGroup(cells={
+            board.get_cell_from_grid(row_number=2, col_number=0),
+            board.get_cell_from_grid(row_number=2, col_number=1)
+        })}
+        off_limit_cells = {
+            board.get_cell_from_grid(row_number=2, col_number=0),
+        }
+
+        with self.assertRaises(PathSetupError):
+            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell, off_limits_cells=off_limit_cells,
+                                             other_cell_groups=other_cell_groups)
+
+    def test_other_cell_groups_adjacent_to_start_cell_group(self) -> None:
+        """
+        The other cells groups contains a cell that is adjacent to the start cell group, so we expect PathSetupError to
+        be thrown.
+        """
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
+        other_cell_groups = {CellGroup(cells={
+            board.get_cell_from_grid(row_number=1, col_number=0)
+        })}
+
+        with self.assertRaises(PathSetupError):
+            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell,
+                                             other_cell_groups=other_cell_groups)
+
+    def test_other_cell_groups_adjacent_to_end_cell_group(self) -> None:
+        """
+        The other cells groups contains a cell that is adjacent to the end cell group. This is allowed, so no error
+        should be thrown.
+        """
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
+        other_cell_groups = {CellGroup(cells={
+            board.get_cell_from_grid(row_number=1, col_number=3)
+        })}
+
+        try:
+            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell,
+                                             other_cell_groups=other_cell_groups)
+        except PathSetupError:
+            self.fail(f'find_shortest_path_between_cells raised PathSetupError unexpectedly')
 
 
 class TestPathFindingBetweenCells(TestPathFinding):
@@ -41,34 +141,6 @@ class TestPathFindingBetweenCells(TestPathFinding):
 
         with self.assertRaises(NoPathFoundError):
             find_shortest_path_between_cells(start_cell=cell, end_cell=cell, max_path_length=0)
-
-    def test_start_cell_off_limits(self) -> None:
-        """Since the start cell is off limits, we expect NoPathFoundError to be thrown."""
-        board_details = [
-            '_,_,_,_',
-            '_,_,_,_',
-            '_,_,_,_'
-        ]
-        board = self.create_board(board_details)
-        start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
-        end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
-
-        with self.assertRaises(NoPathFoundError):
-            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell, off_limits_cells={start_cell})
-
-    def test_end_cell_off_limits(self) -> None:
-        """Since the start cell is off limits, we expect NoPathFoundError to be thrown."""
-        board_details = [
-            '_,_,_,_',
-            '_,_,_,_',
-            '_,_,_,_'
-        ]
-        board = self.create_board(board_details)
-        start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
-        end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
-
-        with self.assertRaises(NoPathFoundError):
-            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell, off_limits_cells={end_cell})
 
     def test_straight_path_between_cells(self) -> None:
         """Test that the algorithm finds a straight path between cells when possible."""
@@ -288,6 +360,303 @@ class TestPathFindingBetweenCells(TestPathFinding):
         with self.assertRaises(NoPathFoundError):
             find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell, off_limits_cells=off_limit_cells,
                                              max_path_length=15)
+
+    def test_path_between_cells_adjacent_with_other_too_large_cell_group(self) -> None:
+        """
+        The path from start cell to end cell must pass adjacent to another cell group. The path length increases to
+        include the number of cells in the adjacent cell group. If the max path length is too small to allow the
+        additional cells from the adjacent cell group, then we expect an error to be thrown.
+        """
+        board_details = [
+            '_,_,_',
+            '_,_,_',
+            '_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=2, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        other_cell_groups = {CellGroup(cells={
+            board.get_cell_from_grid(row_number=1, col_number=1),
+            board.get_cell_from_grid(row_number=1, col_number=2)
+        })}
+
+        # Trying to go from S to E, with other cell groups marked as 'O'
+        # 'E,_,_',
+        # '_,O,O',
+        # 'S,_,_'
+
+        with self.assertRaises(NoPathFoundError):
+            find_shortest_path_between_cells(start_cell=start_cell, end_cell=end_cell, max_path_length=4,
+                                             other_cell_groups=other_cell_groups)
+
+    def test_path_between_cells_adjacent_with_other_small_enough_cell_group(self) -> None:
+        """
+        The path from start cell to end cell must pass adjacent to another cell group. The path length increases to
+        include the number of cells in the adjacent cell group. If the max path length is large enough, then this
+        inclusion is allowed.
+        """
+        board_details = [
+            '_,_,_',
+            '_,_,_',
+            '_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=2, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        other_cell_groups = {CellGroup(cells={
+            board.get_cell_from_grid(row_number=1, col_number=1),
+            board.get_cell_from_grid(row_number=1, col_number=2)
+        })}
+
+        # Trying to go from S to E, with other cell groups marked as 'O'
+        # 'E,_,_',
+        # '_,O,O',
+        # 'S,_,_'
+
+        shortest_path_between_cells = find_shortest_path_between_cells(
+            start_cell=start_cell,
+            end_cell=end_cell,
+            max_path_length=5,
+            other_cell_groups=other_cell_groups
+        )
+        expected = [
+            start_cell,
+            board.get_cell_from_grid(row_number=1, col_number=0),
+            end_cell
+        ]
+
+        self.assertEqual(shortest_path_between_cells.cell_list, expected)
+        self.assertEqual(shortest_path_between_cells.path_length, 5)
+
+    def test_path_between_cells_adjacent_with_other_small_enough_cell_group_in_multiple_places(self) -> None:
+        """
+        The path from start cell to end cell must pass adjacent to another cell group multiple times. The path length
+        increases to include the number of cells in the adjacent cell group, but only one time. If the max path length
+        is large enough, then this inclusion is allowed.
+        """
+        board_details = [
+            '_,_,_',
+            '_,_,_',
+            '_,_,_',
+            '_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=3, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        other_cell_groups = {CellGroup(cells={
+            board.get_cell_from_grid(row_number=1, col_number=1),
+            board.get_cell_from_grid(row_number=2, col_number=1),
+            board.get_cell_from_grid(row_number=2, col_number=2)
+        })}
+
+        # Trying to go from S to E, with other cell groups marked as 'O'
+        # 'E,_,_',
+        # '_,O,_',
+        # '_,O,O',
+        # 'S,_,_'
+
+        shortest_path_between_cells = find_shortest_path_between_cells(
+            start_cell=start_cell,
+            end_cell=end_cell,
+            max_path_length=7,
+            other_cell_groups=other_cell_groups
+        )
+        expected = [
+            start_cell,
+            board.get_cell_from_grid(row_number=2, col_number=0),
+            board.get_cell_from_grid(row_number=1, col_number=0),
+            end_cell
+        ]
+
+        self.assertEqual(shortest_path_between_cells.cell_list, expected)
+        self.assertEqual(shortest_path_between_cells.path_length, 7)
+
+    def test_path_between_cells_leverage_other_cell_group(self) -> None:
+        """
+        The path from start cell to end cell must pass adjacent to another cell group. The path can than either go
+        through the other cell group or go around. The number of physical cells the path must pass through is larger for
+        the path through the other cell group. The path should go through the other cell group since once the path
+        passes adjacent to it (which it must), there is zero cost to passing through the rest of the cell group.
+        Whereas going the other way, will not allow the path to take advantage of this. The total "cost" of the path is
+        smaller if the path leverages the other cell group.
+        """
+        board_details = [
+            '_,_,_',
+            '_,_,_',
+            '_,_,_',
+            '_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=3, col_number=1)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        other_cell_groups = {CellGroup(cells={
+            board.get_cell_from_grid(row_number=0, col_number=2),
+            board.get_cell_from_grid(row_number=1, col_number=2),
+            board.get_cell_from_grid(row_number=2, col_number=2)
+        })}
+
+        off_limit_cells = {
+            board.get_cell_from_grid(row_number=1, col_number=1),
+            board.get_cell_from_grid(row_number=3, col_number=0),
+            board.get_cell_from_grid(row_number=3, col_number=2)
+        }
+
+        # Trying to go from S to E, with other cell groups marked as 'O' and off limits cells marked as 'X'
+        # 'E,_,O',
+        # '_,X,O',
+        # '_,_,O',
+        # 'X,S,X'
+
+        shortest_path_between_cells = find_shortest_path_between_cells(
+            start_cell=start_cell,
+            end_cell=end_cell,
+            off_limits_cells=off_limit_cells,
+            other_cell_groups=other_cell_groups
+        )
+        expected = [
+            start_cell,
+            board.get_cell_from_grid(row_number=2, col_number=1),
+            board.get_cell_from_grid(row_number=2, col_number=2),
+            board.get_cell_from_grid(row_number=1, col_number=2),
+            board.get_cell_from_grid(row_number=0, col_number=2),
+            board.get_cell_from_grid(row_number=0, col_number=1),
+            end_cell
+        ]
+        self.assertEqual(shortest_path_between_cells.cell_list, expected)
+        self.assertEqual(shortest_path_between_cells.path_length, 7)
+
+    def test_path_between_cells_adjacent_with_multiple_cell_groups(self) -> None:
+        """
+        The path from start cell to end cell must pass adjacent to multiple other cell groups. The path length increases
+        to include the number of cells in each adjacent cell group. If the max path length is large enough, then this
+        inclusion is allowed.
+        """
+        board_details = [
+            '_,_,_,_,_',
+            '_,_,_,_,_',
+            '_,_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=2, col_number=2)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=2)
+        other_cell_groups = {
+            CellGroup(cells={
+                board.get_cell_from_grid(row_number=1, col_number=0),
+                board.get_cell_from_grid(row_number=1, col_number=1)
+            }),
+            CellGroup(cells={
+                board.get_cell_from_grid(row_number=1, col_number=3),
+                board.get_cell_from_grid(row_number=1, col_number=4)
+            })
+        }
+        off_limit_cells = {
+            board.get_cell_from_grid(row_number=2, col_number=1),
+            board.get_cell_from_grid(row_number=2, col_number=3)
+        }
+
+        # Trying to go from S to E, with other cell groups marked as 'O' and off limit cells marked as 'X'
+        # '_,_,E,_,_',
+        # 'O,O,_,O,O',
+        # '_,X,S,X,_'
+
+        shortest_path_between_cells = find_shortest_path_between_cells(
+            start_cell=start_cell,
+            end_cell=end_cell,
+            off_limits_cells=off_limit_cells,
+            max_path_length=7,
+            other_cell_groups=other_cell_groups
+        )
+        expected = [
+            start_cell,
+            board.get_cell_from_grid(row_number=1, col_number=2),
+            end_cell
+        ]
+
+        self.assertEqual(shortest_path_between_cells.cell_list, expected)
+        self.assertEqual(shortest_path_between_cells.path_length, 7)
+
+    def test_go_long_way_around_due_to_large_other_cell_group(self) -> None:
+        """
+        The path from start cell to end cell has two choices.
+        1. Go through few physical cells but pass adjacent to a large other cell group.
+        2. Go through many physical cells, but don't pass adjacent to a large other cell group.
+
+        In this case, option 2 is cheaper since the cell group adds "length" to the short physical path that makes is
+        "longer" than the physically longer path.
+        """
+        board_details = [
+            '_,_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_,_',
+            '_,_,_,_,_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=7, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=7, col_number=7)
+
+        cells_in_other_cell_group: set[Cell] = set()
+        for row_num in (2, 3, 4, 5):
+            for col_num in (2, 3, 4, 5):
+                cells_in_other_cell_group.add(board.get_cell_from_grid(row_number=row_num, col_number=col_num))
+        cells_in_other_cell_group.add(board.get_cell_from_grid(row_number=6, col_number=4))
+        other_cell_groups = {CellGroup(cells=cells_in_other_cell_group)}
+
+        off_limit_cells: set[Cell] = set()
+        for row_num in (1, 6):
+            for col_num in range(1, 7):
+                if not (row_num == 6 and col_num == 4):
+                    off_limit_cells.add(board.get_cell_from_grid(row_number=row_num, col_number=col_num))
+        for col_num in (1, 6):
+            for row_num in range(1, 7):
+                off_limit_cells.add(board.get_cell_from_grid(row_number=row_num, col_number=col_num))
+
+        # Trying to go from S to E, with other cell groups marked as 'O' and off limit cells marked as 'X'
+        # '_,_,_,_,_,_,_,_',
+        # '_,X,X,X,X,X,X,_',
+        # '_,X,O,O,O,O,X,_',
+        # '_,X,O,O,O,O,X,_',
+        # '_,X,O,O,O,O,X,_',
+        # '_,X,O,O,O,O,X,_',
+        # '_,X,X,X,O,X,X,_',
+        # 'S,_,_,_,_,_,_,E'
+
+        shortest_path_between_cells = find_shortest_path_between_cells(
+            start_cell=start_cell,
+            end_cell=end_cell,
+            off_limits_cells=off_limit_cells,
+            other_cell_groups=other_cell_groups
+        )
+        expected = [
+            start_cell,
+            board.get_cell_from_grid(row_number=6, col_number=0),
+            board.get_cell_from_grid(row_number=5, col_number=0),
+            board.get_cell_from_grid(row_number=4, col_number=0),
+            board.get_cell_from_grid(row_number=3, col_number=0),
+            board.get_cell_from_grid(row_number=2, col_number=0),
+            board.get_cell_from_grid(row_number=1, col_number=0),
+            board.get_cell_from_grid(row_number=0, col_number=0),
+            board.get_cell_from_grid(row_number=0, col_number=1),
+            board.get_cell_from_grid(row_number=0, col_number=2),
+            board.get_cell_from_grid(row_number=0, col_number=3),
+            board.get_cell_from_grid(row_number=0, col_number=4),
+            board.get_cell_from_grid(row_number=0, col_number=5),
+            board.get_cell_from_grid(row_number=0, col_number=6),
+            board.get_cell_from_grid(row_number=0, col_number=7),
+            board.get_cell_from_grid(row_number=1, col_number=7),
+            board.get_cell_from_grid(row_number=2, col_number=7),
+            board.get_cell_from_grid(row_number=3, col_number=7),
+            board.get_cell_from_grid(row_number=4, col_number=7),
+            board.get_cell_from_grid(row_number=5, col_number=7),
+            board.get_cell_from_grid(row_number=6, col_number=7),
+            end_cell
+        ]
+
+        self.assertEqual(shortest_path_between_cells.cell_list, expected)
+        self.assertEqual(shortest_path_between_cells.path_length, 22)
 
 
 class TestPathFindingBetweenCellGroups(TestPathFinding):
