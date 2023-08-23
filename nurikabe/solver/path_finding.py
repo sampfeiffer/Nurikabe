@@ -1,4 +1,3 @@
-from __future__ import annotations
 import queue
 import math
 from dataclasses import dataclass, field
@@ -6,6 +5,7 @@ from typing import Optional
 
 from ..cell import Cell
 from ..cell_group import CellGroup
+from .path_info import PathInfo
 
 
 class NoPathFoundError(Exception):
@@ -16,29 +16,6 @@ class NoPathFoundError(Exception):
 class PathSetupError(Exception):
     """Indicates that there was something wrong with how the path finding problem was defined."""
     pass
-
-
-class PathInfo:
-    def __init__(self, cell_list: list[Cell], path_length: int, adjacent_cell_groups: Optional[set[CellGroup]] = None):
-        self.cell_list = cell_list
-        self.path_length = path_length
-        self.adjacent_cell_groups = adjacent_cell_groups
-        if self.adjacent_cell_groups is None:
-            self.adjacent_cell_groups: set[CellGroup] = set()
-
-    def is_adjacent_to_cell_group(self, cell_group: CellGroup) -> bool:
-        return cell_group in self.adjacent_cell_groups
-
-    def add_adjacent_to_cell_group(self, cell_group: CellGroup) -> None:
-        self.adjacent_cell_groups.add(cell_group)
-
-    def get_extended_path_info(self, new_cell: Cell, additional_path_length: int,
-                               additional_adjacent_cell_groups: set[CellGroup]) -> PathInfo:
-        return PathInfo(
-            cell_list=self.cell_list + [new_cell],
-            path_length=self.path_length + additional_path_length,
-            adjacent_cell_groups=self.adjacent_cell_groups.union(additional_adjacent_cell_groups)
-        )
 
 
 @dataclass(order=True)
