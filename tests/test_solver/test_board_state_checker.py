@@ -21,9 +21,9 @@ class TestCheckForTwoByTwoSectionOfWalls(TestBoardStateChecker):
         Ensure that when there are no two-by-two sections of walls, NoPossibleSolutionFromCurrentState is not raised.
         """
         board_details = [
-            '1,_,_,X',
-            'X,_,X,_',
-            '_,3,O,X'
+            '1,_,_,W',
+            'W,_,W,_',
+            '_,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         try:
@@ -34,9 +34,9 @@ class TestCheckForTwoByTwoSectionOfWalls(TestBoardStateChecker):
     def test_has_two_by_two_section_of_walls(self) -> None:
         """Check that when a there is a two-by-two section of walls, NoPossibleSolutionFromCurrentState is raised"""
         board_details = [
-            '1,_,X,X',
-            'X,O,X,X',
-            '_,3,O,X'
+            '1,_,W,W',
+            'W,O,W,W',
+            '_,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
@@ -62,7 +62,7 @@ class TestCheckForIsolatedWalls(TestBoardStateChecker):
         board_details = [
             '1,_,_,_',
             '_,_,_,O',
-            '_,3,O,X'
+            '_,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         try:
@@ -73,9 +73,9 @@ class TestCheckForIsolatedWalls(TestBoardStateChecker):
     def test_no_isolation(self) -> None:
         """Ensure that when there are no isolated walls, NoPossibleSolutionFromCurrentState is not raised."""
         board_details = [
-            '1,_,_,X',
-            'X,_,X,_',
-            '_,3,O,X'
+            '1,_,_,W',
+            'W,_,W,_',
+            '_,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         try:
@@ -86,9 +86,9 @@ class TestCheckForIsolatedWalls(TestBoardStateChecker):
     def test_single_isolated_wall(self) -> None:
         """Check that when a single wall is isolated, NoPossibleSolutionFromCurrentState is raised"""
         board_details = [
-            '1,_,_,X',
-            'X,O,X,_',
-            '_,3,O,X'
+            '1,_,_,W',
+            'W,O,W,_',
+            '_,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
@@ -97,9 +97,9 @@ class TestCheckForIsolatedWalls(TestBoardStateChecker):
     def test_multiple_isolated_wall(self) -> None:
         """Check that when a single wall is isolated, NoPossibleSolutionFromCurrentState is raised"""
         board_details = [
-            '1,_,_,X',
-            'X,O,X,_',
-            'X,3,O,X'
+            '1,_,_,W',
+            'W,O,W,_',
+            'W,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
@@ -154,8 +154,8 @@ class TestCheckForTooSmallGarden(TestBoardStateChecker):
         """Check that when there is a garden that is too small, NoPossibleSolutionFromCurrentState is raised."""
         board_details = [
             '_,_,O,_',
-            '1,X,X,_',
-            'X,3,O,X'
+            '1,W,W,_',
+            'W,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
@@ -167,8 +167,8 @@ class TestCheckForTooSmallGarden(TestBoardStateChecker):
         check_for_too_small_garden().
         """
         board_details = [
-            '_,X,O,O',
-            '1,_,X,X',
+            '_,W,O,O',
+            '1,_,W,W',
             '_,3,O,_'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
@@ -199,7 +199,7 @@ class TestCheckForTooLargeGarden(TestBoardStateChecker):
         board_details = [
             '_,_,O,_',
             '1,_,O,_',
-            'X,3,O,X'
+            'W,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
@@ -210,8 +210,8 @@ class TestCheckForTooLargeGarden(TestBoardStateChecker):
         Ensure that a garden that has no clue does not raise an error when calling check_for_too_large_garden().
         """
         board_details = [
-            '_,X,O,O',
-            '1,_,X,X',
+            '_,W,O,O',
+            '1,_,W,W',
             '_,3,O,_'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
@@ -225,8 +225,8 @@ class TestCheckForTooLargeGarden(TestBoardStateChecker):
         Ensure that a garden that has multiple clue does not raise an error when calling check_for_too_large_garden().
         """
         board_details = [
-            '_,X,O,O',
-            '1,_,_,X',
+            '_,W,O,O',
+            '1,_,_,W',
             'O,3,O,_'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
@@ -242,7 +242,7 @@ class TestCheckForEnclosedGardenWithNoClue(TestBoardStateChecker):
         Ensure that when there are no enclosed gardens without a clue, NoPossibleSolutionFromCurrentState is not raised.
         """
         board_details = [
-            '_,O,X,O',
+            '_,O,W,O',
             '1,_,_,_',
             '_,3,O,_'
         ]
@@ -257,9 +257,9 @@ class TestCheckForEnclosedGardenWithNoClue(TestBoardStateChecker):
         Check that when there is an enclosed garden that has no clue, NoPossibleSolutionFromCurrentState is raised.
         """
         board_details = [
-            '_,X,O,O',
-            '1,_,X,X',
-            'X,3,O,X'
+            '_,W,O,O',
+            '1,_,W,W',
+            'W,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
@@ -271,9 +271,9 @@ class TestCheckForEnclosedGardenWithNoClue(TestBoardStateChecker):
         NoPossibleSolutionFromCurrentState is raised if it cannot reach a clue cell since it's blocked by walls.
         """
         board_details = [
-            '_,X,O,O',
-            '1,_,X,_',
-            'X,3,O,X'
+            '_,W,O,O',
+            '1,_,W,_',
+            'W,3,O,W'
         ]
         board_state_checker = self.create_board_state_checker(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):

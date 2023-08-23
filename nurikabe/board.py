@@ -227,9 +227,9 @@ class Board:
 
         For example:
         [
-            '_,_,X,2',
-            'X,1,_,O',
-            '_,_,_,X'
+            '_,_,W,2',
+            'W,1,_,O',
+            '_,_,_,W'
         ]
         """
         return [','.join([cell.as_simple_string() for cell in row]) for row in self.cell_grid]

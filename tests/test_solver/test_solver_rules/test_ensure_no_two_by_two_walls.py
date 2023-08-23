@@ -18,9 +18,9 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
     def test_no_cell_changes(self) -> None:
         """There are no cells that need to be marked as a non-wall to avoid a two-by-two wall section."""
         board_details = [
-            'X,_,_,_',
-            '_,X,X,_',
-            '_,O,X,_'
+            'W,_,_,_',
+            '_,W,W,_',
+            '_,O,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureNoTwoByTwoWalls(board).apply_rule()
@@ -30,17 +30,17 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
     def test_prevent_two_by_two_walls(self) -> None:
         """There are cells that need to be marked as a non-wall to avoid a two-by-two wall section."""
         board_details = [
-            '_,X,_,_',
-            'X,X,X,X',
-            '_,_,X,_'
+            '_,W,_,_',
+            'W,W,W,W',
+            '_,_,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureNoTwoByTwoWalls(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
-            'O,X,O,_',
-            'X,X,X,X',
-            '_,O,X,O'
+            'O,W,O,_',
+            'W,W,W,W',
+            '_,O,W,O'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -49,9 +49,9 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
         If there is already a two-by-two section of walls, the board is not in a solvable state, so an error is thrown.
         """
         board_details = [
-            '_,X,X,_',
-            'X,X,X,X',
-            '_,_,X,_'
+            '_,W,W,_',
+            'W,W,W,W',
+            '_,_,W,_'
         ]
         board = self.create_board(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):

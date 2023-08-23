@@ -22,7 +22,7 @@ class TestEnsureGardenCanExpand(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            'O,3,X,_'
+            'O,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpand(board).apply_rule()
@@ -33,16 +33,16 @@ class TestEnsureGardenCanExpand(TestCase):
         """An undersized garden can only expand via a single cell, so this solver rule marks it as a non-wall cell."""
         board_details = [
             '_,_,_,_',
-            '_,X,_,_',
-            'O,3,X,_'
+            '_,W,_,_',
+            'O,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpand(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
             '_,_,_,_',
-            'O,X,_,_',
-            'O,3,X,_'
+            'O,W,_,_',
+            'O,3,W,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -52,16 +52,16 @@ class TestEnsureGardenCanExpand(TestCase):
         garden must expand via that cell, so this solver rule marks it as a non-wall cell.
         """
         board_details = [
-            'O,O,X,_',
-            'X,_,_,_',
+            'O,O,W,_',
+            'W,_,_,_',
             '_,_,_,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpand(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
-            'O,O,X,_',
-            'X,O,_,_',
+            'O,O,W,_',
+            'W,O,_,_',
             '_,_,_,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
@@ -69,8 +69,8 @@ class TestEnsureGardenCanExpand(TestCase):
     def test_garden_with_multiple_clues(self) -> None:
         """If a garden contains more than one clue, the board is not in a solvable state, so an error is thrown."""
         board_details = [
-            '1,O,3,X',
-            'X,_,_,_',
+            '1,O,3,W',
+            'W,_,_,_',
             '_,_,_,_'
         ]
         board = self.create_board(board_details)
@@ -90,7 +90,7 @@ class TestEnsureGardenCanExpand(TestCase):
         """
         board_details = [
             '_,_,_,_',
-            '_,_,X,X',
+            '_,_,W,W',
             '_,_,3,_'
         ]
         board = self.create_board(board_details)
@@ -111,7 +111,7 @@ class TestEnsureGardenCanExpand(TestCase):
         """
         board_details = [
             '_,_,_,_',
-            '_,4,X,X',
+            '_,4,W,W',
             '_,_,O,_'
         ]
         board = self.create_board(board_details)
@@ -128,7 +128,7 @@ class TestEnsureGardenCanExpand(TestCase):
         """
         board_details = [
             '_,_,_,_',
-            '_,_,X,X',
+            '_,_,W,W',
             '_,_,_,3'
         ]
         board = self.create_board(board_details)
@@ -139,7 +139,7 @@ class TestEnsureGardenCanExpand(TestCase):
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state1 = [
             '_,_,_,_',
-            '_,_,X,X',
+            '_,_,W,W',
             '_,_,O,3'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state1)
@@ -149,7 +149,7 @@ class TestEnsureGardenCanExpand(TestCase):
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state2 = [
             '_,_,_,_',
-            '_,_,X,X',
+            '_,_,W,W',
             '_,O,O,3'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state2)

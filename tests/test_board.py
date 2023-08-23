@@ -98,16 +98,16 @@ class TestBoardAsSimpleStringList(TestBoard):
         board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.NON_WALL)
         board.get_cell_from_grid(row_number=2, col_number=3).update_cell_state(CellState.WALL)
         expected_simple_string_list = [
-            '_,X,X,2',
+            '_,W,W,2',
             '_,1,_,O',
-            '_,_,_,X'
+            '_,_,_,W'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_simple_string_list)
 
     def test_build_board_with_cell_states(self) -> None:
         board_details = [
-            '_,_,X,2',
-            'X,1,O,_',
+            '_,_,W,2',
+            'W,1,O,_',
             'O,_,_,_'
         ]
         board = self.create_board(board_details)
@@ -125,8 +125,8 @@ class TestBoardAsSimpleStringList(TestBoard):
     def test_build_board_with_bad_char(self) -> None:
         """If there is an unexpected character in the board details, an error should be thrown"""
         board_details = [
-            '_,_,X,2',
-            'X,1,O,e',
+            '_,_,W,2',
+            'W,1,O,e',
             'O,_,_,_'
         ]
         with self.assertRaises(BadLevelSetupError):
@@ -147,8 +147,8 @@ class TestTwoByTwoWall(TestBoard):
 
     def test_board_has_three_of_four_walls(self) -> None:
         board_details = [
-            '1,X,X,_',
-            '_,X,_,_',
+            '1,W,W,_',
+            '_,W,_,_',
             '_,3,_,_'
         ]
         board = self.create_board(board_details)
@@ -156,8 +156,8 @@ class TestTwoByTwoWall(TestBoard):
 
     def test_board_has_two_by_two_walls(self) -> None:
         board_details = [
-            '1,X,X,_',
-            '_,X,X,_',
+            '1,W,W,_',
+            '_,W,W,_',
             '_,3,_,_'
         ]
         board = self.create_board(board_details)
@@ -242,9 +242,9 @@ class TestCellGroups(TestBoard):
             wall_cell.update_cell_state(CellState.WALL)
 
         expected_board_state = [
-            '_,_,_,_,X,_',
-            '_,1,_,_,X,_',
-            '_,_,_,_,_,X'
+            '_,_,_,_,W,_',
+            '_,1,_,_,W,_',
+            '_,_,_,_,_,W'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -285,9 +285,9 @@ class TestCellGroups(TestBoard):
             wall_cell.update_cell_state(CellState.WALL)
 
         expected_board_state = [
-            '_,_,_,_,X,_',
-            '_,1,_,_,X,X',
-            '_,_,_,X,_,_'
+            '_,_,_,_,W,_',
+            '_,1,_,_,W,W',
+            '_,_,_,W,_,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -301,9 +301,9 @@ class TestCellGroups(TestBoard):
         # Now we connect those two wall sections via another wall, and they are merged into one large wall section
         board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.WALL)
         expected_board_state = [
-            '_,_,_,_,X,_',
-            '_,1,_,X,X,X',
-            '_,_,_,X,_,_'
+            '_,_,_,_,W,_',
+            '_,1,_,W,W,W',
+            '_,_,_,W,_,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
         self.assertEqual(len(board.get_all_wall_sections()), 1)
@@ -357,7 +357,7 @@ class TestCellGroups(TestBoard):
 
         # The garden is still not fully enclosed
         expected_board_state = [
-            '_,_,X,2,O,X',
+            '_,_,W,2,O,W',
             '_,5,_,_,_,_',
             '_,_,_,_,_,_'
         ]
@@ -369,8 +369,8 @@ class TestCellGroups(TestBoard):
 
         # The garden is still not fully enclosed
         expected_board_state = [
-            '_,_,X,2,O,X',
-            '_,5,_,X,_,_',
+            '_,_,W,2,O,W',
+            '_,5,_,W,_,_',
             '_,_,_,_,_,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
@@ -381,8 +381,8 @@ class TestCellGroups(TestBoard):
 
         # Now the garden should be fully enclosed
         expected_board_state = [
-            '_,_,X,2,O,X',
-            '_,5,_,X,X,_',
+            '_,_,W,2,O,W',
+            '_,5,_,W,W,_',
             '_,_,_,_,_,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)

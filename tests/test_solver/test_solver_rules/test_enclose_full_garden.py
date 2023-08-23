@@ -19,7 +19,7 @@ class TestEncloseFullGarden(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            'O,3,X,_'
+            'O,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EncloseFullGarden(board).apply_rule()
@@ -31,15 +31,15 @@ class TestEncloseFullGarden(TestCase):
         board_details = [
             '_,_,_,1',
             '_,O,_,_',
-            'O,3,X,_'
+            'O,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EncloseFullGarden(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
-            '_,X,X,1',
-            'X,O,X,X',
-            'O,3,X,_'
+            '_,W,W,1',
+            'W,O,W,W',
+            'O,3,W,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -48,7 +48,7 @@ class TestEncloseFullGarden(TestCase):
         board_details = [
             '_,_,_,_',
             'O,O,_,_',
-            'O,3,X,_'
+            'O,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = EncloseFullGarden(board).apply_rule()
@@ -58,8 +58,8 @@ class TestEncloseFullGarden(TestCase):
     def test_garden_with_multiple_clues(self) -> None:
         """If a garden contains more than one clue, the board is not in a solvable state, so an error is thrown."""
         board_details = [
-            '1,O,3,X',
-            'X,_,_,_',
+            '1,O,3,W',
+            'W,_,_,_',
             '_,_,_,_'
         ]
         board = self.create_board(board_details)

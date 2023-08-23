@@ -32,9 +32,9 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         are walls in the way when determining if a cell is reachable by a clue cell.
         """
         board_details = [
-            '_,_,X,_',
-            '_,4,X,_',
-            '_,_,X,_'
+            '_,_,W,_',
+            '_,4,W,_',
+            '_,_,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromClueCell(board).apply_rule()
@@ -45,16 +45,16 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         """Empty cells that are Manhattan unreachable from a clue cell are marked as walls."""
         board_details = [
             '_,_,_,_',
-            '_,_,_,X',
-            '_,3,X,_'
+            '_,_,_,W',
+            '_,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromClueCell(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
-            'X,_,X,X',
-            '_,_,_,X',
-            '_,3,X,_'
+            'W,_,W,W',
+            '_,_,_,W',
+            '_,3,W,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -64,15 +64,15 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         """
         board_details = [
             '_,_,O,_',
-            '_,_,_,X',
-            '_,3,X,_'
+            '_,_,_,W',
+            '_,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromClueCell(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
-            'X,_,O,X',
-            '_,_,_,X',
-            '_,3,X,_'
+            'W,_,O,W',
+            '_,_,_,W',
+            '_,3,W,_'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)

@@ -20,9 +20,9 @@ class TestNoIsolatedWallSections(TestCase):
         trigger any cell changes.
         """
         board_details = [
-            '1,_,_,X',
+            '1,_,_,W',
             '_,_,_,_',
-            '_,3,X,_'
+            '_,3,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSections(board).apply_rule()
@@ -37,7 +37,7 @@ class TestNoIsolatedWallSections(TestCase):
         board_details = [
             '1,_,_,_',
             '_,_,O,_',
-            '_,_,X,3'
+            '_,_,W,3'
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSections(board).apply_rule()
@@ -51,16 +51,16 @@ class TestNoIsolatedWallSections(TestCase):
         """
         board_details = [
             '1,_,_,_',
-            'X,_,O,_',
-            '_,_,X,3'
+            'W,_,O,_',
+            '_,_,W,3'
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSections(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
             '1,_,_,_',
-            'X,_,O,_',
-            '_,X,X,3'
+            'W,_,O,_',
+            '_,W,W,3'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -77,9 +77,9 @@ class TestNoIsolatedWallSections(TestCase):
         cell must be a wall.
         """
         board_details = [
-            'X,_,_,_',
+            'W,_,_,_',
             '_,_,O,O',
-            '_,_,X,_'
+            '_,_,W,_'
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSections(board).apply_rule()
@@ -95,9 +95,9 @@ class TestNoIsolatedWallSections(TestCase):
         wall.
         """
         board_details = [
-            '_,X,_,_',
+            '_,W,_,_',
             '_,_,O,O',
-            '_,_,_,X'
+            '_,_,_,W'
         ]
         board = self.create_board(board_details)
         no_isolated_wall_sections_solver_rule = NoIsolatedWallSections(board)
@@ -106,9 +106,9 @@ class TestNoIsolatedWallSections(TestCase):
         cell_changes = no_isolated_wall_sections_solver_rule.apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state1 = [
-            '_,X,_,_',
+            '_,W,_,_',
             '_,_,O,O',
-            '_,_,X,X'
+            '_,_,W,W'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state1)
 
@@ -116,9 +116,9 @@ class TestNoIsolatedWallSections(TestCase):
         cell_changes = no_isolated_wall_sections_solver_rule.apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state2 = [
-            '_,X,_,_',
+            '_,W,_,_',
             '_,_,O,O',
-            '_,X,X,X'
+            '_,W,W,W'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state2)
 

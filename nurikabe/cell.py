@@ -160,6 +160,6 @@ class Cell:
         else:
             return {
                 CellState.EMPTY: '_',
-                CellState.WALL: 'X',
+                CellState.WALL: 'W',
                 CellState.NON_WALL: 'O',
             }[self.cell_state]

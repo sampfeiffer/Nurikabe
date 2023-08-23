@@ -32,9 +32,9 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         are walls in the way when determining if a cell is reachable by a garden.
         """
         board_details = [
-            '_,O,X,_',
-            '_,4,X,_',
-            '_,_,X,X'
+            '_,O,W,_',
+            '_,4,W,_',
+            '_,_,W,W'
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromGarden(board).apply_rule()
@@ -52,9 +52,9 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         cell_changes = NaivelyUnreachableFromGarden(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
-            '_,_,_,X,X',
-            '_,4,_,_,X',
-            '_,O,_,_,X'
+            '_,_,_,W,W',
+            '_,4,_,_,W',
+            '_,O,_,_,W'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -71,8 +71,8 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         cell_changes = NaivelyUnreachableFromGarden(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
-            '_,_,_,X,O',
+            '_,_,_,W,O',
             '_,4,_,_,O',
-            '_,O,_,_,X'
+            '_,O,_,_,W'
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
