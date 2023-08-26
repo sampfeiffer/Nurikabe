@@ -109,3 +109,27 @@ class TestPathFindingSetup(TestCase):
             PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=other_cell_groups)
         except PathSetupError:
             self.fail(f'find_shortest_path_between_cells raised PathSetupError unexpectedly')
+
+    def test_overlapping_other_cell_groups(self) -> None:
+        """There is a cell that is in more than one other cell group, so we expect PathSetupError to be thrown."""
+        board_details = [
+            '_,_,_,_',
+            '_,_,_,_',
+            '_,_,_,_'
+        ]
+        board = self.create_board(board_details)
+        start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
+        end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
+        other_cell_groups = {
+            CellGroup(cells={
+                board.get_cell_from_grid(row_number=1, col_number=3),
+                board.get_cell_from_grid(row_number=2, col_number=3),
+            }),
+            CellGroup(cells={
+                board.get_cell_from_grid(row_number=2, col_number=2),
+                board.get_cell_from_grid(row_number=2, col_number=3),
+            }),
+        }
+
+        with self.assertRaises(PathSetupError):
+            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=other_cell_groups)

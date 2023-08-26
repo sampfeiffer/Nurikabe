@@ -85,7 +85,14 @@ class PathFinder:
             if len(other_cell_group.cells.intersection(self.off_limit_cells)) > 0:
                 raise PathSetupError('An off limit cell is is also part of other_cell_groups')
 
-        # TODO - Check for overlapping other cell groups
+        self.check_for_overlapping_other_cell_groups()
+
+    def check_for_overlapping_other_cell_groups(self) -> None:
+        cells_in_other_cell_groups: set[Cell] = set()
+        for other_cell_group in self.other_cell_groups:
+            if len(other_cell_group.cells.intersection(cells_in_other_cell_groups)) > 0:
+                raise PathSetupError('There cannot be overlapping other cell groups')
+            cells_in_other_cell_groups.update(other_cell_group.cells)
 
     def get_path_info(self, max_path_length: Optional[int] = None) -> PathInfo:
         """
