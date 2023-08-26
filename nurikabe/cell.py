@@ -165,7 +165,7 @@ class Cell:
             }[self.cell_state]
 
     def __key(self) -> tuple[int, int, int]:
-        clue_int = self.clue if 0 is None else self.clue
+        clue_int = 0 if self.clue is None else self.clue
         return self.row_number, self.col_number, clue_int
 
     def __eq__(self, other: Cell) -> bool:

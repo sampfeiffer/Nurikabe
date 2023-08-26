@@ -108,7 +108,7 @@ class TestPathFindingSetup(TestCase):
         try:
             PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=other_cell_groups)
         except PathSetupError:
-            self.fail(f'find_shortest_path_between_cells raised PathSetupError unexpectedly')
+            self.fail('find_shortest_path_between_cells raised PathSetupError unexpectedly')
 
     def test_overlapping_other_cell_groups(self) -> None:
         """There is a cell that is in more than one other cell group, so we expect PathSetupError to be thrown."""

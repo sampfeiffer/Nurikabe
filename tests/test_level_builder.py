@@ -14,7 +14,7 @@ class TestLevelBuilder(TestCase):
         try:
             LevelBuilderFromStringList(level_details).build_level()
         except BadLevelSetupError:
-            self.fail(f'LevelBuilderFromStringList.build_level() raised BadLevelSetupError unexpectedly')
+            self.fail('LevelBuilderFromStringList.build_level() raised BadLevelSetupError unexpectedly')
 
     def test_inconsistent_num_of_columns_per_row(self) -> None:
         """If there is an inconsistent number of columns per row in the level details, an error should be thrown."""
