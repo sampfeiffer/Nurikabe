@@ -163,3 +163,15 @@ class Cell:
                 CellState.WALL: 'W',
                 CellState.NON_WALL: 'O',
             }[self.cell_state]
+
+    def __key(self) -> tuple[int, int, int]:
+        clue_int = self.clue if 0 is None else self.clue
+        return self.row_number, self.col_number, clue_int
+
+    def __eq__(self, other: Cell) -> bool:
+        if isinstance(other, Cell):
+            return self.__key() == other.__key()
+        raise RuntimeError(f'Cannot compare Cell to {type(other)}')
+
+    def __hash__(self) -> int:
+        return hash(self.__key())

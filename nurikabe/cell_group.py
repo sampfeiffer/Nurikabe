@@ -88,3 +88,10 @@ class CellGroup:
         class_name = self.__class__.__name__
         cell_string_set = {str(cell) for cell in self.cells}
         return f'{class_name}(cells={cell_string_set})'
+
+    def __eq__(self, other_cell_group: CellGroup) -> bool:
+        return self.cells == other_cell_group.cells
+
+    def __hash__(self) -> int:
+        sorted_cells = tuple(sorted(list(self.cells), key=lambda cell: (cell.row_number, cell.col_number)))
+        return hash(sorted_cells)

@@ -13,8 +13,14 @@ class TestWeakGarden(TestCase):
         cls.screen = MagicMock(name='Screen')
         cls.pixel_position = MagicMock(name='PixelPosition')
 
-    def get_cell(self, row_number: int = 0, col_number: int = 0, clue: Optional[int] = None) -> Cell:
-        return Cell(row_number, col_number, clue, pixel_position=self.pixel_position, screen=self.screen)
+        # Used to ensure that each created cell has a distinct row number so that they are not hash equivalents
+        cls.row_number = 0
+
+    def get_cell(self, clue: Optional[int] = None) -> Cell:
+        cell = Cell(row_number=self.row_number, col_number=0, clue=clue, pixel_position=self.pixel_position,
+                    screen=self.screen)
+        self.row_number += 1
+        return cell
 
     def test_weak_garden_no_clues(self) -> None:
         cells = {self.get_cell(clue=None) for _ in range(5)}
