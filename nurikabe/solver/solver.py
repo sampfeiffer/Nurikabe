@@ -9,7 +9,7 @@ from .board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurren
 
 from .solver_rules.separate_clues import SeparateClues
 from .solver_rules.no_isolated_wall_sections import NoIsolatedWallSections
-from .solver_rules.ensure_garden_can_expand import EnsureGardenCanExpand
+from .solver_rules.ensure_garden_can_expand_one_route import EnsureGardenCanExpandOneRoute
 from .solver_rules.enclose_full_garden import EncloseFullGarden
 from .solver_rules.ensure_no_two_by_two_walls import EnsureNoTwoByTwoWalls
 from .solver_rules.naively_unreachable_from_clue_cell import NaivelyUnreachableFromClueCell
@@ -32,7 +32,7 @@ class Solver:
         # Solver rules
         self.separate_clues = SeparateClues(self.board)
         self.no_isolated_wall_sections = NoIsolatedWallSections(self.board)
-        self.ensure_garden_can_expand = EnsureGardenCanExpand(self.board)
+        self.ensure_garden_can_expand_one_route = EnsureGardenCanExpandOneRoute(self.board)
         self.enclose_full_garden = EncloseFullGarden(self.board)
         self.ensure_no_two_by_two_walls = EnsureNoTwoByTwoWalls(self.board)
         self.naively_unreachable_from_clue_cell = NaivelyUnreachableFromClueCell(self.board)
@@ -49,7 +49,7 @@ class Solver:
 
             cell_changes.add_changes(self.separate_clues.apply_rule())
             cell_changes.add_changes(self.no_isolated_wall_sections.apply_rule())
-            cell_changes.add_changes(self.ensure_garden_can_expand.apply_rule())
+            cell_changes.add_changes(self.ensure_garden_can_expand_one_route.apply_rule())
             cell_changes.add_changes(self.enclose_full_garden.apply_rule())
             cell_changes.add_changes(self.ensure_no_two_by_two_walls.apply_rule())
             cell_changes.add_changes(self.naively_unreachable_from_clue_cell.apply_rule())

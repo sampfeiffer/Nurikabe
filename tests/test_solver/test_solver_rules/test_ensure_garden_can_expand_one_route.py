@@ -2,12 +2,12 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.ensure_garden_can_expand import EnsureGardenCanExpand, \
+from nurikabe.solver.solver_rules.ensure_garden_can_expand_one_route import EnsureGardenCanExpandOneRoute, \
     NoPossibleSolutionFromCurrentState
 from tests.build_board import build_board
 
 
-class TestEnsureGardenCanExpand(TestCase):
+class TestEnsureGardenCanExpandOneRoute(TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.screen = MagicMock(name='Screen')
@@ -25,7 +25,7 @@ class TestEnsureGardenCanExpand(TestCase):
             'O,3,W,_'
         ]
         board = self.create_board(board_details)
-        cell_changes = EnsureGardenCanExpand(board).apply_rule()
+        cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
         self.assertFalse(cell_changes.has_any_changes())
         self.assertEqual(board.as_simple_string_list(), board_details)
 
@@ -37,7 +37,7 @@ class TestEnsureGardenCanExpand(TestCase):
             'O,3,W,_'
         ]
         board = self.create_board(board_details)
-        cell_changes = EnsureGardenCanExpand(board).apply_rule()
+        cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
             '_,_,_,_',
@@ -57,7 +57,7 @@ class TestEnsureGardenCanExpand(TestCase):
             '_,_,_,_'
         ]
         board = self.create_board(board_details)
-        cell_changes = EnsureGardenCanExpand(board).apply_rule()
+        cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
         self.assertTrue(cell_changes.has_any_changes())
         expected_board_state = [
             'O,O,W,_',
@@ -75,7 +75,7 @@ class TestEnsureGardenCanExpand(TestCase):
         ]
         board = self.create_board(board_details)
         with self.assertRaises(NoPossibleSolutionFromCurrentState):
-            EnsureGardenCanExpand(board).apply_rule()
+            EnsureGardenCanExpandOneRoute(board).apply_rule()
 
     def test_non_naive_escape_route_for_garden_with_clue(self) -> None:
         """
@@ -94,7 +94,7 @@ class TestEnsureGardenCanExpand(TestCase):
             '_,_,3,_'
         ]
         board = self.create_board(board_details)
-        cell_changes = EnsureGardenCanExpand(board).apply_rule()
+        cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
         self.assertFalse(cell_changes.has_any_changes())
         self.assertEqual(board.as_simple_string_list(), board_details)
 
@@ -115,7 +115,7 @@ class TestEnsureGardenCanExpand(TestCase):
             '_,_,O,_'
         ]
         board = self.create_board(board_details)
-        cell_changes = EnsureGardenCanExpand(board).apply_rule()
+        cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
         self.assertFalse(cell_changes.has_any_changes())
         self.assertEqual(board.as_simple_string_list(), board_details)
 
@@ -132,7 +132,7 @@ class TestEnsureGardenCanExpand(TestCase):
             '_,_,_,3'
         ]
         board = self.create_board(board_details)
-        ensure_garden_can_expand_solver_rule = EnsureGardenCanExpand(board)
+        ensure_garden_can_expand_solver_rule = EnsureGardenCanExpandOneRoute(board)
 
         # First iteration of the solver rule should only change one cell
         cell_changes = ensure_garden_can_expand_solver_rule.apply_rule()

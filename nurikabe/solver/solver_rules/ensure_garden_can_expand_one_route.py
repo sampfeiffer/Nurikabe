@@ -5,7 +5,7 @@ from ...cell_state import CellState
 from ...cell_group import CellGroup
 
 
-class EnsureGardenCanExpand(SolverRule):
+class EnsureGardenCanExpandOneRoute(SolverRule):
     def apply_rule(self) -> CellChanges:
         """
         If there is an incomplete garden and only one empty cell adjacent to the garden, the garden must expand via
