@@ -199,6 +199,9 @@ class Board:
     def get_clue_cells(self) -> set[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_clue())
 
+    def get_garden_cells(self) -> set[Cell]:
+        return self.filter_cells(lambda cell: cell.cell_state.is_garden())
+
     def get_weak_garden_cells(self) -> set[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_weak_garden())
 
@@ -220,6 +223,19 @@ class Board:
             if cell.does_form_two_by_two_walls():
                 two_by_two_wall_section_cells.update(cell.get_two_by_two_section())
         return two_by_two_wall_section_cells
+
+    def get_all_non_garden_cell_groups_with_walls(self, additional_off_limit_cell: Optional[Cell] = None) \
+            -> set[CellGroup]:
+        off_limit_cells = self.get_garden_cells()
+        if additional_off_limit_cell is not None:
+            off_limit_cells.add(additional_off_limit_cell)
+        non_garden_cell_groups = self.get_all_cell_groups(
+            cell_criteria_func=lambda cell: cell not in off_limit_cells
+        )
+        return {
+            non_garden_cell_group for non_garden_cell_group in non_garden_cell_groups
+            if non_garden_cell_group.does_contain_wall()
+        }
 
     def as_simple_string_list(self) -> list[str]:
         """

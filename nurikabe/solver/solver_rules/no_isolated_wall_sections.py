@@ -1,4 +1,5 @@
 from .abstract_solver_rule import SolverRule
+from ..board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentState
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
 
@@ -6,21 +7,22 @@ from ...cell_state import CellState
 class NoIsolatedWallSections(SolverRule):
     def apply_rule(self) -> CellChanges:
         """
-        All walls must be connected vertically or horizontally. If there is a wall that only has one "escape route" to
-        connect to other walls, set that escape route cell to a wall.
+        All walls must be connected vertically or horizontally. If there is an empty cell that would block all wall
+        sections from connecting if it were to be marked as a non-wall, then it must be a wall cell. This solver rule is
+        more expensive, but also more comprehensive than NoIsolatedWallSectionsNaive.
         """
         cell_changes = CellChanges()
-        wall_sections = self.board.get_all_wall_sections()
-        if len(wall_sections) == 1:
-            # If there is one wall section, then we don't know that the wall section needs to expand
+        non_garden_cell_groups_with_walls = self.board.get_all_non_garden_cell_groups_with_walls()
+        if len(non_garden_cell_groups_with_walls) == 0:
             return cell_changes
 
-        for wall_section in wall_sections:
-            escape_routes = wall_section.get_empty_adjacent_neighbors()
-            if len(escape_routes) == 1:
-                only_escape_route = list(escape_routes)[0]
-                cell_changes.add_change(self.set_cell_to_state(only_escape_route, CellState.WALL,
+        board_state_checker = BoardStateChecker(self.board)
+        board_state_checker.check_for_isolated_walls(non_garden_cell_groups_with_walls)
+
+        for cell in self.board.get_empty_cells():
+            cell_groups = self.board.get_all_non_garden_cell_groups_with_walls(additional_off_limit_cell=cell)
+            if len(cell_groups) > 1:
+                cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL,
                                                                reason='Ensure no isolated wall sections'))
-                # Because a cell was changed to a wall, the previously calculated wall_sections is no longer valid
-                return cell_changes
+
         return cell_changes
