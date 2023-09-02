@@ -66,12 +66,11 @@ class Solver:
             cell_changes.add_changes(self.ensure_garden_with_clue_can_expand.apply_rule())
             cell_changes.add_changes(self.ensure_garden_without_clue_can_expand.apply_rule())
             cell_changes.add_changes(self.no_isolated_wall_sections.apply_rule())
+            self.board.update_painted_gardens()
         except NoPossibleSolutionFromCurrentState as error:
             logger.error(f'Cannot solve from current state. Reason: {error}')
             for i, cell_group in enumerate(error.problem_cell_groups):
                 cell_group.draw_edges(self.screen, color=Color.RED)
-            return cell_changes
 
-        self.board.update_painted_gardens()
         self.undo_redo_control.process_board_event(cell_changes)
         return cell_changes
