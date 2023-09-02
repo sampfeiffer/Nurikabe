@@ -34,7 +34,7 @@ def main() -> None:
     log_level = {'debug': logging.DEBUG, 'info': logging.INFO}[args.log_level]
     logging.basicConfig(
         level=log_level,
-        format='%(asctime)s %(levelname)s %(filename)s:%(lineno)s:%(funcName)s() - %(message)s',
+        format='%(asctime)s.%(msecs)03d %(levelname)s %(filename)s:%(lineno)s:%(funcName)s() - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S'
     )
     pygame.init()

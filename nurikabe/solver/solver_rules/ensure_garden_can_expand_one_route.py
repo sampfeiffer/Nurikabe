@@ -6,6 +6,11 @@ from ...cell_group import CellGroup
 
 
 class EnsureGardenCanExpandOneRoute(SolverRule):
+    # TODO - this is definitely covered by the combo of EnsureGardenWithClueCanExpand and
+    #  EnsureGardenWithoutClueCanExpand. Should we keep this solver rule since it's cheap? Or should we remove since
+    #  it's a duplicated check? This decision is pending some speed checks to see how much quicker this runs than the
+    #  more complicated solver rules mentioned above.
+
     def apply_rule(self) -> CellChanges:
         """
         If there is an incomplete garden and only one empty cell adjacent to the garden, the garden must expand via
