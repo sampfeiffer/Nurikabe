@@ -17,6 +17,8 @@ from .solver_rules.naively_unreachable_from_garden import NaivelyUnreachableFrom
 from .solver_rules.separate_gardens_with_clues import SeparateGardensWithClues
 from .solver_rules.fill_correctly_sized_weak_garden import FillCorrectlySizedWeakGarden
 from .solver_rules.unreachable_from_garden import UnreachableFromGarden
+from .solver_rules.ensure_garden_with_clue_can_expand import EnsureGardenWithClueCanExpand
+from .solver_rules.ensure_garden_without_clue_can_expand import EnsureGardenWithoutClueCanExpand
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,8 @@ class Solver:
         self.separate_gardens_with_clues = SeparateGardensWithClues(self.board)
         self.fill_correctly_sized_weak_garden = FillCorrectlySizedWeakGarden(self.board)
         self.unreachable_from_garden = UnreachableFromGarden(self.board)
+        self.ensure_garden_with_clue_can_expand = EnsureGardenWithClueCanExpand(self.board)
+        self.ensure_garden_without_clue_can_expand = EnsureGardenWithoutClueCanExpand(self.board)
 
     def run_solver(self) -> CellChanges:
         cell_changes = CellChanges()
@@ -57,6 +61,8 @@ class Solver:
             cell_changes.add_changes(self.separate_gardens_with_clues.apply_rule())
             cell_changes.add_changes(self.fill_correctly_sized_weak_garden.apply_rule())
             cell_changes.add_changes(self.unreachable_from_garden.apply_rule())
+            cell_changes.add_changes(self.ensure_garden_with_clue_can_expand.apply_rule())
+            cell_changes.add_changes(self.ensure_garden_without_clue_can_expand.apply_rule())
         except NoPossibleSolutionFromCurrentState as error:
             logger.error(f'Cannot solve from current state. Reason: {error}')
             for i, cell_group in enumerate(error.problem_cell_groups):
