@@ -1,13 +1,18 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
-import pygame
+from typing import TYPE_CHECKING
 
 from .pixel_position import PixelPosition
+
+if TYPE_CHECKING:
+    import pygame
 
 
 @dataclass(frozen=True)
 class RectEdge:
     """Represents the edge of a pygame.Rect object."""
+
     start_pixel_position: PixelPosition
     end_pixel_position: PixelPosition
 

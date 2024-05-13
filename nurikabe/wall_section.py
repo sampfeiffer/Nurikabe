@@ -1,7 +1,7 @@
-from typing import Callable
+from collections.abc import Callable
 
-from .cell_group import CellGroup
 from .cell import Cell
+from .cell_group import CellGroup
 
 
 class WallSection(CellGroup):

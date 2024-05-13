@@ -1,7 +1,8 @@
 # To run, go up one directory and run python -m nurikabe.main
 
-import logging
 import argparse
+import logging
+
 import pygame
 
 from .nurikabe import Nurikabe
@@ -35,7 +36,7 @@ def main() -> None:
     logging.basicConfig(
         level=log_level,
         format='%(asctime)s.%(msecs)03d %(levelname)s %(filename)s:%(lineno)s:%(funcName)s() - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        datefmt='%Y-%m-%d %H:%M:%S',
     )
     pygame.init()
     Nurikabe(level_number=args.level, should_use_solver=args.use_solver,

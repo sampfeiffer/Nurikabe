@@ -2,8 +2,10 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.ensure_no_two_by_two_walls import EnsureNoTwoByTwoWalls, \
-    NoPossibleSolutionFromCurrentState
+from nurikabe.solver.solver_rules.ensure_no_two_by_two_walls import (
+    EnsureNoTwoByTwoWalls,
+    NoPossibleSolutionFromCurrentStateError,
+)
 from tests.build_board import build_board
 
 
@@ -20,7 +22,7 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
         board_details = [
             'W,_,_,_',
             '_,W,W,_',
-            '_,O,W,_'
+            '_,O,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureNoTwoByTwoWalls(board).apply_rule()
@@ -32,7 +34,7 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
         board_details = [
             '_,W,_,_',
             'W,W,W,W',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureNoTwoByTwoWalls(board).apply_rule()
@@ -40,7 +42,7 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
         expected_board_state = [
             'O,W,O,_',
             'W,W,W,W',
-            '_,O,W,O'
+            '_,O,W,O',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -51,8 +53,8 @@ class TestEnsureNoTwoByTwoWalls(TestCase):
         board_details = [
             '_,W,W,_',
             'W,W,W,W',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
-        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
             EnsureNoTwoByTwoWalls(board).apply_rule()

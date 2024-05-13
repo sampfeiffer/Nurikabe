@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.enclose_full_garden import EncloseFullGarden, NoPossibleSolutionFromCurrentState
+from nurikabe.solver.solver_rules.enclose_full_garden import EncloseFullGarden, NoPossibleSolutionFromCurrentStateError
 from tests.build_board import build_board
 
 
@@ -19,7 +19,7 @@ class TestEncloseFullGarden(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EncloseFullGarden(board).apply_rule()
@@ -31,7 +31,7 @@ class TestEncloseFullGarden(TestCase):
         board_details = [
             '_,_,_,1',
             '_,O,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EncloseFullGarden(board).apply_rule()
@@ -39,7 +39,7 @@ class TestEncloseFullGarden(TestCase):
         expected_board_state = [
             '_,W,W,1',
             'W,O,W,W',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -48,7 +48,7 @@ class TestEncloseFullGarden(TestCase):
         board_details = [
             '_,_,_,_',
             'O,O,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EncloseFullGarden(board).apply_rule()
@@ -60,8 +60,8 @@ class TestEncloseFullGarden(TestCase):
         board_details = [
             '1,O,3,W',
             'W,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
-        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
             EncloseFullGarden(board).apply_rule()

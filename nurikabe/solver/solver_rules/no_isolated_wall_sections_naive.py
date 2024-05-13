@@ -1,7 +1,7 @@
-from .abstract_solver_rule import SolverRule
-from ..board_state_checker import NoPossibleSolutionFromCurrentState
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
+from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from .abstract_solver_rule import SolverRule
 
 
 class NoIsolatedWallSectionsNaive(SolverRule):
@@ -22,12 +22,12 @@ class NoIsolatedWallSectionsNaive(SolverRule):
         for wall_section in wall_sections:
             escape_routes = wall_section.get_empty_adjacent_neighbors()
             if len(escape_routes) == 0:
-                raise NoPossibleSolutionFromCurrentState(
+                raise NoPossibleSolutionFromCurrentStateError(
                     message='Isolated wall section',
-                    problem_cell_groups={wall_section}
+                    problem_cell_groups={wall_section},
                 )
-            elif len(escape_routes) == 1:
-                only_escape_route = list(escape_routes)[0]
+            if len(escape_routes) == 1:
+                only_escape_route = next(iter(escape_routes))  # Get first item in the list
                 cell_changes.add_change(self.set_cell_to_state(only_escape_route, CellState.WALL,
                                                                reason='Ensure no naively isolated wall sections'))
                 # Because a cell was changed to a wall, the previously calculated wall_sections is no longer valid

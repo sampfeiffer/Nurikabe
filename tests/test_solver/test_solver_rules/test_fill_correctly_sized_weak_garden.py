@@ -19,7 +19,7 @@ class TestFillCorrectlySizedWeakGarden(TestCase):
         board_details = [
             '_,W,_,3',
             '_,_,W,_',
-            '_,_,_,W'
+            '_,_,_,W',
         ]
         board = self.create_board(board_details)
         cell_changes = FillCorrectlySizedWeakGarden(board).apply_rule()
@@ -27,7 +27,7 @@ class TestFillCorrectlySizedWeakGarden(TestCase):
         expected_board_state = [
             '_,W,O,3',
             '_,_,W,O',
-            '_,_,_,W'
+            '_,_,_,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -36,7 +36,7 @@ class TestFillCorrectlySizedWeakGarden(TestCase):
         board_details = [
             '_,W,_,3',
             '_,_,W,W',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = FillCorrectlySizedWeakGarden(board).apply_rule()
@@ -48,7 +48,7 @@ class TestFillCorrectlySizedWeakGarden(TestCase):
         board_details = [
             '_,W,_,3',
             '_,_,W,_',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = FillCorrectlySizedWeakGarden(board).apply_rule()
@@ -60,7 +60,7 @@ class TestFillCorrectlySizedWeakGarden(TestCase):
         board_details = [
             '_,W,_,_',
             '_,_,W,_',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = FillCorrectlySizedWeakGarden(board).apply_rule()
@@ -72,7 +72,7 @@ class TestFillCorrectlySizedWeakGarden(TestCase):
         board_details = [
             '_,W,2,_',
             '_,W,_,_',
-            '_,_,W,2'
+            '_,_,W,2',
         ]
         board = self.create_board(board_details)
         cell_changes = FillCorrectlySizedWeakGarden(board).apply_rule()

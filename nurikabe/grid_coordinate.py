@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from .direction import Direction, OFFSET_MAP
+from .direction import OFFSET_MAP, Direction
 
 
 class GridCoordinate:

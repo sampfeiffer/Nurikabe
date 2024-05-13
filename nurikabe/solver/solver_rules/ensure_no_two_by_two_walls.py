@@ -1,11 +1,13 @@
-from .abstract_solver_rule import SolverRule
-from ..board_state_checker import NoPossibleSolutionFromCurrentState
 from ...cell_change_info import CellChanges
-from ...cell_state import CellState
 from ...cell_group import CellGroup
+from ...cell_state import CellState
+from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from .abstract_solver_rule import SolverRule
 
 
 class EnsureNoTwoByTwoWalls(SolverRule):
+    CELL_COUNT_IN_TWO_BY_TWO_SECTION = 4
+
     def apply_rule(self) -> CellChanges:
         """
         If marking an empty cell as a wall would create a two-by-two section of walls, then that cell must be a
@@ -19,14 +21,14 @@ class EnsureNoTwoByTwoWalls(SolverRule):
                 two_by_two_section = cell.get_two_by_two_section()
                 two_by_two_section_num_of_walls = len([cell for cell in two_by_two_section
                                                        if cell.cell_state.is_wall()])
-                if two_by_two_section_num_of_walls == 3:
+                if two_by_two_section_num_of_walls == self.CELL_COUNT_IN_TWO_BY_TWO_SECTION - 1:
                     for cell_corner in two_by_two_section:
                         if cell_corner.cell_state.is_empty():
                             cell_changes.add_change(self.set_cell_to_state(cell_corner, CellState.NON_WALL,
                                                                            reason='No two-by-two walls'))
-                elif two_by_two_section_num_of_walls == 4:
-                    raise NoPossibleSolutionFromCurrentState(
+                elif two_by_two_section_num_of_walls == self.CELL_COUNT_IN_TWO_BY_TWO_SECTION:
+                    raise NoPossibleSolutionFromCurrentStateError(
                         message='There is a two-by-two section of walls',
-                        problem_cell_groups={CellGroup(two_by_two_section)}
+                        problem_cell_groups={CellGroup(two_by_two_section)},
                     )
         return cell_changes

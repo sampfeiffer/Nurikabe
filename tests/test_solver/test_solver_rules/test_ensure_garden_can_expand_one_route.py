@@ -2,8 +2,10 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.ensure_garden_can_expand_one_route import EnsureGardenCanExpandOneRoute, \
-    NoPossibleSolutionFromCurrentState
+from nurikabe.solver.solver_rules.ensure_garden_can_expand_one_route import (
+    EnsureGardenCanExpandOneRoute,
+    NoPossibleSolutionFromCurrentStateError,
+)
 from tests.build_board import build_board
 
 
@@ -22,7 +24,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
@@ -34,7 +36,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         board_details = [
             '_,_,_,_',
             '_,W,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
@@ -42,7 +44,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         expected_board_state = [
             '_,_,_,_',
             'O,W,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -54,7 +56,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         board_details = [
             'O,O,W,_',
             'W,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
@@ -62,7 +64,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         expected_board_state = [
             'O,O,W,_',
             'W,O,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -71,10 +73,10 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         board_details = [
             '1,O,3,W',
             'W,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
-        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
             EnsureGardenCanExpandOneRoute(board).apply_rule()
 
     def test_non_naive_escape_route_for_garden_with_clue(self) -> None:
@@ -91,7 +93,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,_,3,_'
+            '_,_,3,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
@@ -112,7 +114,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         board_details = [
             '_,_,_,_',
             '_,4,W,W',
-            '_,_,O,_'
+            '_,_,O,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenCanExpandOneRoute(board).apply_rule()
@@ -129,7 +131,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,_,_,3'
+            '_,_,_,3',
         ]
         board = self.create_board(board_details)
         ensure_garden_can_expand_solver_rule = EnsureGardenCanExpandOneRoute(board)
@@ -140,7 +142,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         expected_board_state1 = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,_,O,3'
+            '_,_,O,3',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state1)
 
@@ -150,7 +152,7 @@ class TestEnsureGardenCanExpandOneRoute(TestCase):
         expected_board_state2 = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,O,O,3'
+            '_,O,O,3',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state2)
 

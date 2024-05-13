@@ -1,9 +1,9 @@
-from .abstract_solver_rule import SolverRule
-from ..board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentState
+from ...cell import Cell
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
-from ...cell import Cell
 from ...garden import Garden
+from ..board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentStateError
+from .abstract_solver_rule import SolverRule
 
 
 class EnsureGardenWithClueCanExpand(SolverRule):
@@ -24,7 +24,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
         for incomplete_garden_with_clue in incomplete_gardens_with_clue:
             off_limit_cells = self.get_off_limit_cells(
                 gardens_with_clue=gardens_with_clue,
-                this_garden=incomplete_garden_with_clue
+                this_garden=incomplete_garden_with_clue,
             )
 
             # Get the set of cells that can be reached via a flood fill from the clue cell while avoiding off limit
@@ -33,15 +33,15 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             clue_value = clue_cell.clue
             potentially_reachable_cells_from_garden = self.board.get_connected_cells(
                 starting_cell=clue_cell,
-                cell_criteria_func=lambda x: x not in off_limit_cells
+                cell_criteria_func=lambda cell: cell not in off_limit_cells,  # noqa: B023
             )
 
             # If the number of potentially reachable cells is fewer than the clue value, then the garden does not have
             # enough space to expand and the board is in a bad state, so throw an error
             if len(potentially_reachable_cells_from_garden) < clue_value:
-                raise NoPossibleSolutionFromCurrentState(
+                raise NoPossibleSolutionFromCurrentStateError(
                     message='Incomplete garden with clue cannot expand to appropriate size',
-                    problem_cell_groups={incomplete_garden_with_clue}
+                    problem_cell_groups={incomplete_garden_with_clue},
                 )
 
             # Farther filter down the potentially_reachable_cells_from_garden to only include cells that we need to
@@ -59,7 +59,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
 
             prioritized_escape_route_cells = self.get_prioritized_escape_route_cells(
                 escape_route_cells=escape_route_cells,
-                source_garden=incomplete_garden_with_clue
+                source_garden=incomplete_garden_with_clue,
             )
 
             for escape_route_cell in prioritized_escape_route_cells:
@@ -69,13 +69,13 @@ class EnsureGardenWithClueCanExpand(SolverRule):
                 off_limit_cells_for_this_escape_route = off_limit_cells.union({escape_route_cell})
                 potentially_reachable_cells = self.board.get_connected_cells(
                     starting_cell=clue_cell,
-                    cell_criteria_func=lambda x: x not in off_limit_cells_for_this_escape_route
+                    cell_criteria_func=lambda x: x not in off_limit_cells_for_this_escape_route,  # noqa: B023
                 )
                 if len(potentially_reachable_cells) < clue_value:
                     cell_changes.add_change(self.set_cell_to_state(
                         escape_route_cell,
                         CellState.NON_WALL,
-                        reason='Ensure garden with clue can expand'
+                        reason='Ensure garden with clue can expand',
                     ))
 
                     # Since some cells were marked as non-walls, the previously calculated all_gardens is no longer

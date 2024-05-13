@@ -1,7 +1,7 @@
 import pygame
 
-from .screen import Screen
 from .color import Color
+from .screen import Screen
 from .text_type import TextType
 
 

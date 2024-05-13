@@ -1,14 +1,13 @@
 from dataclasses import dataclass
-from typing import Optional
 
-from .abstract_solver_rule import SolverRule
-from ..path_finding import PathFinder, NoPathFoundError
-from ..board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentState
+from ...board import Board
+from ...cell import Cell
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
-from ...cell import Cell
-from ...board import Board
 from ...garden import Garden
+from ..board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentStateError
+from ..path_finding import NoPathFoundError, PathFinder
+from .abstract_solver_rule import SolverRule
 
 
 @dataclass(frozen=True)
@@ -32,7 +31,7 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
             # Get the set of gardens that are incomplete, have a clue, and are reachable from this garden_without_clue.
             # This also contains the shortest path to each garden.
             reachable_gardens_and_path = garden_info.get_reachable_gardens_and_path(
-                source_garden_without_clue=garden_without_clue
+                source_garden_without_clue=garden_without_clue,
             )
             reachable_gardens = {reachable_garden_and_path.garden for reachable_garden_and_path
                                  in reachable_gardens_and_path}
@@ -40,9 +39,9 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
             # If there are no reachable incomplete gardens with a clue, then this garden_without_clue breaks the rules
             # of a solved Nurikabe puzzle since it will be a garden without a clue.
             if len(reachable_gardens_and_path) == 0:
-                raise NoPossibleSolutionFromCurrentState(
+                raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden without clue cannot reach a clue cell',
-                    problem_cell_groups={garden_without_clue}
+                    problem_cell_groups={garden_without_clue},
                 )
 
             # Extract the set of empty cells that are in all the paths the reachable incomplete gardens with a clue.
@@ -50,7 +49,7 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
             # aforementioned gardens.
             cells_in_all_paths: set[Cell] = set.intersection(
                 *[set(reachable_garden_and_path.path_cell_tuple) for reachable_garden_and_path in
-                  reachable_gardens_and_path]
+                  reachable_gardens_and_path],
             )
             empty_cells_in_all_paths = {cell for cell in cells_in_all_paths if cell.cell_state.is_empty()}
 
@@ -62,7 +61,7 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
                 sorted(empty_cells_in_all_paths,
                        key=lambda cell: garden_without_clue.get_shortest_manhattan_distance_to_cell(cell))
             for escape_route_cell in prioritized_escape_route_cells:
-                # TODO - also filter via flood fill?
+                # TODO: also filter via flood fill?
 
                 # If the escape_route_cell were to be marked as a wall, would any garden be reachable from the
                 # garden_without_clue? If not, then the escape_route_cell cannot be a wall and is therefore marked as a
@@ -70,13 +69,13 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
                 is_any_garden_reachable = garden_info.is_any_garden_reachable(
                     source_garden_without_clue=garden_without_clue,
                     gardens_to_check=reachable_gardens,
-                    additional_off_limit_cell=escape_route_cell
+                    additional_off_limit_cell=escape_route_cell,
                 )
                 if not is_any_garden_reachable:
                     cell_changes.add_change(self.set_cell_to_state(
                         escape_route_cell,
                         CellState.NON_WALL,
-                        reason='Ensure garden without clue can reach a clue cell'
+                        reason='Ensure garden without clue can reach a clue cell',
                     ))
 
                     # Since some cells were marked as non-walls, the previously calculated all_gardens is no longer
@@ -101,21 +100,19 @@ class GardenInfo:
         self.wall_cells = self.board.get_wall_cells()
 
     def get_reachable_gardens_and_path(self, source_garden_without_clue: Garden,
-                                       additional_off_limit_cell: Optional[Cell] = None) -> set[PathToGardenInfo]:
+                                       additional_off_limit_cell: Cell | None = None) -> set[PathToGardenInfo]:
         """
         Get a set of gardens (and the shortest path to that garden) that are reachable from source_garden_without_clue.
         """
-
         # Only bother checking gardens that are manhattan reachable
-        manhattan_reachable_incomplete_gardens_with_clue = self.get_manhattan_reachable_incomplete_gardens_with_clue(
-            source_garden_without_clue
-        )
+        manhattan_reachable_incomplete_gardens_with_clue = \
+            self.get_manhattan_reachable_incomplete_gardens_with_clue(source_garden_without_clue)
 
         # Only bother checking gardens that can be reached via a flood fill from source_garden_without_clue
-        # TODO - Flood fill check may actually make it slower, so maybe exclude the flood fill filter?
+        # TODO: Flood fill check may actually make it slower, so maybe exclude the flood fill filter?
         flood_fill_reachable_cells = self.get_flood_fill_reachable_cells(
             source_garden_without_clue,
-            additional_off_limit_cell
+            additional_off_limit_cell,
         )
         gardens_to_check = {garden for garden in manhattan_reachable_incomplete_gardens_with_clue
                             if garden.does_include_cell(flood_fill_reachable_cells)}
@@ -126,29 +123,29 @@ class GardenInfo:
                 path_cell_list = self.get_path_to_incomplete_garden_with_clue(
                     source_garden_without_clue=source_garden_without_clue,
                     destination_garden_with_clue=destination_garden_with_clue,
-                    additional_off_limit_cell=additional_off_limit_cell
+                    additional_off_limit_cell=additional_off_limit_cell,
                 )
                 path_to_garden_info.add(PathToGardenInfo(
                     garden=destination_garden_with_clue,
-                    path_cell_tuple=tuple(path_cell_list)
+                    path_cell_tuple=tuple(path_cell_list),
                 ))
             except NoPathFoundError:
                 pass
         return path_to_garden_info
 
     def get_flood_fill_reachable_cells(self, source_garden_without_clue: Garden,
-                                       additional_off_limit_cell: Optional[Cell] = None) -> set[Cell]:
+                                       additional_off_limit_cell: Cell | None = None) -> set[Cell]:
         """
         Get the cells that can be accessed from the source_garden_without_clue without going through an off limit cell.
         Off limit cells are wall cells and any cell adjacent to a complete garden.
         """
         off_limit_cells = self.get_off_limit_cells(
             adjacent_off_limit_gardens=self.complete_gardens,
-            additional_off_limit_cell=additional_off_limit_cell
+            additional_off_limit_cell=additional_off_limit_cell,
         )
         return self.board.get_connected_cells(
-            starting_cell=list(source_garden_without_clue.cells)[0],
-            cell_criteria_func=lambda cell: cell not in off_limit_cells
+            starting_cell=next(iter(source_garden_without_clue.cells)),
+            cell_criteria_func=lambda cell: cell not in off_limit_cells,
         )
 
     def get_manhattan_reachable_incomplete_gardens_with_clue(self, source_garden_without_clue: Garden) -> set[Garden]:
@@ -158,7 +155,7 @@ class GardenInfo:
     @staticmethod
     def is_garden_manhattan_reachable(source_garden_without_clue: Garden,
                                       incomplete_garden_with_clue: Garden) -> bool:
-        """if """
+        # TODO: Add docstring
         manhattan_distance = incomplete_garden_with_clue. \
             get_shortest_manhattan_distance_to_cell_group(source_garden_without_clue)
         remaining_garden_size = incomplete_garden_with_clue.get_num_of_remaining_garden_cells()
@@ -170,36 +167,37 @@ class GardenInfo:
 
     def is_any_garden_reachable(self, source_garden_without_clue: Garden,
                                 gardens_to_check: set[Garden],
-                                additional_off_limit_cell: Optional[Cell] = None) -> bool:
-        """Are any of the gardens in gardens_to_check reachable from source_garden_without_clue?"""
+                                additional_off_limit_cell: Cell | None = None) -> bool:
+        """Check if any of the gardens in gardens_to_check reachable from source_garden_without_clue."""
         for destination_garden_with_clue in gardens_to_check:
             try:
                 self.get_path_to_incomplete_garden_with_clue(
                     source_garden_without_clue=source_garden_without_clue,
                     destination_garden_with_clue=destination_garden_with_clue,
-                    additional_off_limit_cell=additional_off_limit_cell
+                    additional_off_limit_cell=additional_off_limit_cell,
                 )
-                return True
             except NoPathFoundError:
                 pass
+            else:
+                return True
         return False
 
     def get_path_to_incomplete_garden_with_clue(self,
                                                 source_garden_without_clue: Garden,
                                                 destination_garden_with_clue: Garden,
-                                                additional_off_limit_cell: Optional[Cell] = None) -> list[Cell]:
+                                                additional_off_limit_cell: Cell | None = None) -> list[Cell]:
         """Find the (shortest) path from the source_garden_without_clue to the destination_garden_with_clue."""
         other_gardens_without_clue = self.gardens_without_clue - {source_garden_without_clue}
         other_gardens_with_clue = self.gardens_with_clue - {destination_garden_with_clue}
         off_limit_cells = self.get_off_limit_cells(
             adjacent_off_limit_gardens=other_gardens_with_clue,
-            additional_off_limit_cell=additional_off_limit_cell
+            additional_off_limit_cell=additional_off_limit_cell,
         )
         path_finder = PathFinder(
             start_cell_group=source_garden_without_clue,
             end_cell_group=destination_garden_with_clue,
             off_limit_cells=off_limit_cells,
-            other_cell_groups=other_gardens_without_clue
+            other_cell_groups=other_gardens_without_clue,
         )
         max_total_path_length = destination_garden_with_clue.get_clue_value()
         remaining_available_cells = max_total_path_length - len(source_garden_without_clue.cells) - \
@@ -211,7 +209,7 @@ class GardenInfo:
         return path_info.cell_list
 
     def get_off_limit_cells(self, adjacent_off_limit_gardens: set[Garden],
-                            additional_off_limit_cell: Optional[Cell] = None) -> set[Cell]:
+                            additional_off_limit_cell: Cell | None = None) -> set[Cell]:
         off_limit_cells: set[Cell] = set()
         off_limit_cells.update(self.wall_cells)
 

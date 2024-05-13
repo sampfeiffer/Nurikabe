@@ -1,11 +1,11 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from nurikabe.level import Level, LevelBuilderFromStringList
 from nurikabe.board import Board
-from nurikabe.game_status_checker import GameStatusChecker
-from nurikabe.cell_state import CellState
 from nurikabe.cell_group import MultipleCluesInCellGroupError, NoCluesInCellGroupError
+from nurikabe.cell_state import CellState
+from nurikabe.game_status_checker import GameStatusChecker
+from nurikabe.level import Level, LevelBuilderFromStringList
 
 
 class TestGameStatusChecker(TestCase):
@@ -19,7 +19,7 @@ class TestGameStatusChecker(TestCase):
         level_details = [
             '1,,,',
             ',,,',
-            ',3,,'
+            ',3,,',
         ]
         cls.level = TestGameStatusChecker.create_level_from_string_list(level_details)
 
@@ -58,7 +58,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,_,_',
             '_,_,_,_',
-            '_,3,_,_'
+            '_,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertTrue(self.game_status_checker.are_all_walls_connected())
@@ -68,7 +68,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
-            '_,3,_,_'
+            '_,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertTrue(self.game_status_checker.are_all_walls_connected())
@@ -78,7 +78,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
-            '_,3,W,_'
+            '_,3,W,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertFalse(self.game_status_checker.are_all_walls_connected())
@@ -89,7 +89,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,_,_',
             '_,W,W,_',
-            '_,3,W,_'
+            '_,3,W,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         self.assertTrue(self.game_status_checker.are_all_walls_connected())
@@ -104,7 +104,7 @@ class TestGameStatusChecker(TestCase):
         cell_list = [
             self.board.get_cell_from_grid(row_number=0, col_number=1),
             self.board.get_cell_from_grid(row_number=1, col_number=1),
-            self.board.get_cell_from_grid(row_number=2, col_number=0)
+            self.board.get_cell_from_grid(row_number=2, col_number=0),
         ]
 
         # Set some cells as walls. Since they don't completely disconnect the two clue cells, the clue cells are still
@@ -114,7 +114,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
-            '_,3,_,_'
+            '_,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
@@ -126,7 +126,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
-            'W,3,_,_'
+            'W,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
@@ -138,7 +138,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
-            'O,3,_,_'
+            'O,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
@@ -156,14 +156,14 @@ class TestGameStatusChecker(TestCase):
         cell_list1 = [
             self.board.get_cell_from_grid(row_number=0, col_number=1),
             self.board.get_cell_from_grid(row_number=1, col_number=1),
-            self.board.get_cell_from_grid(row_number=2, col_number=0)
+            self.board.get_cell_from_grid(row_number=2, col_number=0),
         ]
         for cell in cell_list1:
             cell.update_cell_state(CellState.WALL)
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
-            'W,3,_,_'
+            'W,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
@@ -177,14 +177,14 @@ class TestGameStatusChecker(TestCase):
             self.board.get_cell_from_grid(row_number=0, col_number=2),
             self.board.get_cell_from_grid(row_number=0, col_number=3),
             self.board.get_cell_from_grid(row_number=1, col_number=2),
-            self.board.get_cell_from_grid(row_number=1, col_number=3)
+            self.board.get_cell_from_grid(row_number=1, col_number=3),
         ]
         for cell in cell_list2:
             cell.update_cell_state(CellState.WALL)
         expected_board_state = [
             '1,W,W,W',
             '_,W,W,W',
-            'W,3,_,_'
+            'W,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
@@ -197,7 +197,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,W,W',
             'W,W,W,W',
-            'W,3,_,_'
+            'W,3,_,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
@@ -209,7 +209,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,W,W',
             'W,W,W,W',
-            'W,3,O,_'
+            'W,3,O,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
         weak_gardens = self.board.get_all_weak_gardens()
@@ -220,7 +220,7 @@ class TestGameStatusChecker(TestCase):
         expected_board_state = [
             '1,W,W,_',
             'W,W,W,W',
-            'W,3,O,_'
+            'W,3,O,_',
         ]
         self.assertEqual(self.board.as_simple_string_list(), expected_board_state)
 

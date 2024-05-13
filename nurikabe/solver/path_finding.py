@@ -1,7 +1,6 @@
-import queue
 import math
+import queue
 from dataclasses import dataclass, field
-from typing import Optional, Union
 
 from ..cell import Cell
 from ..cell_group import CellGroup
@@ -10,17 +9,16 @@ from .path_info import PathInfo
 
 class NoPathFoundError(Exception):
     """Indicates that no path could be found within the given constraints."""
-    pass
 
 
 class PathSetupError(Exception):
     """Indicates that there was something wrong with how the path finding problem was defined."""
-    pass
 
 
 @dataclass(order=True)
 class PrioritizedCell:
     """Used in the A* path finding algorithm to determine the next cell to investigate."""
+
     priority: int
     cell: Cell = field(compare=False)
 
@@ -28,14 +26,15 @@ class PrioritizedCell:
 class PathFinder:
     """
     Uses A* algorithm to find the shortest path between two cell groups. The wiki page has a great explanation of the
-    basic A* algorithm: https://en.wikipedia.org/wiki/A*_search_algorithm
+    basic A* algorithm: https://en.wikipedia.org/wiki/A*_search_algorithm .
 
     The heuristic get_shortest_naive_path_length_to_cell_group is admissible meaning that this length is never greater
     than the actual shortest path length. The heuristic is also consistent since when going from two neighboring cells,
     the change in heuristic never over-estimates the actual cost of the step.
     """
-    def __init__(self, start_cell_group: Union[Cell, CellGroup], end_cell_group: Union[Cell, CellGroup],
-                 off_limit_cells: Optional[set[Cell]] = None, other_cell_groups: Optional[set[CellGroup]] = None):
+
+    def __init__(self, start_cell_group: Cell | CellGroup, end_cell_group: Cell | CellGroup,
+                 off_limit_cells: set[Cell] | None = None, other_cell_groups: set[CellGroup] | None = None):
         """
         :param start_cell_group: The CellGroup that the path starts from.
         :param end_cell_group: The CellGroup where the path should end.
@@ -64,26 +63,32 @@ class PathFinder:
         self.check_path_finding_setup()
 
     @staticmethod
-    def to_cell_group(cell_or_cell_group: Union[Cell, CellGroup]) -> CellGroup:
+    def to_cell_group(cell_or_cell_group: Cell | CellGroup) -> CellGroup:
         if isinstance(cell_or_cell_group, Cell):
-            return CellGroup(cells={cell_or_cell_group})
+            cell_group = CellGroup(cells={cell_or_cell_group})
         elif isinstance(cell_or_cell_group, CellGroup):
-            return cell_or_cell_group
+            cell_group = cell_or_cell_group
         else:
-            raise RuntimeError(f'Unexpected type for cell_or_cell_group: {type(cell_or_cell_group)}')
+            msg = f'Unexpected type for cell_or_cell_group: {type(cell_or_cell_group)}'
+            raise TypeError(msg)
+        return cell_group
 
     def check_path_finding_setup(self) -> None:
         if len(self.start_cell_group.cells.intersection(self.off_limit_cells)) > 0:
-            raise PathSetupError('Cannot find path since a cell in the start cell group is off limits')
+            msg = 'Cannot find path since a cell in the start cell group is off limits'
+            raise PathSetupError(msg)
         if len(self.end_cell_group.cells.intersection(self.off_limit_cells)) > 0:
-            raise PathSetupError('Cannot find path since a cell in the end cell group is off limits')
+            msg = 'Cannot find path since a cell in the end cell group is off limits'
+            raise PathSetupError(msg)
 
         cells_adjacent_to_start_cell_group = self.start_cell_group.get_adjacent_neighbors()
         for other_cell_group in self.other_cell_groups:
             if len(other_cell_group.cells.intersection(cells_adjacent_to_start_cell_group)) > 0:
-                raise PathSetupError('Start cell group is adjacent to a cell in the other_cell_groups')
+                msg = 'Start cell group is adjacent to a cell in the other_cell_groups'
+                raise PathSetupError(msg)
             if len(other_cell_group.cells.intersection(self.off_limit_cells)) > 0:
-                raise PathSetupError('An off limit cell is is also part of other_cell_groups')
+                msg = 'An off limit cell is is also part of other_cell_groups'
+                raise PathSetupError(msg)
 
         self.check_for_overlapping_other_cell_groups()
 
@@ -91,10 +96,11 @@ class PathFinder:
         cells_in_other_cell_groups: set[Cell] = set()
         for other_cell_group in self.other_cell_groups:
             if len(other_cell_group.cells.intersection(cells_in_other_cell_groups)) > 0:
-                raise PathSetupError('There cannot be overlapping other cell groups')
+                msg = 'There cannot be overlapping other cell groups'
+                raise PathSetupError(msg)
             cells_in_other_cell_groups.update(other_cell_group.cells)
 
-    def get_path_info(self, max_path_length: Optional[int] = None) -> PathInfo:
+    def get_path_info(self, max_path_length: int | None = None) -> PathInfo:
         """
         Note that max_path_length includes both the start and end cell. If a path cannot be found from the start cell
         group to the end cell group, or the path can be found but is longer than the max path length, this function
@@ -113,7 +119,7 @@ class PathFinder:
 
         # Keep a prioritized queue of cells to explore. Start with a random cell in the start cell group.
         prioritized_cells_to_explore: queue.PriorityQueue[PrioritizedCell] = queue.PriorityQueue()
-        start_cell = list(self.start_cell_group.cells)[0]
+        start_cell = next(iter(self.start_cell_group.cells))
         prioritized_cells_to_explore.put(PrioritizedCell(priority=min_possible_path_length, cell=start_cell))
 
         # Keep track of the details on how the path got from the start cell group to each cell. We can't just use a
@@ -162,7 +168,7 @@ class PathFinder:
                     path_info_to_neighbor_cell = path_info_to_cell[current_cell].get_extended_path_info(
                         new_cell=neighbor_cell,
                         additional_path_length=distance_from_current_to_neighbor,
-                        additional_adjacent_cell_groups=newly_adjacent_cell_groups
+                        additional_adjacent_cell_groups=newly_adjacent_cell_groups,
                     )
                     path_info_to_cell[neighbor_cell] = path_info_to_neighbor_cell
 
@@ -175,8 +181,8 @@ class PathFinder:
                         prioritized_cell.cell for prioritized_cell in prioritized_cells_to_explore.queue
                     }
 
-                    # TODO  - I think we need to replace in the priority queue even if it's already there.
-                    # Or do we - since if we're finding the same path it maybe can't be shorter??
+                    # TODO: I think we need to replace in the priority queue even if it's already there.
+                    #  Or do we - since if we're finding the same path it maybe can't be shorter??
                     if neighbor_cell not in cells_in_prioritized_cells_to_explore:
                         prioritized_cells_to_explore.put(PrioritizedCell(priority=f_score, cell=neighbor_cell))
 
@@ -187,15 +193,17 @@ class PathFinder:
         if current_cell in self.start_cell_group.cells and neighbor_cell in self.start_cell_group.cells:
             # If both the current and the neighbor cell are part of the start_cell_group, then the distance is
             # considered zero
-            return 0
+            distance_between_cells = 0
         elif any(neighbor_cell in other_cell_group.cells for other_cell_group in self.other_cell_groups):
             # Once the path steps adjacent to a cell in the other_cell_groups, the size of the cell group is added to
             # the path "length". Further steps into the cell group have zero additional cost. Therefore, if the neighbor
             # cell is part of the other_cell_groups, then the "distance" is zero. Note that this does not apply to
             # stepping out of a cell group to another cell that is not part of the other_cell_groups.
-            return 0
+            distance_between_cells = 0
         else:
-            return 1
+            distance_between_cells = 1
+
+        return distance_between_cells
 
     @staticmethod
     def get_adjacent_cell_groups(root_cell: Cell, unvisited_other_cell_groups: set[CellGroup]) -> set[CellGroup]:
@@ -204,7 +212,7 @@ class PathFinder:
                 if cell_group.does_include_cell(root_cell_adjacent_neighbors)}
 
     def get_min_possible_remaining_distance(self, neighbor_cell: Cell) -> int:
-        cell_group_containing_neighbor_cell: Optional[CellGroup] = None
+        cell_group_containing_neighbor_cell: CellGroup | None = None
         for cell_group in self.other_cell_groups:
             if neighbor_cell in cell_group.cells:
                 cell_group_containing_neighbor_cell = cell_group
@@ -215,7 +223,7 @@ class PathFinder:
             neighbor_cell_group = cell_group_containing_neighbor_cell
         return neighbor_cell_group.get_shortest_manhattan_distance_to_cell_group(self.end_cell_group)
 
-    def get_no_path_error_string(self, max_path_length: Optional[int]) -> str:
+    def get_no_path_error_string(self, max_path_length: int | None) -> str:
         error_string = f'No viable path found from {self.start_cell_group} to {self.end_cell_group}'
         if max_path_length is not None:
             error_string += f' of length {max_path_length}'

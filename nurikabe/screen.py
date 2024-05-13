@@ -1,11 +1,10 @@
-from typing import Optional
 import pygame
 
+from .color import Color
 from .level import Level
 from .pixel_position import PixelPosition
-from .color import Color
-from .text_type import TextType
 from .rect_edge import RectEdge
+from .text_type import TextType
 
 
 class Screen:
@@ -31,21 +30,27 @@ class Screen:
 
     BACKGROUND_COLOR = Color.GRAY
 
-    def __init__(self, level: Level, should_include_grid_numbers: bool):
+    def __init__(self, level: Level, *, should_include_grid_numbers: bool):
         self.screen = pygame.display.set_mode(size=(Screen.SCREEN_WIDTH, Screen.SCREEN_HEIGHT))
         pygame.display.set_caption('Nurikabe')
         self.screen.fill(Screen.BACKGROUND_COLOR.value)
 
         self.top_left_of_game_status = self.get_top_left_of_game_status()
-        self.cell_width = self.get_cell_width(level.number_of_rows, level.number_of_columns,
-                                              should_include_grid_numbers)
-        self.top_left_of_board = self.get_top_left_of_board(level.number_of_columns, should_include_grid_numbers)
+        self.cell_width = self.get_cell_width(
+            number_of_rows=level.number_of_rows,
+            number_of_columns=level.number_of_columns,
+            should_include_grid_numbers=should_include_grid_numbers,
+        )
+        self.top_left_of_board = self.get_top_left_of_board(
+            number_of_columns=level.number_of_columns,
+            should_include_grid_numbers=should_include_grid_numbers,
+        )
 
         self.font_map = {
             TextType.CELL: self.get_cell_font(),
             TextType.PUZZLE_SOLVED: pygame.font.SysFont(self.FONT, self.PUZZLE_SOLVED_FONT_SIZE),
             TextType.BUTTON: pygame.font.SysFont(self.FONT, self.BUTTON_FONT_SIZE),
-            TextType.GRID_NUMBERING: self.get_grid_numbering_font()
+            TextType.GRID_NUMBERING: self.get_grid_numbering_font(),
         }
 
         if should_include_grid_numbers:
@@ -56,20 +61,22 @@ class Screen:
         top = self.SCREEN_HEIGHT - (self.GAME_STATUS_RECT_HEIGHT + self.MIN_BORDER)
         return PixelPosition(x_coordinate=left, y_coordinate=top)
 
-    def get_cell_width(self, number_of_rows: int, number_of_columns: int, should_include_grid_numbers: bool) -> int:
-        width_for_non_board_components = self.get_suggested_left_side_of_board_width(should_include_grid_numbers) + \
+    def get_cell_width(self, *, number_of_rows: int, number_of_columns: int, should_include_grid_numbers: bool) -> int:
+        width_for_non_board_components = \
+            self.get_suggested_left_side_of_board_width(should_include_grid_numbers=should_include_grid_numbers) + \
             self.get_right_side_of_board_width()
         max_board_width = self.SCREEN_WIDTH - width_for_non_board_components
         max_cell_width = int(max_board_width / number_of_columns)
 
-        height_for_non_board_components = self.get_top_of_board_height(should_include_grid_numbers) + \
+        height_for_non_board_components = \
+            self.get_top_of_board_height(should_include_grid_numbers=should_include_grid_numbers) + \
             self.get_bottom_of_board_height()
         max_board_height = self.SCREEN_HEIGHT - height_for_non_board_components
         max_cell_height = int(max_board_height / number_of_rows)
 
         return min((max_cell_width, max_cell_height))
 
-    def get_suggested_left_side_of_board_width(self, should_include_grid_numbers: bool) -> int:
+    def get_suggested_left_side_of_board_width(self, *, should_include_grid_numbers: bool) -> int:
         """
         This is only the "suggested" width, since after the cell width is calculated and all the spacing needed for the
         left and right side of the board, the items are centered on the screen.
@@ -82,7 +89,7 @@ class Screen:
     def get_right_side_of_board_width(self) -> int:
         return self.MIN_BORDER
 
-    def get_top_of_board_height(self, should_include_grid_numbers: bool) -> int:
+    def get_top_of_board_height(self, *, should_include_grid_numbers: bool) -> int:
         top_of_board_height = self.MIN_BORDER
         if should_include_grid_numbers:
             top_of_board_height += self.GRID_NUMBERING_WIDTH
@@ -91,15 +98,16 @@ class Screen:
     def get_bottom_of_board_height(self) -> int:
         return self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT + self.BUTTON_RECT_HEIGHT
 
-    def get_top_left_of_board(self, number_of_columns: int, should_include_grid_numbers: bool) -> PixelPosition:
-        suggested_left_border_size = self.get_suggested_left_side_of_board_width(should_include_grid_numbers)
+    def get_top_left_of_board(self, number_of_columns: int, *, should_include_grid_numbers: bool) -> PixelPosition:
+        suggested_left_border_size = \
+            self.get_suggested_left_side_of_board_width(should_include_grid_numbers=should_include_grid_numbers)
         if should_include_grid_numbers:
             left_border_size = suggested_left_border_size
         else:
             # Ensure that the board is centered on the screen for cleanliness
             board_width = self.cell_width * number_of_columns
             left_border_size = int((Screen.SCREEN_WIDTH - board_width) / 2)
-        top_border_size = self.get_top_of_board_height(should_include_grid_numbers)
+        top_border_size = self.get_top_of_board_height(should_include_grid_numbers=should_include_grid_numbers)
         return PixelPosition(x_coordinate=left_border_size, y_coordinate=top_border_size)
 
     def get_cell_font(self) -> pygame.font.SysFont:
@@ -146,17 +154,19 @@ class Screen:
         top = board_rect.top + self.cell_width * row_number
         return PixelPosition(x_coordinate=left, y_coordinate=top)
 
-    def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: Optional[str] = None,
-                  text_color: Optional[Color] = None, text_type: TextType = TextType.CELL,
-                  image: Optional[pygame.Surface] = None) -> None:
+    def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: str | None = None,  # noqa: PLR0913
+                  text_color: Color | None = None, text_type: TextType = TextType.CELL,
+                  image: pygame.Surface | None = None) -> None:
 
         if text is not None and image is not None:
-            raise ValueError('Cannot have both text and an image')
+            msg = 'Cannot have both text and an image'
+            raise ValueError(msg)
 
         pygame.draw.rect(surface=self.screen, color=color.value, rect=rect, width=width)
         if text is not None:
             if text_color is None:
-                raise RuntimeError('text_color must be provided if text is provided')
+                msg = 'text_color must be provided if text is provided'
+                raise RuntimeError(msg)
             font = self.font_map[text_type]
             text = font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
             text_rect = text.get_rect(center=rect.center)
@@ -172,7 +182,7 @@ class Screen:
             color=color.value,
             start_pos=rect_edge.start_pixel_position.coordinates,
             end_pos=rect_edge.end_pixel_position.coordinates,
-            width=width
+            width=width,
         )
 
     @staticmethod

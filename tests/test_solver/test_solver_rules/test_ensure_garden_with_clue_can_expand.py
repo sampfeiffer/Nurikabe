@@ -2,8 +2,10 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.ensure_garden_with_clue_can_expand import EnsureGardenWithClueCanExpand, \
-    NoPossibleSolutionFromCurrentState
+from nurikabe.solver.solver_rules.ensure_garden_with_clue_can_expand import (
+    EnsureGardenWithClueCanExpand,
+    NoPossibleSolutionFromCurrentStateError,
+)
 from tests.build_board import build_board
 
 
@@ -23,7 +25,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenWithClueCanExpand(board).apply_rule()
@@ -38,7 +40,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '3,_,_,_',
             '_,_,_,_',
-            'O,W,_,_'
+            'O,W,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenWithClueCanExpand(board).apply_rule()
@@ -50,7 +52,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '_,_,_,_',
             '_,W,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenWithClueCanExpand(board).apply_rule()
@@ -58,7 +60,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         expected_board_state = [
             '_,_,_,_',
             'O,W,_,_',
-            'O,3,W,_'
+            'O,3,W,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -67,10 +69,10 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '1,O,3,W',
             'W,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
-        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
             EnsureGardenWithClueCanExpand(board).apply_rule()
 
     def test_no_escape_route_for_garden_with_clue_adjacent_cells_blocked(self) -> None:
@@ -81,10 +83,10 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '3,O,W,_',
             'W,W,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
-        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
             EnsureGardenWithClueCanExpand(board).apply_rule()
 
     def test_no_escape_route_adjacent_cells_not_blocked(self) -> None:
@@ -95,10 +97,10 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '6,O,W,_',
             '_,_,W,_',
-            '_,W,_,_'
+            '_,W,_,_',
         ]
         board = self.create_board(board_details)
-        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
             EnsureGardenWithClueCanExpand(board).apply_rule()
 
     def test_non_naive_escape_route(self) -> None:
@@ -109,7 +111,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,_,3,_'
+            '_,_,3,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenWithClueCanExpand(board).apply_rule()
@@ -117,7 +119,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         expected_board_state = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,O,3,_'
+            '_,O,3,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -131,7 +133,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
             'W,6,O,W',
             'W,_,_,W',
             'W,_,_,W',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenWithClueCanExpand(board).apply_rule()
@@ -140,7 +142,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
             'W,6,O,W',
             'W,_,_,W',
             'W,O,_,W',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -155,7 +157,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
             'W,7,O,W',
             'W,_,_,W',
             'W,O,_,W',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenWithClueCanExpand(board).apply_rule()
@@ -164,7 +166,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
             'W,7,O,W',
             'W,_,_,W',
             'W,O,_,W',
-            '_,O,W,_'
+            '_,O,W,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -177,7 +179,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
             '_,W,5,O,W',
             '_,_,_,_,W',
             '_,_,_,O,W',
-            '_,_,_,O,4'
+            '_,_,_,O,4',
         ]
         board = self.create_board(board_details)
         cell_changes = EnsureGardenWithClueCanExpand(board).apply_rule()
@@ -186,7 +188,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
             '_,W,5,O,W',
             '_,_,O,_,W',
             '_,_,_,O,W',
-            '_,_,_,O,4'
+            '_,_,_,O,4',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -200,7 +202,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,_,_,3'
+            '_,_,_,3',
         ]
         board = self.create_board(board_details)
         ensure_garden_with_clue_can_expand_solver_rule = EnsureGardenWithClueCanExpand(board)
@@ -211,7 +213,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         expected_board_state1 = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,_,O,3'
+            '_,_,O,3',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state1)
 
@@ -221,7 +223,7 @@ class TestEnsureGardenWithClueCanExpand(TestCase):
         expected_board_state2 = [
             '_,_,_,_',
             '_,_,W,W',
-            '_,O,O,3'
+            '_,O,O,3',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state2)
 

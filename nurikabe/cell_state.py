@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from enum import Enum, auto
 
 
@@ -29,12 +30,15 @@ class CellState(Enum):
     def get_next_in_cycle(self) -> CellState:
         """When the user clicks on a cell, it cycles through these states."""
         if self is CellState.EMPTY:
-            return CellState.WALL
+            cell_state = CellState.WALL
         elif self is CellState.WALL:
-            return CellState.NON_WALL
+            cell_state = CellState.NON_WALL
         elif self is CellState.NON_WALL:
-            return CellState.EMPTY
+            cell_state = CellState.EMPTY
         elif self is CellState.CLUE:
-            raise RuntimeError('clue cells are not clickable')
+            msg = 'clue cells are not clickable'
+            raise RuntimeError(msg)
         else:
-            raise RuntimeError('This should not be possible')
+            msg = 'This should not be possible'
+            raise RuntimeError(msg)
+        return cell_state

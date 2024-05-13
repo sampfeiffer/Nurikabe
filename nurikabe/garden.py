@@ -1,4 +1,4 @@
-from typing import Callable
+from collections.abc import Callable
 
 from .cell import Cell
 from .weak_garden import WeakGarden

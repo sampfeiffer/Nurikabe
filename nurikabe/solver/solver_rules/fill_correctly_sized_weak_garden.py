@@ -1,6 +1,6 @@
-from .abstract_solver_rule import SolverRule
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
+from .abstract_solver_rule import SolverRule
 
 
 class FillCorrectlySizedWeakGarden(SolverRule):

@@ -1,5 +1,5 @@
-from enum import Enum, auto
 from dataclasses import dataclass
+from enum import Enum, auto
 
 
 class Direction(Enum):
@@ -30,5 +30,5 @@ OFFSET_MAP = {
     Direction.RIGHT_UP: GridOffset(row_offset=-1, col_offset=1),
     Direction.LEFT_UP: GridOffset(row_offset=-1, col_offset=-1),
     Direction.RIGHT_DOWN: GridOffset(row_offset=1, col_offset=1),
-    Direction.LEFT_DOWN: GridOffset(row_offset=1, col_offset=-1)
+    Direction.LEFT_DOWN: GridOffset(row_offset=1, col_offset=-1),
 }

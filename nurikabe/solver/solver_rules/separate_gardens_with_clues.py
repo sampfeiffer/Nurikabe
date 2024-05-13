@@ -1,7 +1,11 @@
-from .abstract_solver_rule import SolverRule
+from typing import TYPE_CHECKING
+
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
-from ...cell import Cell
+from .abstract_solver_rule import SolverRule
+
+if TYPE_CHECKING:
+    from ...cell import Cell
 
 
 class SeparateGardensWithClues(SolverRule):

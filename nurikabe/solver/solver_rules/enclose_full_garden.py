@@ -1,7 +1,7 @@
-from .abstract_solver_rule import SolverRule
-from ..board_state_checker import NoPossibleSolutionFromCurrentState
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
+from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from .abstract_solver_rule import SolverRule
 
 
 class EncloseFullGarden(SolverRule):
@@ -22,8 +22,8 @@ class EncloseFullGarden(SolverRule):
                         cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL,
                                                                        reason='Enclose full garden'))
             else:
-                raise NoPossibleSolutionFromCurrentState(
+                raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden contains more than one clue',
-                    problem_cell_groups={garden}
+                    problem_cell_groups={garden},
                 )
         return cell_changes

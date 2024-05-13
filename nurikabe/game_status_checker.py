@@ -1,8 +1,8 @@
 import logging
 
 from .board import Board
-from .game_status import GameStatus
 from .cell_change_info import CellChanges
+from .game_status import GameStatus
 from .weak_garden import WeakGarden
 
 logger = logging.getLogger(__name__)
@@ -56,7 +56,7 @@ class GameStatusChecker:
         all_walls = self.board.get_wall_cells()
         if len(all_walls) == 0:
             return True
-        first_wall_section = self.board.get_wall_section(starting_cell=list(all_walls)[0])
+        first_wall_section = self.board.get_wall_section(starting_cell=next(iter(all_walls)))
         return first_wall_section.cells == all_walls
 
     @staticmethod

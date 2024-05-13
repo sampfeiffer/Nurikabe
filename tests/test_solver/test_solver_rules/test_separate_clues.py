@@ -19,7 +19,7 @@ class TestSeparateClues(TestCase):
         board_details = [
             '1,_,_,_',
             '_,_,_,_',
-            '_,3,_,_'
+            '_,3,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateClues(board).apply_rule()
@@ -31,7 +31,7 @@ class TestSeparateClues(TestCase):
         board_details = [
             '1,_,3,_',
             '_,_,_,2',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateClues(board).apply_rule()
@@ -39,7 +39,7 @@ class TestSeparateClues(TestCase):
         expected_board_state = [
             '1,W,3,W',
             '_,_,W,2',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -48,7 +48,7 @@ class TestSeparateClues(TestCase):
         board_details = [
             '1,_,3,_',
             '_,2,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateClues(board).apply_rule()
@@ -56,7 +56,7 @@ class TestSeparateClues(TestCase):
         expected_board_state = [
             '1,W,3,_',
             'W,2,W,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -68,7 +68,7 @@ class TestSeparateClues(TestCase):
         board_details = [
             '1,W,3,_',
             'W,2,W,_',
-            '_,W,1,_'
+            '_,W,1,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateClues(board).apply_rule()

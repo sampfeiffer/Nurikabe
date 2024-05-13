@@ -1,9 +1,8 @@
-from typing import Optional
 from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.cell import Cell
-from nurikabe.cell_group import CellGroup, NoCluesInCellGroupError, MultipleCluesInCellGroupError
+from nurikabe.cell_group import CellGroup, MultipleCluesInCellGroupError, NoCluesInCellGroupError
 
 
 class TestCellGroup(TestCase):
@@ -12,7 +11,7 @@ class TestCellGroup(TestCase):
         cls.screen = MagicMock(name='Screen')
         cls.pixel_position = MagicMock(name='PixelPosition')
 
-    def get_cell(self, row_number: int = 0, col_number: int = 0, clue: Optional[int] = None) -> Cell:
+    def get_cell(self, row_number: int = 0, col_number: int = 0, clue: int | None = None) -> Cell:
         return Cell(row_number, col_number, clue, pixel_position=self.pixel_position, screen=self.screen)
 
     def test_contains_zero_clues(self) -> None:
@@ -54,7 +53,7 @@ class TestCellGroup(TestCase):
         cells_in_cell_group = {
             self.get_cell(row_number=5, col_number=4),
             self.get_cell(row_number=5, col_number=5),
-            self.get_cell(row_number=6, col_number=5)
+            self.get_cell(row_number=6, col_number=5),
         }
         cell_group = CellGroup(cells_in_cell_group)
 
@@ -79,13 +78,13 @@ class TestCellGroup(TestCase):
         cells_in_source_cell_group = {
             self.get_cell(row_number=5, col_number=4),
             self.get_cell(row_number=5, col_number=5),
-            self.get_cell(row_number=6, col_number=5)
+            self.get_cell(row_number=6, col_number=5),
         }
         source_cell_group = CellGroup(cells_in_source_cell_group)
 
         cells_in_destination_cell_group1 = {
             self.get_cell(row_number=5, col_number=2),
-            self.get_cell(row_number=6, col_number=2)
+            self.get_cell(row_number=6, col_number=2),
         }
         destination_cell_group1 = CellGroup(cells_in_destination_cell_group1)
         self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group1), 2)
@@ -93,7 +92,7 @@ class TestCellGroup(TestCase):
         # Equidistant from more than one cell in the destination cell group
         cells_in_destination_cell_group2 = {
             self.get_cell(row_number=5, col_number=2),
-            self.get_cell(row_number=6, col_number=3)
+            self.get_cell(row_number=6, col_number=3),
         }
         destination_cell_group2 = CellGroup(cells_in_destination_cell_group2)
         self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group2), 2)
@@ -101,7 +100,7 @@ class TestCellGroup(TestCase):
         # Equidistant from more than one cell in the source cell group
         cells_in_destination_cell_group3 = {
             self.get_cell(row_number=7, col_number=2),
-            self.get_cell(row_number=7, col_number=3)
+            self.get_cell(row_number=7, col_number=3),
         }
         destination_cell_group3 = CellGroup(cells_in_destination_cell_group3)
         self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group3), 3)
@@ -109,7 +108,7 @@ class TestCellGroup(TestCase):
         # If the two cell groups contain any of the same cells, the distance should be zero
         cells_in_destination_cell_group4 = {
             self.get_cell(row_number=7, col_number=2),
-            self.get_cell(row_number=6, col_number=5)
+            self.get_cell(row_number=6, col_number=5),
         }
         destination_cell_group4 = CellGroup(cells_in_destination_cell_group4)
         self.assertEqual(source_cell_group.get_shortest_manhattan_distance_to_cell_group(destination_cell_group4), 0)
