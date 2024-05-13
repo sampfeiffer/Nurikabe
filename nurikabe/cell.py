@@ -1,26 +1,32 @@
 from __future__ import annotations
-from typing import Optional, Iterable
+
+from typing import TYPE_CHECKING
+
 import pygame
 
-from .screen import Screen
-from .cell_state import CellState
-from .pixel_position import PixelPosition
-from .color import Color
 from .cell_change_info import CellChangeInfo
-from .direction import Direction, ADJACENT_DIRECTIONS
+from .cell_state import CellState
+from .color import Color
+from .direction import ADJACENT_DIRECTIONS, Direction
 from .grid_coordinate import GridCoordinate
 from .rect_edge import RectEdge, get_rect_edges
 
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
-class NonExistentNeighbor(Exception):
+    from .pixel_position import PixelPosition
+    from .screen import Screen
+
+
+class NonExistentNeighborError(Exception):
     pass
 
 
 class Cell:
     CENTER_DOT = '\u2022'
 
-    def __init__(self, row_number: int, col_number: int, clue: Optional[int], pixel_position: PixelPosition,
-                 screen: Screen):
+    def __init__(self, row_number: int, col_number: int, clue: int | None,  # noqa: PLR0913
+                 pixel_position: PixelPosition, screen: Screen):
         self.row_number = row_number
         self.col_number = col_number
         self.grid_coordinate = GridCoordinate(row_number, col_number)
@@ -34,35 +40,37 @@ class Cell:
         self.rect = self.get_rect(pixel_position)
         self.draw_cell()
 
-        self.neighbor_cell_map: Optional[dict[Direction, Cell]] = None
+        self.neighbor_cell_map: dict[Direction, Cell] | None = None
 
     def get_rect(self, pixel_position: PixelPosition) -> pygame.Rect:
         width = self.screen.cell_width
         height = self.screen.cell_width
         return pygame.Rect(pixel_position.x_coordinate, pixel_position.y_coordinate, width, height)
 
-    def draw_cell(self, is_in_completed_garden: bool = False, perimeter_color: Optional[Color] = None) -> None:
+    def draw_cell(self, *, is_in_completed_garden: bool = False, perimeter_color: Color | None = None) -> None:
         if self.has_clue:
-            self.draw_clue(is_in_completed_garden)
+            self.draw_clue(is_in_completed_garden=is_in_completed_garden)
         elif self.cell_state.is_empty():
             self.draw_garden_cell()
         elif self.cell_state.is_wall():
             self.draw_wall_cell()
         elif self.cell_state.is_non_wall():
-            self.draw_non_wall_cell(is_in_completed_garden)
+            self.draw_non_wall_cell(is_in_completed_garden=is_in_completed_garden)
         else:
-            raise RuntimeError('This should not be possible')
+            msg = 'This should not be possible'
+            raise RuntimeError(msg)
 
         if perimeter_color is not None:
             self.draw_perimeter(perimeter_color)
 
-    def draw_clue(self, is_in_completed_garden: bool) -> None:
+    def draw_clue(self, *, is_in_completed_garden: bool) -> None:
         text = None if self.clue is None else str(self.clue)
         self.draw_garden_cell(text, is_in_completed_garden)
 
-    def draw_garden_cell(self, text: Optional[str] = None, is_in_completed_garden: Optional[bool] = None) -> None:
+    def draw_garden_cell(self, text: str | None = None, is_in_completed_garden: bool | None = None) -> None:
         if text is not None and is_in_completed_garden is None:
-            raise RuntimeError('is_in_completed_garden must be provided if text is provided')
+            msg = 'is_in_completed_garden must be provided if text is provided'
+            raise RuntimeError(msg)
 
         # background
         self.screen.draw_rect(color=Color.OFF_WHITE, rect=self.rect, width=0)
@@ -74,11 +82,11 @@ class Cell:
     def draw_wall_cell(self) -> None:
         self.screen.draw_rect(color=Color.BLACK, rect=self.rect, width=0)
 
-    def draw_non_wall_cell(self, is_in_completed_garden: bool) -> None:
+    def draw_non_wall_cell(self, *, is_in_completed_garden: bool) -> None:
         text = self.CENTER_DOT
         self.draw_garden_cell(text, is_in_completed_garden)
 
-    def draw_perimeter(self, perimeter_color: Color, should_update_screen_immediately: bool = False) -> None:
+    def draw_perimeter(self, perimeter_color: Color, *, should_update_screen_immediately: bool = False) -> None:
         self.screen.draw_rect(color=perimeter_color, rect=self.rect, width=3)
         if should_update_screen_immediately:
             self.screen.update_screen()
@@ -92,9 +100,9 @@ class Cell:
     def is_inside_cell(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
 
-    def handle_cell_click(self) -> Optional[CellChangeInfo]:
+    def handle_cell_click(self) -> CellChangeInfo | None:
         if not self.is_clickable:
-            return
+            return None
 
         new_cell_state = self.cell_state.get_next_in_cycle()
         return self.update_cell_state(new_cell_state)
@@ -109,7 +117,7 @@ class Cell:
     def get_adjacent_neighbors(self) -> set[Cell]:
         """Get a list of adjacent (non-diagonal) Cells."""
         return {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
-                if direction in self.neighbor_cell_map.keys()}
+                if direction in self.neighbor_cell_map}
 
     def get_neighbor_set(self, direction_list: Iterable[Direction]) -> set[Cell]:
         return {self.get_neighbor(direction) for direction in direction_list}
@@ -118,14 +126,15 @@ class Cell:
         try:
             return self.neighbor_cell_map[direction]
         except KeyError:
-            raise NonExistentNeighbor(f'{str(self)} has no neighbor in {direction}')
+            msg = f'{self} has no neighbor in {direction}'
+            raise NonExistentNeighborError(msg) from None
 
     def does_form_two_by_two_walls(self) -> bool:
         """Returns True if this cell is the top left corner of a two by two section of walls."""
         try:
             two_by_two_section = self.get_two_by_two_section()
             return all(cell.cell_state.is_wall() for cell in two_by_two_section)
-        except NonExistentNeighbor:
+        except NonExistentNeighborError:
             # Can't be top-left of two by two since this is on the right or lower edge of board so the required
             # neighbors do not exist
             return False
@@ -137,7 +146,7 @@ class Cell:
         return neighbor_cells.union({self})
 
     def has_any_clues_adjacent(self) -> bool:
-        return any([neighbor_cell for neighbor_cell in self.get_adjacent_neighbors() if neighbor_cell.has_clue])
+        return any(neighbor_cell for neighbor_cell in self.get_adjacent_neighbors() if neighbor_cell.has_clue)
 
     def get_manhattan_distance(self, other_cell: Cell) -> int:
         """Get the Manhattan distance between this cell and the other cell."""
@@ -154,15 +163,16 @@ class Cell:
                 f'clue={self.clue})')
 
     def as_simple_string(self) -> str:
-        """Useful for printing the board with each cell state shown as a simple string"""
+        """Useful for printing the board with each cell state shown as a simple string."""
         if self.cell_state.is_clue():
-            return str(self.clue)
+            cell_str = str(self.clue)
         else:
-            return {
+            cell_str = {
                 CellState.EMPTY: '_',
                 CellState.WALL: 'W',
                 CellState.NON_WALL: 'O',
             }[self.cell_state]
+        return cell_str
 
     def __key(self) -> tuple[int, int, int]:
         clue_int = 0 if self.clue is None else self.clue
@@ -171,7 +181,8 @@ class Cell:
     def __eq__(self, other: Cell) -> bool:
         if isinstance(other, Cell):
             return self.__key() == other.__key()
-        raise RuntimeError(f'Cannot compare Cell to {type(other)}')
+        msg = f'Cannot compare Cell to {type(other)}'
+        raise RuntimeError(msg)
 
     def __hash__(self) -> int:
         return hash(self.__key())

@@ -1,12 +1,12 @@
-from .abstract_solver_rule import SolverRule
-from ..board_state_checker import NoPossibleSolutionFromCurrentState
 from ...cell_change_info import CellChanges
-from ...cell_state import CellState
 from ...cell_group import CellGroup
+from ...cell_state import CellState
+from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from .abstract_solver_rule import SolverRule
 
 
 class EnsureGardenCanExpandOneRoute(SolverRule):
-    # TODO - this is definitely covered by the combo of EnsureGardenWithClueCanExpand and
+    # TODO: this is definitely covered by the combo of EnsureGardenWithClueCanExpand and
     #  EnsureGardenWithoutClueCanExpand. Should we keep this solver rule since it's cheap? Or should we remove since
     #  it's a duplicated check? This decision is pending some speed checks to see how much quicker this runs than the
     #  more complicated solver rules mentioned above.
@@ -27,9 +27,9 @@ class EnsureGardenCanExpandOneRoute(SolverRule):
                 if len(garden.cells) < clue:
                     cell_changes.add_changes(self.handle_undersized_garden_escape_routes(garden))
             else:
-                raise NoPossibleSolutionFromCurrentState(
+                raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden contains more than one clue',
-                    problem_cell_groups={garden}
+                    problem_cell_groups={garden},
                 )
             if cell_changes.has_any_changes():
                 # Since some cells were marked as non-walls, the previously calculated all_gardens is no longer valid
@@ -40,7 +40,7 @@ class EnsureGardenCanExpandOneRoute(SolverRule):
         cell_changes = CellChanges()
         escape_route_cells = non_wall_cell_group.get_empty_adjacent_neighbors()
         if len(escape_route_cells) == 1:
-            only_escape_route_cell = list(escape_route_cells)[0]
+            only_escape_route_cell = next(iter(escape_route_cells))
             cell_changes.add_change(self.set_cell_to_state(only_escape_route_cell, CellState.NON_WALL,
                                                            reason='Ensure garden can expand'))
         return cell_changes

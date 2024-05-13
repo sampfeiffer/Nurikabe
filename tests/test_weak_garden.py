@@ -1,9 +1,8 @@
-from typing import Optional
 from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.cell import Cell
-from nurikabe.cell_group import NoCluesInCellGroupError, MultipleCluesInCellGroupError
+from nurikabe.cell_group import MultipleCluesInCellGroupError, NoCluesInCellGroupError
 from nurikabe.weak_garden import WeakGarden
 
 
@@ -16,7 +15,7 @@ class TestWeakGarden(TestCase):
         # Used to ensure that each created cell has a distinct row number so that they are not hash equivalents
         cls.row_number = 0
 
-    def get_cell(self, clue: Optional[int] = None) -> Cell:
+    def get_cell(self, clue: int | None = None) -> Cell:
         cell = Cell(row_number=self.row_number, col_number=0, clue=clue, pixel_position=self.pixel_position,
                     screen=self.screen)
         self.row_number += 1

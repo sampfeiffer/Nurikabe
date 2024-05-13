@@ -1,19 +1,23 @@
-import sys
 import logging
+import sys
+from typing import TYPE_CHECKING
+
 import pygame
 
-from .screen import Screen
-from .level import LevelBuilderFromFile
 from .board import Board
-from .pixel_position import PixelPosition
-from .game_status_checker import GameStatusChecker
+from .cell_change_info import CellChanges
 from .game_status import GameStatus
+from .game_status_checker import GameStatusChecker
+from .game_status_display import GameStatusDisplay
+from .level import LevelBuilderFromFile
+from .pixel_position import PixelPosition
+from .screen import Screen
+from .solver.solver import Solver
 from .solver_button import SolverButton
 from .undo_redo_control import UndoRedoControl
-from .game_status_display import GameStatusDisplay
-from .cell_change_info import CellChanges
-from .solver.solver import Solver
-from .button import Button
+
+if TYPE_CHECKING:
+    from .button import Button
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +25,9 @@ LEFT_MOUSE_BUTTON = 1  # Pygame's representation the left mouse button
 
 
 class Nurikabe:
-    def __init__(self, level_number: int, should_use_solver: bool, should_include_grid_numbers: bool):
+    def __init__(self, *, level_number: int, should_use_solver: bool, should_include_grid_numbers: bool):
         level = LevelBuilderFromFile(level_number).build_level()
-        self.screen = Screen(level, should_include_grid_numbers)
+        self.screen = Screen(level, should_include_grid_numbers=should_include_grid_numbers)
         self.board = Board(level, self.screen)
         self.undo_redo_control = UndoRedoControl(self.screen, self.board)
         self.buttons: list[Button] = list(self.undo_redo_control.buttons[::])
@@ -62,7 +66,7 @@ class Nurikabe:
         elif event_type == pygame.MOUSEMOTION:
             event_position = PixelPosition.from_tuple(event.pos)
             is_left_mouse_down = event.buttons[0] == 1
-            self.process_mouse_motion(event_position, is_left_mouse_down)
+            self.process_mouse_motion(event_position, is_left_mouse_down=is_left_mouse_down)
         else:
             pass  # ignore all other events
 
@@ -87,9 +91,9 @@ class Nurikabe:
             cell_changes = self.solver.run_solver()
             self.check_game_status(cell_changes)
 
-    def process_mouse_motion(self, event_position: PixelPosition, is_left_mouse_down: bool) -> None:
+    def process_mouse_motion(self, event_position: PixelPosition, *, is_left_mouse_down: bool) -> None:
         for button in self.buttons:
-            button.process_mouse_motion(event_position, is_left_mouse_down)
+            button.process_mouse_motion(event_position, is_left_mouse_down=is_left_mouse_down)
 
     def check_game_status(self, cell_changes: CellChanges) -> None:
         game_status = self.game_status_checker.is_solution_correct(cell_changes)

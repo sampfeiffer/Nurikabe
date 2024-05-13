@@ -1,6 +1,5 @@
 import csv
 from abc import ABC, abstractmethod
-from typing import Optional
 from pathlib import Path
 
 
@@ -13,7 +12,8 @@ class Level:
     Basic representation of a Nurikabe level. This is just a list of lists, where each cell value is either a
     positive integer representing a clue or None which indicates an empty cell.
     """
-    def __init__(self, level_setup: list[list[Optional[int]]]):
+
+    def __init__(self, level_setup: list[list[int | None]]):
         """level_setup is a 2 dimensional list. Each outer list represents a row."""
         self.level_setup = level_setup
         self.number_of_rows = len(self.level_setup)
@@ -25,9 +25,10 @@ class Level:
         """If there is an inconsistent number of columns per row, throw an error."""
         for row in self.level_setup:
             if len(row) != self.number_of_columns:
-                raise BadLevelSetupError('Inconsistent number of columns in level setup')
+                msg = 'Inconsistent number of columns in level setup'
+                raise BadLevelSetupError(msg)
 
-    def get_cell_value(self, row_number: int, col_number: int) -> Optional[int]:
+    def get_cell_value(self, row_number: int, col_number: int) -> int | None:
         return self.level_setup[row_number][col_number]
 
     def __str__(self) -> str:
@@ -53,7 +54,7 @@ class Level:
         return largest_clue_value
 
     @staticmethod
-    def format_cell_value(cell_value: Optional[int], largest_clue_num_of_digits: int) -> str:
+    def format_cell_value(cell_value: int | None, largest_clue_num_of_digits: int) -> str:
         cell_value_str = '' if cell_value is None else str(cell_value)
         return cell_value_str.rjust(largest_clue_num_of_digits)
 
@@ -64,13 +65,16 @@ class LevelBuilder(ABC):
         raise NotImplementedError
 
     @staticmethod
-    def parse_cell_value(cell_value_as_str: str) -> Optional[int]:
+    def parse_cell_value(cell_value_as_str: str) -> int | None:
         if cell_value_as_str == '':
-            return None
+            cell_value = None
         elif cell_value_as_str.isnumeric():
-            return int(cell_value_as_str)
+            cell_value = int(cell_value_as_str)
         else:
-            raise BadLevelSetupError(f'Unexpected character in level setup: {cell_value_as_str}')
+            msg = f'Unexpected character in level setup: {cell_value_as_str}'
+            raise BadLevelSetupError(msg)
+
+        return cell_value
 
 
 class LevelBuilderFromFile(LevelBuilder):
@@ -81,7 +85,7 @@ class LevelBuilderFromFile(LevelBuilder):
         level_setup = self.read_level_setup()
         return Level(level_setup)
 
-    def read_level_setup(self) -> list[list[Optional[int]]]:
+    def read_level_setup(self) -> list[list[int | None]]:
         level_filename = self.get_level_filename()
         with level_filename.open(mode='r') as csv_file:
             csv_reader = csv.reader(csv_file)

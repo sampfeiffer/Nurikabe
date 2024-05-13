@@ -1,25 +1,25 @@
-from typing import Optional
 import pygame
 
-from .screen import Screen
 from .color import Color
-from .text_type import TextType
 from .pixel_position import PixelPosition
+from .screen import Screen
+from .text_type import TextType
 
 
 class Button:
     ENABLED_TEXT_COLOR = Color.BLACK
     DISABLED_TEXT_COLOR = Color.GRAY
 
-    def __init__(self, screen: Screen, left: int, top: int, width: int, height: int, text: Optional[str] = None,
-                 image: Optional[pygame.Surface] = None, is_clickable: bool = True):
+    def __init__(self, screen: Screen, left: int, top: int, width: int, height: int,  # noqa: PLR0913
+                 text: str | None = None, image: pygame.Surface | None = None, *, is_clickable: bool = True):
         self.screen = screen
         self.text = text
         self.image = image
         self.image_disabled = self.get_disabled_button_image()
 
         if self.text is not None and self.image is not None:
-            raise ValueError('Button cannot have both text and an image')
+            msg = 'Button cannot have both text and an image'
+            raise ValueError(msg)
 
         self.rect = pygame.Rect(left, top, width, height)
         self.is_clickable = is_clickable
@@ -28,13 +28,13 @@ class Button:
 
         self.draw_button_rect()
 
-    def get_disabled_button_image(self) -> Optional[pygame.Surface]:
+    def get_disabled_button_image(self) -> pygame.Surface | None:
         if self.image is None:
-            return None
+            disabled_image = None
         else:
             disabled_image = self.image.copy()
             disabled_image.set_alpha(255 - Button.DISABLED_TEXT_COLOR.value[0])
-            return disabled_image
+        return disabled_image
 
     def draw_button_rect(self) -> None:
         # Background
@@ -54,10 +54,7 @@ class Button:
         if not self.is_clickable or not self.is_mouse_on_button:
             color = Color.OFF_WHITE
         else:
-            if self.is_left_mouse_down:
-                color = Color.MEDIUM_SLATE_GRAY
-            else:
-                color = Color.LIGHT_SLATE_GRAY
+            color = Color.MEDIUM_SLATE_GRAY if self.is_left_mouse_down else Color.LIGHT_SLATE_GRAY
         return color
 
     def process_potential_left_click_down(self, event_position: PixelPosition) -> None:
@@ -79,15 +76,15 @@ class Button:
         self.is_left_mouse_down = False
         self.draw_button_rect()
 
-    def process_mouse_motion(self, event_position: PixelPosition, is_left_mouse_down: bool) -> None:
+    def process_mouse_motion(self, event_position: PixelPosition, *, is_left_mouse_down: bool) -> None:
         if self.should_handle_mouse_event(event_position):
-            self.handle_mouse_motion(is_left_mouse_down)
+            self.handle_mouse_motion(is_left_mouse_down=is_left_mouse_down)
         elif self.is_mouse_on_button:
             self.is_mouse_on_button = False
             self.is_left_mouse_down = False
             self.draw_button_rect()
 
-    def handle_mouse_motion(self, is_left_mouse_down: bool) -> None:
+    def handle_mouse_motion(self, *, is_left_mouse_down: bool) -> None:
         if not self.is_mouse_on_button or self.is_left_mouse_down != is_left_mouse_down:
             self.is_mouse_on_button = True
             self.is_left_mouse_down = is_left_mouse_down

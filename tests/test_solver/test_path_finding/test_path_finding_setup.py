@@ -20,7 +20,7 @@ class TestPathFindingSetup(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
@@ -34,7 +34,7 @@ class TestPathFindingSetup(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=1, col_number=2)
@@ -51,14 +51,14 @@ class TestPathFindingSetup(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
         other_cell_groups = {CellGroup(cells={
             board.get_cell_from_grid(row_number=2, col_number=0),
-            board.get_cell_from_grid(row_number=2, col_number=1)
+            board.get_cell_from_grid(row_number=2, col_number=1),
         })}
         off_limit_cells = {
             board.get_cell_from_grid(row_number=2, col_number=0),
@@ -76,13 +76,13 @@ class TestPathFindingSetup(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
         other_cell_groups = {CellGroup(cells={
-            board.get_cell_from_grid(row_number=1, col_number=0)
+            board.get_cell_from_grid(row_number=1, col_number=0),
         })}
 
         with self.assertRaises(PathSetupError):
@@ -96,13 +96,13 @@ class TestPathFindingSetup(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
         other_cell_groups = {CellGroup(cells={
-            board.get_cell_from_grid(row_number=1, col_number=3)
+            board.get_cell_from_grid(row_number=1, col_number=3),
         })}
 
         try:
@@ -115,7 +115,7 @@ class TestPathFindingSetup(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)

@@ -1,25 +1,24 @@
 import logging
 
-from ..screen import Screen
 from ..board import Board
-from ..color import Color
 from ..cell_change_info import CellChanges
+from ..color import Color
+from ..screen import Screen
 from ..undo_redo_control import UndoRedoControl
-from .board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentState
-
-from .solver_rules.separate_clues import SeparateClues
-from .solver_rules.no_isolated_wall_sections_naive import NoIsolatedWallSectionsNaive
-from .solver_rules.ensure_garden_can_expand_one_route import EnsureGardenCanExpandOneRoute
+from .board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentStateError
 from .solver_rules.enclose_full_garden import EncloseFullGarden
-from .solver_rules.ensure_no_two_by_two_walls import EnsureNoTwoByTwoWalls
-from .solver_rules.naively_unreachable_from_clue_cell import NaivelyUnreachableFromClueCell
-from .solver_rules.naively_unreachable_from_garden import NaivelyUnreachableFromGarden
-from .solver_rules.separate_gardens_with_clues import SeparateGardensWithClues
-from .solver_rules.fill_correctly_sized_weak_garden import FillCorrectlySizedWeakGarden
-from .solver_rules.unreachable_from_garden import UnreachableFromGarden
+from .solver_rules.ensure_garden_can_expand_one_route import EnsureGardenCanExpandOneRoute
 from .solver_rules.ensure_garden_with_clue_can_expand import EnsureGardenWithClueCanExpand
 from .solver_rules.ensure_garden_without_clue_can_expand import EnsureGardenWithoutClueCanExpand
+from .solver_rules.ensure_no_two_by_two_walls import EnsureNoTwoByTwoWalls
+from .solver_rules.fill_correctly_sized_weak_garden import FillCorrectlySizedWeakGarden
+from .solver_rules.naively_unreachable_from_clue_cell import NaivelyUnreachableFromClueCell
+from .solver_rules.naively_unreachable_from_garden import NaivelyUnreachableFromGarden
 from .solver_rules.no_isolated_wall_sections import NoIsolatedWallSections
+from .solver_rules.no_isolated_wall_sections_naive import NoIsolatedWallSectionsNaive
+from .solver_rules.separate_clues import SeparateClues
+from .solver_rules.separate_gardens_with_clues import SeparateGardensWithClues
+from .solver_rules.unreachable_from_garden import UnreachableFromGarden
 
 logger = logging.getLogger(__name__)
 
@@ -67,9 +66,9 @@ class Solver:
             cell_changes.add_changes(self.ensure_garden_without_clue_can_expand.apply_rule())
             cell_changes.add_changes(self.no_isolated_wall_sections.apply_rule())
             self.board.update_painted_gardens()
-        except NoPossibleSolutionFromCurrentState as error:
-            logger.error(f'Cannot solve from current state. Reason: {error}')
-            for i, cell_group in enumerate(error.problem_cell_groups):
+        except NoPossibleSolutionFromCurrentStateError as error:
+            logger.exception('Cannot solve from current state')
+            for cell_group in error.problem_cell_groups:
                 cell_group.draw_edges(self.screen, color=Color.RED)
 
         self.undo_redo_control.process_board_event(cell_changes)

@@ -1,7 +1,7 @@
-from .abstract_solver_rule import SolverRule
-from ..board_state_checker import BoardStateChecker, NoPossibleSolutionFromCurrentState
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
+from ..board_state_checker import BoardStateChecker
+from .abstract_solver_rule import SolverRule
 
 
 class NoIsolatedWallSections(SolverRule):
@@ -22,7 +22,12 @@ class NoIsolatedWallSections(SolverRule):
         for cell in self.board.get_empty_cells():
             cell_groups = self.board.get_all_non_garden_cell_groups_with_walls(additional_off_limit_cell=cell)
             if len(cell_groups) > 1:
-                cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL,
-                                                               reason='Ensure no isolated wall sections'))
+                cell_changes.add_change(
+                    self.set_cell_to_state(
+                        cell,
+                        CellState.WALL,
+                        reason='Ensure no isolated wall sections',
+                    ),
+                )
 
         return cell_changes

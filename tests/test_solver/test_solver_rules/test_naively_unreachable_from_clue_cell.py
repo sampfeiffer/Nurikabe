@@ -19,7 +19,7 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         board_details = [
             '_,_,_,_,_,_',
             '_,4,_,_,3,_',
-            '_,_,_,_,_,_'
+            '_,_,_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromClueCell(board).apply_rule()
@@ -34,7 +34,7 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         board_details = [
             '_,_,W,_',
             '_,4,W,_',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromClueCell(board).apply_rule()
@@ -46,7 +46,7 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         board_details = [
             '_,_,_,_',
             '_,_,_,W',
-            '_,3,W,_'
+            '_,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromClueCell(board).apply_rule()
@@ -54,7 +54,7 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         expected_board_state = [
             'W,_,W,W',
             '_,_,_,W',
-            '_,3,W,_'
+            '_,3,W,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -65,7 +65,7 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         board_details = [
             '_,_,O,_',
             '_,_,_,W',
-            '_,3,W,_'
+            '_,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromClueCell(board).apply_rule()
@@ -73,6 +73,6 @@ class TestNaivelyUnreachableFromClueCell(TestCase):
         expected_board_state = [
             'W,_,O,W',
             '_,_,_,W',
-            '_,3,W,_'
+            '_,3,W,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)

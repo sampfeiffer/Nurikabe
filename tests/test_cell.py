@@ -1,8 +1,7 @@
-from typing import Optional
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from nurikabe.cell import Cell, NonExistentNeighbor
+from nurikabe.cell import Cell, NonExistentNeighborError
 from nurikabe.cell_state import CellState
 from nurikabe.direction import Direction
 
@@ -13,7 +12,7 @@ class TestCell(TestCase):
         cls.screen = MagicMock(name='Screen')
         cls.pixel_position = MagicMock(name='PixelPosition')
 
-    def get_cell(self, row_number: int = 0, col_number: int = 0, clue: Optional[int] = None) -> Cell:
+    def get_cell(self, row_number: int = 0, col_number: int = 0, clue: int | None = None) -> Cell:
         return Cell(row_number, col_number, clue, pixel_position=self.pixel_position, screen=self.screen)
 
 
@@ -76,7 +75,7 @@ class TestCellNeighbors(TestCell):
             Direction.RIGHT: self.get_cell(),
             Direction.RIGHT_DOWN: self.get_cell(),
             Direction.DOWN: self.get_cell(),
-            Direction.LEFT: self.get_cell()
+            Direction.LEFT: self.get_cell(),
         }
         cell.set_neighbor_map(neighbor_cell_map)
 
@@ -86,7 +85,7 @@ class TestCellNeighbors(TestCell):
         self.assertEqual(up_and_right_up_neighbors, expected)
 
         # Attempting to get a neighbor set that includes a non-existent neighbor throws an error
-        with self.assertRaises(NonExistentNeighbor):
+        with self.assertRaises(NonExistentNeighborError):
             cell.get_neighbor_set({Direction.UP, Direction.LEFT_DOWN})
 
     def test_get_adjacent_neighbors(self) -> None:
@@ -98,7 +97,7 @@ class TestCellNeighbors(TestCell):
             Direction.UP: self.get_cell(),
             Direction.RIGHT_UP: self.get_cell(),
             Direction.RIGHT: self.get_cell(),
-            Direction.LEFT: self.get_cell()
+            Direction.LEFT: self.get_cell(),
         }
         cell.set_neighbor_map(neighbor_cell_map)
 
@@ -118,7 +117,7 @@ class TestCellNeighbors(TestCell):
             Direction.RIGHT_DOWN: self.get_cell(),
             Direction.DOWN: self.get_cell(),
             Direction.LEFT_DOWN: self.get_cell(),
-            Direction.LEFT: self.get_cell()
+            Direction.LEFT: self.get_cell(),
         }
         cell.set_neighbor_map(neighbor_cell_map)
 
@@ -128,17 +127,17 @@ class TestCellNeighbors(TestCell):
         self.assertEqual(two_by_two_section, expected)
 
     def test_two_by_two_section_edge(self) -> None:
-        """Test that a cell on the right or bottom edge cannot have a corresponding two-by-two section"""
+        """Test that a cell on the right or bottom edge cannot have a corresponding two-by-two section."""
         right_edge_cell = self.get_cell()
         neighbor_cell_map = {
             Direction.LEFT_UP: self.get_cell(),
             Direction.UP: self.get_cell(),
             Direction.DOWN: self.get_cell(),
             Direction.LEFT_DOWN: self.get_cell(),
-            Direction.LEFT: self.get_cell()
+            Direction.LEFT: self.get_cell(),
         }
         right_edge_cell.set_neighbor_map(neighbor_cell_map)
-        with self.assertRaises(NonExistentNeighbor):
+        with self.assertRaises(NonExistentNeighborError):
             right_edge_cell.get_two_by_two_section()
 
         bottom_edge_cell = self.get_cell()
@@ -147,8 +146,8 @@ class TestCellNeighbors(TestCell):
             Direction.UP: self.get_cell(),
             Direction.RIGHT_UP: self.get_cell(),
             Direction.RIGHT: self.get_cell(),
-            Direction.LEFT: self.get_cell()
+            Direction.LEFT: self.get_cell(),
         }
         bottom_edge_cell.set_neighbor_map(neighbor_cell_map)
-        with self.assertRaises(NonExistentNeighbor):
+        with self.assertRaises(NonExistentNeighborError):
             bottom_edge_cell.get_two_by_two_section()

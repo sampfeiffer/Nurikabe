@@ -19,7 +19,7 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,_,_,_',
             '_,4,_,_,3,O',
-            '_,_,_,_,_,_'
+            '_,_,_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromGarden(board).apply_rule()
@@ -34,7 +34,7 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         board_details = [
             '_,O,W,_',
             '_,4,W,_',
-            '_,_,W,W'
+            '_,_,W,W',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromGarden(board).apply_rule()
@@ -46,7 +46,7 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,_,_',
             '_,4,_,_,_',
-            '_,O,_,_,_'
+            '_,O,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromGarden(board).apply_rule()
@@ -54,7 +54,7 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,_,_,W,W',
             '_,4,_,_,W',
-            '_,O,_,_,W'
+            '_,O,_,_,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -65,7 +65,7 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,_,O',
             '_,4,_,_,O',
-            '_,O,_,_,_'
+            '_,O,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NaivelyUnreachableFromGarden(board).apply_rule()
@@ -73,6 +73,6 @@ class TestNaivelyUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,_,_,W,O',
             '_,4,_,_,O',
-            '_,O,_,_,W'
+            '_,O,_,_,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)

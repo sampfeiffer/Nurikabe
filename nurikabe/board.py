@@ -1,18 +1,19 @@
-from typing import Optional, Callable
+from collections.abc import Callable
+
 import pygame
 
-from .screen import Screen
-from .level import Level
 from .cell import Cell
-from .pixel_position import PixelPosition
-from .color import Color
 from .cell_change_info import CellChangeInfo, CellChanges
-from .direction import Direction
-from .grid_coordinate import GridCoordinate
-from .garden import Garden
-from .weak_garden import WeakGarden
-from .wall_section import WallSection
 from .cell_group import CellGroup
+from .color import Color
+from .direction import Direction
+from .garden import Garden
+from .grid_coordinate import GridCoordinate
+from .level import Level
+from .pixel_position import PixelPosition
+from .screen import Screen
+from .wall_section import WallSection
+from .weak_garden import WeakGarden
 
 
 class AdjacentCluesError(Exception):
@@ -55,7 +56,7 @@ class Board:
         return [[self.create_cell(row_number, col_number, cell_clue) for col_number, cell_clue in enumerate(row)]
                 for row_number, row in enumerate(self.level.level_setup)]
 
-    def create_cell(self, row_number: int, col_number: int, cell_clue: Optional[int]) -> Cell:
+    def create_cell(self, row_number: int, col_number: int, cell_clue: int | None) -> Cell:
         cell_pixel_position = self.screen.get_cell_location(self.rect, row_number, col_number)
         return Cell(row_number, col_number, cell_clue, cell_pixel_position, self.screen)
 
@@ -76,13 +77,14 @@ class Board:
                     neighbor_cell_map[direction] = neighbor_cell
             cell.set_neighbor_map(neighbor_cell_map)
 
-    def get_neighbor_cell(self, cell: Cell, direction: Direction) -> Optional[Cell]:
+    def get_neighbor_cell(self, cell: Cell, direction: Direction) -> Cell | None:
         neighbor_coordinate = cell.grid_coordinate.get_offset(direction)
         if self.is_valid_cell_coordinate(neighbor_coordinate):
-            return self.get_cell_from_grid(row_number=neighbor_coordinate.row_number,
-                                           col_number=neighbor_coordinate.col_number)
+            neighbor_cell = self.get_cell_from_grid(row_number=neighbor_coordinate.row_number,
+                                                    col_number=neighbor_coordinate.col_number)
         else:
-            return None
+            neighbor_cell = None
+        return neighbor_cell
 
     def is_valid_cell_coordinate(self, grid_coordinate: GridCoordinate) -> bool:
         return 0 <= grid_coordinate.row_number < self.level.number_of_rows and \
@@ -94,21 +96,26 @@ class Board:
     def ensure_no_adjacent_clues(self) -> None:
         """
         As a sanity check, ensure that there are no adjacent clue cells since that would break the rules of Nurikabe
-        and be impossible to solve"""
+        and be impossible to solve.
+        """
         for cell in self.flat_cell_list:
             if cell.has_clue and cell.has_any_clues_adjacent():
-                raise AdjacentCluesError('This board setup is infeasible since there are adjacent clues')
+                msg = 'This board setup is infeasible since there are adjacent clues'
+                raise AdjacentCluesError(msg)
 
-    def handle_board_click(self, event_position: PixelPosition) -> Optional[CellChangeInfo]:
+    def handle_board_click(self, event_position: PixelPosition) -> CellChangeInfo | None:
         if self.is_board_frozen:
-            return
+            return None
         if not self.is_inside_board(event_position):
-            return
+            return None
         for cell in self.flat_cell_list:
             if cell.is_inside_cell(event_position):
                 cell_change_info = cell.handle_cell_click()
                 self.update_painted_gardens()
                 return cell_change_info
+
+        msg = 'Code should not be reachable'
+        raise RuntimeError(msg)
 
     def is_inside_board(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
@@ -164,7 +171,7 @@ class Board:
         return CellGroup(cells)
 
     def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool],
-                            connected_cells: Optional[set[Cell]] = None) -> set[Cell]:
+                            connected_cells: set[Cell] | None = None) -> set[Cell]:
         """
         Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
         returns True.
@@ -212,10 +219,7 @@ class Board:
             cell.update_cell_state(new_cell_state=cell_change_info.after_state)
 
     def has_two_by_two_wall(self) -> bool:
-        for cell in self.flat_cell_list:
-            if cell.does_form_two_by_two_walls():
-                return True
-        return False
+        return any(cell.does_form_two_by_two_walls() for cell in self.flat_cell_list)
 
     def get_two_by_two_wall_sections(self) -> set[Cell]:
         two_by_two_wall_section_cells: set[Cell] = set()
@@ -224,13 +228,13 @@ class Board:
                 two_by_two_wall_section_cells.update(cell.get_two_by_two_section())
         return two_by_two_wall_section_cells
 
-    def get_all_non_garden_cell_groups_with_walls(self, additional_off_limit_cell: Optional[Cell] = None) \
+    def get_all_non_garden_cell_groups_with_walls(self, additional_off_limit_cell: Cell | None = None) \
             -> set[CellGroup]:
         off_limit_cells = self.get_garden_cells()
         if additional_off_limit_cell is not None:
             off_limit_cells.add(additional_off_limit_cell)
         non_garden_cell_groups = self.get_all_cell_groups(
-            cell_criteria_func=lambda cell: cell not in off_limit_cells
+            cell_criteria_func=lambda cell: cell not in off_limit_cells,
         )
         return {
             non_garden_cell_group for non_garden_cell_group in non_garden_cell_groups

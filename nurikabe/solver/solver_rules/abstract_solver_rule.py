@@ -2,8 +2,8 @@ import logging
 from abc import ABC, abstractmethod
 
 from ...board import Board
-from ...cell_change_info import CellChanges, CellChangeInfo
 from ...cell import Cell
+from ...cell_change_info import CellChangeInfo, CellChanges
 from ...cell_state import CellState
 from ...garden import Garden
 
@@ -21,11 +21,12 @@ class SolverRule(ABC):
     @staticmethod
     def set_cell_to_state(cell: Cell, target_cell_state: CellState, reason: str) -> CellChangeInfo:
         if not cell.is_clickable:
-            raise RuntimeError(f'cell is not clickable: {cell}')
-        logger.debug(f'Setting {cell} to {target_cell_state}. Reason: {reason}')
+            msg = f'cell is not clickable: {cell}'
+            raise RuntimeError(msg)
+        logger.debug('Setting %s to %s. Reason: %s', cell, target_cell_state, reason)
         return cell.update_cell_state(target_cell_state)
 
-    def get_incomplete_gardens(self, with_clue_only: bool) -> set[Garden]:
+    def get_incomplete_gardens(self, *, with_clue_only: bool) -> set[Garden]:
         all_gardens = self.board.get_all_gardens()
         incomplete_gardens = {garden for garden in all_gardens
                               if not garden.does_contain_clue() or not garden.is_garden_correct_size()}

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from nurikabe.level import LevelBuilderFromStringList, BadLevelSetupError
+from nurikabe.level import BadLevelSetupError, LevelBuilderFromStringList
 
 
 class TestLevelBuilder(TestCase):
@@ -9,7 +9,7 @@ class TestLevelBuilder(TestCase):
         level_details = [
             ',,3,',
             ',,,',
-            ',1,,'
+            ',1,,',
         ]
         try:
             LevelBuilderFromStringList(level_details).build_level()
@@ -21,7 +21,7 @@ class TestLevelBuilder(TestCase):
         level_details = [
             ',,3',
             ',,',
-            ',1,,'
+            ',1,,',
         ]
         with self.assertRaises(BadLevelSetupError):
             LevelBuilderFromStringList(level_details).build_level()
@@ -31,7 +31,7 @@ class TestLevelBuilder(TestCase):
         level_details = [
             ',,3',
             ',,e',
-            ',1,,'
+            ',1,,',
         ]
         with self.assertRaises(BadLevelSetupError):
             LevelBuilderFromStringList(level_details).build_level()

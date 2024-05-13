@@ -3,9 +3,10 @@ from unittest.mock import MagicMock
 
 from nurikabe.board import Board
 from nurikabe.cell_group import CellGroup
-from nurikabe.solver.path_finding import PathFinder, NoPathFoundError
+from nurikabe.solver.path_finding import NoPathFoundError, PathFinder
+
 from ...build_board import build_board
-from .build_path_finder import build_path_finder, extract_blank_board_details, PathFinderInfo
+from .build_path_finder import PathFinderInfo, build_path_finder, extract_blank_board_details
 
 
 class TestPathFinding(TestCase):
@@ -25,7 +26,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell = board.get_cell_from_grid(row_number=1, col_number=2)
@@ -37,7 +38,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell = board.get_cell_from_grid(row_number=1, col_number=2)
@@ -50,7 +51,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             '_,_,_,_',
             'S,_,_,E',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -61,7 +62,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             board.get_cell_from_grid(row_number=1, col_number=0),
             board.get_cell_from_grid(row_number=1, col_number=1),
             board.get_cell_from_grid(row_number=1, col_number=2),
-            board.get_cell_from_grid(row_number=1, col_number=3)
+            board.get_cell_from_grid(row_number=1, col_number=3),
         ]
         self.assertEqual(shortest_path_between_cells.cell_list, expected)
 
@@ -79,7 +80,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             '_,E,_,_',
             '_,_,_,_',
-            '_,_,S,_'
+            '_,_,S,_',
         ]
         path_finder = self.create_path_finder(board_details).path_finder
 
@@ -91,7 +92,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             '_,E,_,_',
             '_,X,X,X',
-            '_,_,S,_'
+            '_,_,S,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -104,19 +105,19 @@ class TestPathFindingBetweenCells(TestPathFinding):
             board.get_cell_from_grid(row_number=2, col_number=0),
             board.get_cell_from_grid(row_number=1, col_number=0),
             board.get_cell_from_grid(row_number=0, col_number=0),
-            board.get_cell_from_grid(row_number=0, col_number=1)
+            board.get_cell_from_grid(row_number=0, col_number=1),
         ]
         self.assertEqual(path_info.cell_list, expected)
 
     def test_path_between_cells_with_unimportant_off_limit_cells(self) -> None:
         """
         Test that the algorithm finds a path between cells when there are off limit cells, but the off limit cells do
-        not get in the way
+        not get in the way.
         """
         board_details = [
             '_,E,_,X',
             '_,_,X,X',
-            '_,_,S,_'
+            '_,_,S,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -127,7 +128,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             board.get_cell_from_grid(row_number=2, col_number=2),
             board.get_cell_from_grid(row_number=2, col_number=1),
             board.get_cell_from_grid(row_number=1, col_number=1),
-            board.get_cell_from_grid(row_number=0, col_number=1)
+            board.get_cell_from_grid(row_number=0, col_number=1),
         ]
         self.assertEqual(path_info.cell_list, expected)
 
@@ -139,7 +140,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             '_,E,_,_',
             'X,X,X,X',
-            '_,_,S,_'
+            '_,_,S,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         with self.assertRaises(NoPathFoundError):
@@ -148,14 +149,14 @@ class TestPathFindingBetweenCells(TestPathFinding):
     def test_path_between_cells_with_off_limit_cells_blocking_direct_path(self) -> None:
         """
         Test that the algorithm finds a path between cells when it has to go around some off limit cells. Here, the
-        off limit cells block the more direct route, so the algorithm has to go around
+        off limit cells block the more direct route, so the algorithm has to go around.
         """
         board_details = [
             '_,_,_,_,_,_,_',
             '_,X,X,_,X,X,_',
             '_,S,X,_,X,_,_',
             '_,X,X,X,X,X,_',
-            '_,_,_,X,E,_,_'
+            '_,_,_,X,E,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -178,7 +179,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             board.get_cell_from_grid(row_number=3, col_number=6),
             board.get_cell_from_grid(row_number=4, col_number=6),
             board.get_cell_from_grid(row_number=4, col_number=5),
-            board.get_cell_from_grid(row_number=4, col_number=4)
+            board.get_cell_from_grid(row_number=4, col_number=4),
         ]
         self.assertEqual(path_info.cell_list, expected)
         self.assertEqual(path_info.path_length, 16)
@@ -201,7 +202,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             'E,_,_',
             '_,a,a',
-            'S,_,_'
+            'S,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         with self.assertRaises(NoPathFoundError):
@@ -216,7 +217,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             'E,_,_',
             '_,a,a',
-            'S,_,_'
+            'S,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -226,7 +227,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         expected = [
             board.get_cell_from_grid(row_number=2, col_number=0),
             board.get_cell_from_grid(row_number=1, col_number=0),
-            board.get_cell_from_grid(row_number=0, col_number=0)
+            board.get_cell_from_grid(row_number=0, col_number=0),
         ]
 
         self.assertEqual(path_info.cell_list, expected)
@@ -242,7 +243,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             'E,_,_',
             '_,a,_',
             '_,a,a',
-            'S,_,_'
+            'S,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -253,7 +254,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             board.get_cell_from_grid(row_number=3, col_number=0),
             board.get_cell_from_grid(row_number=2, col_number=0),
             board.get_cell_from_grid(row_number=1, col_number=0),
-            board.get_cell_from_grid(row_number=0, col_number=0)
+            board.get_cell_from_grid(row_number=0, col_number=0),
         ]
 
         self.assertEqual(path_info.cell_list, expected)
@@ -272,7 +273,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             'E,_,a',
             '_,X,a',
             '_,_,a',
-            'X,S,X'
+            'X,S,X',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -286,7 +287,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             board.get_cell_from_grid(row_number=1, col_number=2),
             board.get_cell_from_grid(row_number=0, col_number=2),
             board.get_cell_from_grid(row_number=0, col_number=1),
-            board.get_cell_from_grid(row_number=0, col_number=0)
+            board.get_cell_from_grid(row_number=0, col_number=0),
         ]
         self.assertEqual(path_info.cell_list, expected)
         self.assertEqual(path_info.path_length, 7)
@@ -300,7 +301,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         board_details = [
             '_,_,E,_,_',
             'a,a,_,b,b',
-            '_,X,S,X,_'
+            '_,X,S,X,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -310,7 +311,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
         expected = [
             board.get_cell_from_grid(row_number=2, col_number=2),
             board.get_cell_from_grid(row_number=1, col_number=2),
-            board.get_cell_from_grid(row_number=0, col_number=2)
+            board.get_cell_from_grid(row_number=0, col_number=2),
         ]
 
         self.assertEqual(path_info.cell_list, expected)
@@ -333,7 +334,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             '_,X,a,a,a,a,X,_',
             '_,X,a,a,a,a,X,_',
             '_,X,X,X,a,X,X,_',
-            'S,_,_,_,_,_,_,E'
+            'S,_,_,_,_,_,_,E',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -362,7 +363,7 @@ class TestPathFindingBetweenCells(TestPathFinding):
             board.get_cell_from_grid(row_number=4, col_number=7),
             board.get_cell_from_grid(row_number=5, col_number=7),
             board.get_cell_from_grid(row_number=6, col_number=7),
-            board.get_cell_from_grid(row_number=7, col_number=7)
+            board.get_cell_from_grid(row_number=7, col_number=7),
         ]
 
         self.assertEqual(path_info.cell_list, expected)
@@ -373,24 +374,24 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
     def test_overlapping_cell_groups(self) -> None:
         """
         Note that based on the design of the path finding algorithm, the exact cells included in this path are not
-        guaranteed. Only the length of the path is guaranteed to be consistent
+        guaranteed. Only the length of the path is guaranteed to be consistent.
         """
         board_details = [
             '_,_,_,_',
             '_,_,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         start_cell_group = CellGroup(cells={
             board.get_cell_from_grid(row_number=1, col_number=2),
             board.get_cell_from_grid(row_number=2, col_number=2),
-            board.get_cell_from_grid(row_number=2, col_number=3)
+            board.get_cell_from_grid(row_number=2, col_number=3),
         })
 
         end_cell_group = CellGroup(cells={
             board.get_cell_from_grid(row_number=1, col_number=2),
             board.get_cell_from_grid(row_number=0, col_number=2),
-            board.get_cell_from_grid(row_number=0, col_number=3)
+            board.get_cell_from_grid(row_number=0, col_number=3),
         })
 
         shortest_path_between_cell_groups = PathFinder(start_cell_group=start_cell_group,
@@ -402,7 +403,7 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
             '_,_,_,S,_,_',
             '_,_,_,S,S,_',
             '_,E,_,_,_,_',
-            '_,E,_,_,_,_'
+            '_,E,_,_,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_info = path_finder_info.path_finder.get_path_info()
@@ -413,7 +414,7 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
             '_,_,_,S,_,_',
             '_,_,X,S,S,_',
             '_,E,X,X,_,_',
-            '_,E,_,_,_,_'
+            '_,E,_,_,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         path_finder = path_finder_info.path_finder
@@ -434,7 +435,7 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
             'X,_,_,S,_,_',
             '_,X,X,S,S,_',
             '_,E,X,X,_,_',
-            '_,E,_,X,_,_'
+            '_,E,_,X,_,_',
         ]
         path_finder_info = self.create_path_finder(board_details)
         with self.assertRaises(NoPathFoundError):

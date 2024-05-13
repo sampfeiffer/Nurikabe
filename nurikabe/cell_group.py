@@ -1,10 +1,14 @@
 from __future__ import annotations
-from typing import Callable
 
-from .cell import Cell
-from .rect_edge import RectEdge
-from .color import Color
-from .screen import Screen
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from .cell import Cell
+    from .color import Color
+    from .rect_edge import RectEdge
+    from .screen import Screen
 
 
 class NoCluesInCellGroupError(Exception):
@@ -18,7 +22,7 @@ class MultipleCluesInCellGroupError(Exception):
 class CellGroup:
     @staticmethod
     def get_cell_criteria_func() -> Callable[[Cell], bool]:
-        raise NotImplementedError('Unknown criteria for general CellGroup')
+        raise NotImplementedError('Unknown criteria for general CellGroup')  # noqa: EM101
 
     def __init__(self, cells: set[Cell]):
         self.cells = cells
@@ -44,14 +48,16 @@ class CellGroup:
     def get_clue_cell(self) -> Cell:
         number_of_clues = self.get_number_of_clues()
         if number_of_clues == 0:
-            raise NoCluesInCellGroupError('Cannot get clue cell since there are no clues in this CellGroup')
-        elif number_of_clues > 1:
-            raise MultipleCluesInCellGroupError('CellGroup has more than 1 clue')
-        else:
-            for cell in self.cells:
-                if cell.has_clue:
-                    return cell
-        raise RuntimeError('It should not be possible to reach this code')
+            msg = 'Cannot get clue cell since there are no clues in this CellGroup'
+            raise NoCluesInCellGroupError(msg)
+        if number_of_clues > 1:
+            msg = 'CellGroup has more than 1 clue'
+            raise MultipleCluesInCellGroupError(msg)
+        for cell in self.cells:
+            if cell.has_clue:
+                return cell
+        msg = 'It should not be possible to reach this code'
+        raise RuntimeError(msg)
 
     def does_contain_wall(self) -> bool:
         return any(cell.cell_state.is_wall() for cell in self.cells)
@@ -93,5 +99,5 @@ class CellGroup:
         return self.cells == other_cell_group.cells
 
     def __hash__(self) -> int:
-        sorted_cells = tuple(sorted(list(self.cells), key=lambda cell: (cell.row_number, cell.col_number)))
+        sorted_cells = tuple(sorted(self.cells, key=lambda cell: (cell.row_number, cell.col_number)))
         return hash(sorted_cells)

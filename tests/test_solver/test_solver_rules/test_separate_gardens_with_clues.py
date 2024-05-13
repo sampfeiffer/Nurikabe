@@ -19,7 +19,7 @@ class TestSeparateGardensWithClues(TestCase):
         board_details = [
             '_,_,_,3',
             '_,4,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateGardensWithClues(board).apply_rule()
@@ -31,7 +31,7 @@ class TestSeparateGardensWithClues(TestCase):
         board_details = [
             '_,_,3,_',
             '_,4,_,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateGardensWithClues(board).apply_rule()
@@ -40,7 +40,7 @@ class TestSeparateGardensWithClues(TestCase):
         expected_board_state = [
             '_,W,3,_',
             '_,4,W,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -49,7 +49,7 @@ class TestSeparateGardensWithClues(TestCase):
         board_details = [
             '_,_,_,3',
             '_,4,_,O',
-            '_,O,O,_'
+            '_,O,O,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateGardensWithClues(board).apply_rule()
@@ -58,7 +58,7 @@ class TestSeparateGardensWithClues(TestCase):
         expected_board_state = [
             '_,_,_,3',
             '_,4,W,O',
-            '_,O,O,W'
+            '_,O,O,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -70,7 +70,7 @@ class TestSeparateGardensWithClues(TestCase):
         board_details = [
             '_,_,_,O',
             '_,4,_,O',
-            '_,O,O,_'
+            '_,O,O,_',
         ]
         board = self.create_board(board_details)
         cell_changes = SeparateGardensWithClues(board).apply_rule()

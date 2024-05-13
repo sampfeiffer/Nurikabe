@@ -19,7 +19,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,_',
             '_,5,W,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -35,7 +35,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,_',
             '_,4,W,_',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -43,7 +43,7 @@ class TestUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,_,_,_',
             '_,4,W,W',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -55,7 +55,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,W,_',
             '_,4,_,W',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -63,7 +63,7 @@ class TestUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,_,W,W',
             '_,4,_,W',
-            '_,_,_,_'
+            '_,_,_,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -75,7 +75,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,W',
             '4,W,O,O',
-            '_,_,W,3'
+            '_,_,W,3',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -83,7 +83,7 @@ class TestUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,_,W,W',
             '4,W,O,O',
-            '_,_,W,3'
+            '_,_,W,3',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -96,7 +96,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,_',
             '_,4,_,_',
-            '_,O,_,_'
+            '_,O,_,_',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -104,21 +104,21 @@ class TestUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,_,_,W',
             '_,4,_,_',
-            '_,O,_,_'
+            '_,O,_,_',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
     def test_unreachable_cell_due_to_adjacent_garden_without_clue(self) -> None:
         """
-        An empty cell is Manhattan reachable from a garden. However, a cell adjacent to the empty cell is marked a 
-        non-wall cell and is not part of a garden with a clue. By marking the empty cell as a non-wall, we would 
+        An empty cell is Manhattan reachable from a garden. However, a cell adjacent to the empty cell is marked a
+        non-wall cell and is not part of a garden with a clue. By marking the empty cell as a non-wall, we would
         effectively be making both the empty cell and the adjacent cell part of the garden and in this case, making the
         garden too large. The empty cell is therefore marked as a wall cell.
         """
         board_details = [
             '_,_,_,W',
             '_,4,_,_',
-            '_,O,_,O'
+            '_,O,_,O',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -126,7 +126,7 @@ class TestUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,_,_,W',
             '_,4,_,W',
-            '_,O,_,O'
+            '_,O,_,O',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -140,7 +140,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,_,_,W',
             '_,5,_,_',
-            '_,O,_,O'
+            '_,O,_,O',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -156,7 +156,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,W,W,W',
             '4,_,_,_',
-            'W,O,W,W'
+            'W,O,W,W',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()
@@ -164,7 +164,7 @@ class TestUnreachableFromGarden(TestCase):
         expected_board_state = [
             '_,W,W,W',
             '4,_,_,W',
-            'W,O,W,W'
+            'W,O,W,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -178,7 +178,7 @@ class TestUnreachableFromGarden(TestCase):
         board_details = [
             '_,W,W,W',
             '5,_,_,_',
-            'W,O,W,W'
+            'W,O,W,W',
         ]
         board = self.create_board(board_details)
         cell_changes = UnreachableFromGarden(board).apply_rule()

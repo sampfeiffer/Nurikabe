@@ -1,10 +1,10 @@
-from .abstract_solver_rule import SolverRule
-from ..board_state_checker import NoPossibleSolutionFromCurrentState
+from ...cell import Cell
 from ...cell_change_info import CellChanges
 from ...cell_state import CellState
-from ...cell import Cell
 from ...garden import Garden
-from ..path_finding import PathFinder, NoPathFoundError
+from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from ..path_finding import NoPathFoundError, PathFinder
+from .abstract_solver_rule import SolverRule
 
 
 class UnreachableFromGarden(SolverRule):
@@ -25,24 +25,27 @@ class UnreachableFromGarden(SolverRule):
             reachable_from_garden = self.get_cells_reachable_from_garden(
                 source_garden=incomplete_garden_with_clue,
                 other_gardens_with_clues=other_gardens_with_clues,
-                gardens_without_clue=gardens_without_clue
+                gardens_without_clue=gardens_without_clue,
             )
             all_reachable_cells = all_reachable_cells.union(reachable_from_garden)
         for cell in self.board.get_empty_cells():
             if cell not in all_reachable_cells:
                 cell_changes.add_change(
-                    self.set_cell_to_state(cell, CellState.WALL,
-                                           reason='Not reachable by any incomplete gardens with clues')
+                    self.set_cell_to_state(
+                        cell,
+                        CellState.WALL,
+                        reason='Not reachable by any incomplete gardens with clues',
+                    ),
                 )
-                # TODO - should this return right away?
+                # TODO: should this return right away?
         return cell_changes
 
     def get_cells_reachable_from_garden(self, source_garden: Garden, other_gardens_with_clues: set[Garden],
                                         gardens_without_clue: set[Garden]) -> set[Cell]:
         if not source_garden.does_have_exactly_one_clue():
-            raise NoPossibleSolutionFromCurrentState(
+            raise NoPossibleSolutionFromCurrentStateError(
                 message='Cannot determine reach of garden since there is not exactly one clue',
-                problem_cell_groups={source_garden}
+                problem_cell_groups={source_garden},
             )
 
         # Determine which cells are not able to be a part of the source_garden
@@ -54,7 +57,7 @@ class UnreachableFromGarden(SolverRule):
         # Get the cells that can be accessed from source_garden without going through a cell in off_limit_cells
         potentially_reachable_cells = self.board.get_connected_cells(
             starting_cell=source_garden.get_clue_cell(),
-            cell_criteria_func=lambda x: x not in off_limit_cells
+            cell_criteria_func=lambda x: x not in off_limit_cells,
         )
 
         # From among the potentially reachable cells, extract the set of cells for which we want to check for
@@ -70,7 +73,7 @@ class UnreachableFromGarden(SolverRule):
                     start_cell_group=source_garden,
                     end_cell_group=target_cell,
                     off_limit_cells=off_limit_cells,
-                    other_cell_groups=gardens_without_clue
+                    other_cell_groups=gardens_without_clue,
                 ).get_path_info(max_path_length=num_of_remaining_garden_cells + 1)
                 reachable_cells.add(target_cell)
             except NoPathFoundError:

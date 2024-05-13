@@ -2,8 +2,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
+from nurikabe.solver.board_state_checker import NoPossibleSolutionFromCurrentStateError
 from nurikabe.solver.solver_rules.no_isolated_wall_sections_naive import NoIsolatedWallSectionsNaive
-from nurikabe.solver.board_state_checker import NoPossibleSolutionFromCurrentState
 from tests.build_board import build_board
 
 
@@ -23,7 +23,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         board_details = [
             '1,_,_,W',
             '_,_,_,_',
-            '_,3,W,_'
+            '_,3,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSectionsNaive(board).apply_rule()
@@ -38,7 +38,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         board_details = [
             '_,_,_,_',
             'O,O,_,_',
-            'W,W,O,_'
+            'W,W,O,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSectionsNaive(board).apply_rule()
@@ -53,10 +53,10 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         board_details = [
             '_,_,_,W',
             'O,O,_,_',
-            'W,W,O,_'
+            'W,W,O,_',
         ]
         board = self.create_board(board_details)
-        with self.assertRaises(NoPossibleSolutionFromCurrentState):
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
             NoIsolatedWallSectionsNaive(board).apply_rule()
 
     def test_only_escape_route_for_only_wall_section(self) -> None:
@@ -67,7 +67,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         board_details = [
             '1,_,_,_',
             '_,_,O,_',
-            '_,_,W,3'
+            '_,_,W,3',
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSectionsNaive(board).apply_rule()
@@ -82,7 +82,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         board_details = [
             '1,_,_,_',
             'W,_,O,_',
-            '_,_,W,3'
+            '_,_,W,3',
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSectionsNaive(board).apply_rule()
@@ -90,7 +90,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         expected_board_state = [
             '1,_,_,_',
             'W,_,O,_',
-            '_,W,W,3'
+            '_,W,W,3',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -109,7 +109,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         board_details = [
             'W,_,_,_',
             '_,_,O,O',
-            '_,_,W,_'
+            '_,_,W,_',
         ]
         board = self.create_board(board_details)
         cell_changes = NoIsolatedWallSectionsNaive(board).apply_rule()
@@ -127,7 +127,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         board_details = [
             '_,W,_,_',
             '_,_,O,O',
-            '_,_,_,W'
+            '_,_,_,W',
         ]
         board = self.create_board(board_details)
         no_isolated_wall_sections_solver_rule = NoIsolatedWallSectionsNaive(board)
@@ -138,7 +138,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         expected_board_state1 = [
             '_,W,_,_',
             '_,_,O,O',
-            '_,_,W,W'
+            '_,_,W,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state1)
 
@@ -148,7 +148,7 @@ class TestNoIsolatedWallSectionsNaive(TestCase):
         expected_board_state2 = [
             '_,W,_,_',
             '_,_,O,O',
-            '_,W,W,W'
+            '_,W,W,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state2)
 
