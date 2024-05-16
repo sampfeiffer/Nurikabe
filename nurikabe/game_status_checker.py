@@ -14,7 +14,7 @@ class GameStatusChecker:
         self.expected_number_of_weak_garden_cells = self.get_expected_number_of_weak_garden_cells()
 
     def get_expected_number_of_weak_garden_cells(self) -> int:
-        return sum(cell.clue for cell in self.board.get_clue_cells())
+        return sum(cell.get_non_null_clue() for cell in self.board.get_clue_cells())
 
     def is_solution_correct(self, cell_changes: CellChanges) -> GameStatus:
         if not cell_changes.has_any_changes():

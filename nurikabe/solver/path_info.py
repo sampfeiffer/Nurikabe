@@ -11,9 +11,11 @@ class PathInfo:
     def __init__(self, cell_list: list[Cell], path_length: int, adjacent_cell_groups: set[CellGroup] | None = None):
         self.cell_list = cell_list
         self.path_length = path_length
-        self.adjacent_cell_groups = adjacent_cell_groups
-        if self.adjacent_cell_groups is None:
+
+        if adjacent_cell_groups is None:
             self.adjacent_cell_groups: set[CellGroup] = set()
+        else:
+            self.adjacent_cell_groups = adjacent_cell_groups
 
     def add_adjacent_to_cell_group(self, cell_group: CellGroup) -> None:
         self.adjacent_cell_groups.add(cell_group)

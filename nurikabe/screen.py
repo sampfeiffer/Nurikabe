@@ -110,14 +110,14 @@ class Screen:
         top_border_size = self.get_top_of_board_height(should_include_grid_numbers=should_include_grid_numbers)
         return PixelPosition(x_coordinate=left_border_size, y_coordinate=top_border_size)
 
-    def get_cell_font(self) -> pygame.font.SysFont:
+    def get_cell_font(self) -> pygame.font.Font:
         font_size = self.get_cell_font_size()
         return pygame.font.SysFont(self.FONT, font_size)
 
     def get_cell_font_size(self) -> int:
         return int(0.8 * self.cell_width)
 
-    def get_grid_numbering_font(self) -> pygame.font.SysFont:
+    def get_grid_numbering_font(self) -> pygame.font.Font:
         font_size = self.get_grid_numbering_font_size()
         return pygame.font.SysFont(self.FONT, font_size)
 
@@ -167,14 +167,17 @@ class Screen:
             if text_color is None:
                 msg = 'text_color must be provided if text is provided'
                 raise RuntimeError(msg)
-            font = self.font_map[text_type]
-            text = font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
-            text_rect = text.get_rect(center=rect.center)
-            self.screen.blit(text, text_rect)
+            self.draw_text(rect, text, text_color, text_type)
 
         if image is not None:
             image_rect = image.get_rect(center=rect.center)
             self.screen.blit(image, dest=image_rect.topleft)
+
+    def draw_text(self, rect: pygame.Rect, text: str,  text_color: Color, text_type: TextType) -> None:
+        font = self.font_map[text_type]
+        text_surface = font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
+        text_rect = text_surface.get_rect(center=rect.center)
+        self.screen.blit(text_surface, text_rect)
 
     def draw_edge(self, rect_edge: RectEdge, color: Color, width: int) -> None:
         pygame.draw.line(

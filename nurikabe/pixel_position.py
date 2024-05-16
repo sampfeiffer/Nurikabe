@@ -11,7 +11,9 @@ class PixelPosition:
     def from_tuple(position_tuple: tuple[int, int]) -> PixelPosition:
         return PixelPosition(position_tuple[0], position_tuple[1])
 
-    def __eq__(self, other_pixel_position: PixelPosition) -> bool:
+    def __eq__(self, other_pixel_position: object) -> bool:
+        if not isinstance(other_pixel_position, PixelPosition):
+            return NotImplemented
         return self.coordinates == other_pixel_position.coordinates
 
     def __hash__(self) -> int:

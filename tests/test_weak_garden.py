@@ -7,13 +7,12 @@ from nurikabe.weak_garden import WeakGarden
 
 
 class TestWeakGarden(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
-        cls.pixel_position = MagicMock(name='PixelPosition')
+    screen = MagicMock(name='Screen')
+    pixel_position = MagicMock(name='PixelPosition')
 
+    def setUp(self) -> None:
         # Used to ensure that each created cell has a distinct row number so that they are not hash equivalents
-        cls.row_number = 0
+        self.row_number = 0
 
     def get_cell(self, clue: int | None = None) -> Cell:
         cell = Cell(row_number=self.row_number, col_number=0, clue=clue, pixel_position=self.pixel_position,

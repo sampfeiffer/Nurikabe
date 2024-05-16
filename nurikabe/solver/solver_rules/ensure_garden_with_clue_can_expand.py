@@ -30,7 +30,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             # Get the set of cells that can be reached via a flood fill from the clue cell while avoiding off limit
             # cells
             clue_cell = incomplete_garden_with_clue.get_clue_cell()
-            clue_value = clue_cell.clue
+            clue_value = clue_cell.get_non_null_clue()
             potentially_reachable_cells_from_garden = self.board.get_connected_cells(
                 starting_cell=clue_cell,
                 cell_criteria_func=lambda cell: cell not in off_limit_cells,  # noqa: B023

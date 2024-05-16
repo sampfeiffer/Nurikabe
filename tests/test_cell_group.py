@@ -6,10 +6,8 @@ from nurikabe.cell_group import CellGroup, MultipleCluesInCellGroupError, NoClue
 
 
 class TestCellGroup(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
-        cls.pixel_position = MagicMock(name='PixelPosition')
+    screen = MagicMock(name='Screen')
+    pixel_position = MagicMock(name='PixelPosition')
 
     def get_cell(self, row_number: int = 0, col_number: int = 0, clue: int | None = None) -> Cell:
         return Cell(row_number, col_number, clue, pixel_position=self.pixel_position, screen=self.screen)
