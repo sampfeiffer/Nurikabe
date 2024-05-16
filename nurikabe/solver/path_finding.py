@@ -160,7 +160,7 @@ class PathFinder:
                 # If not, then we should extend the current path we are exploring through the neighbor cell by adding it
                 # to the priority queue.
                 if neighbor_cell in path_info_to_cell:
-                    existing_g_score_for_neighbor = path_info_to_cell[neighbor_cell].path_length
+                    existing_g_score_for_neighbor = float(path_info_to_cell[neighbor_cell].path_length)
                 else:
                     existing_g_score_for_neighbor = math.inf
                 if tentative_g_score < existing_g_score_for_neighbor:

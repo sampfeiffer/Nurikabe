@@ -43,7 +43,7 @@ class CellGroup:
         return len([cell for cell in self.cells if cell.has_clue])
 
     def get_clue_value(self) -> int:
-        return self.get_clue_cell().clue
+        return self.get_clue_cell().get_non_null_clue()
 
     def get_clue_cell(self) -> Cell:
         number_of_clues = self.get_number_of_clues()
@@ -95,7 +95,9 @@ class CellGroup:
         cell_string_set = {str(cell) for cell in self.cells}
         return f'{class_name}(cells={cell_string_set})'
 
-    def __eq__(self, other_cell_group: CellGroup) -> bool:
+    def __eq__(self, other_cell_group: object) -> bool:
+        if not isinstance(other_cell_group, CellGroup):
+            return NotImplemented
         return self.cells == other_cell_group.cells
 
     def __hash__(self) -> int:

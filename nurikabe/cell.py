@@ -40,7 +40,7 @@ class Cell:
         self.rect = self.get_rect(pixel_position)
         self.draw_cell()
 
-        self.neighbor_cell_map: dict[Direction, Cell] | None = None
+        self._neighbor_cell_map: dict[Direction, Cell] | None = None
 
     def get_rect(self, pixel_position: PixelPosition) -> pygame.Rect:
         width = self.screen.cell_width
@@ -94,8 +94,20 @@ class Cell:
     def paint_completed_cell(self) -> None:
         self.draw_cell(is_in_completed_garden=True)
 
+    def get_non_null_clue(self) -> int:
+        if self.clue is None:
+            msg = f'Expected a clue in cell {self}, but there is no clue.'
+            raise RuntimeError(msg)
+        return self.clue
+
     def set_neighbor_map(self, neighbor_cell_map: dict[Direction, Cell]) -> None:
-        self.neighbor_cell_map = neighbor_cell_map
+        self._neighbor_cell_map = neighbor_cell_map
+
+    def get_neighbor_map(self) -> dict[Direction, Cell]:
+        if self._neighbor_cell_map is None:
+            msg = 'self._neighbor_cell_map must first be set'
+            raise RuntimeError(msg)
+        return self._neighbor_cell_map
 
     def is_inside_cell(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
@@ -117,14 +129,14 @@ class Cell:
     def get_adjacent_neighbors(self) -> set[Cell]:
         """Get a list of adjacent (non-diagonal) Cells."""
         return {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
-                if direction in self.neighbor_cell_map}
+                if direction in self.get_neighbor_map()}
 
     def get_neighbor_set(self, direction_list: Iterable[Direction]) -> set[Cell]:
         return {self.get_neighbor(direction) for direction in direction_list}
 
     def get_neighbor(self, direction: Direction) -> Cell:
         try:
-            return self.neighbor_cell_map[direction]
+            return self.get_neighbor_map()[direction]
         except KeyError:
             msg = f'{self} has no neighbor in {direction}'
             raise NonExistentNeighborError(msg) from None
@@ -178,11 +190,10 @@ class Cell:
         clue_int = 0 if self.clue is None else self.clue
         return self.row_number, self.col_number, clue_int
 
-    def __eq__(self, other: Cell) -> bool:
-        if isinstance(other, Cell):
-            return self.__key() == other.__key()
-        msg = f'Cannot compare Cell to {type(other)}'
-        raise RuntimeError(msg)
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Cell):
+            return NotImplemented
+        return self.__key() == other.__key()
 
     def __hash__(self) -> int:
         return hash(self.__key())

@@ -7,9 +7,7 @@ from tests.build_board import build_board
 
 
 class TestEncloseFullGarden(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
+    screen = MagicMock(name='Screen')
 
     def create_board(self, board_details: list[str]) -> Board:
         return build_board(self.screen, board_details)

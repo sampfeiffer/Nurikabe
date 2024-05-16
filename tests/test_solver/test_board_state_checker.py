@@ -6,9 +6,7 @@ from tests.build_board import build_board
 
 
 class TestBoardStateChecker(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
+    screen = MagicMock(name='Screen')
 
     def create_board_state_checker(self, board_details: list[str]) -> BoardStateChecker:
         board = build_board(self.screen, board_details)

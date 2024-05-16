@@ -5,23 +5,16 @@ from nurikabe.board import Board
 from nurikabe.cell_group import MultipleCluesInCellGroupError, NoCluesInCellGroupError
 from nurikabe.cell_state import CellState
 from nurikabe.game_status_checker import GameStatusChecker
-from nurikabe.level import Level, LevelBuilderFromStringList
+from nurikabe.level import LevelBuilderFromStringList
 
 
 class TestGameStatusChecker(TestCase):
-    @staticmethod
-    def create_level_from_string_list(level_details: list[str]) -> Level:
-        return LevelBuilderFromStringList(level_details).build_level()
-
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
-        level_details = [
-            '1,,,',
-            ',,,',
-            ',3,,',
-        ]
-        cls.level = TestGameStatusChecker.create_level_from_string_list(level_details)
+    screen = MagicMock(name='Screen')
+    level = LevelBuilderFromStringList(level_details=[
+        '1,,,',
+        ',,,',
+        ',3,,',
+    ]).build_level()
 
     def setUp(self) -> None:
         self.board = Board(self.level, self.screen)

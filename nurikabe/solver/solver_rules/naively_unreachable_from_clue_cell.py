@@ -15,7 +15,7 @@ class NaivelyUnreachableFromClueCell(SolverRule):
         for cell in self.board.get_empty_cells():
             is_cell_reachable_by_a_clue = False
             for clue_cell in clue_cells:
-                if cell.get_shortest_naive_path_length(clue_cell) <= clue_cell.clue:
+                if cell.get_shortest_naive_path_length(clue_cell) <= clue_cell.get_non_null_clue():
                     is_cell_reachable_by_a_clue = True
                     break
             if not is_cell_reachable_by_a_clue:

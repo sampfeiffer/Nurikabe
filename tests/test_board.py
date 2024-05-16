@@ -9,9 +9,7 @@ from tests.build_board import build_board
 
 
 class TestBoard(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
+    screen = MagicMock(name='Screen')
 
     def create_board(self, board_details: list[str]) -> Board:
         return build_board(self.screen, board_details)
@@ -49,7 +47,7 @@ class TestBoardSetup(TestBoard):
             board.get_cell_from_grid(row_number=2, col_number=3),
         )
         for corner_cell in corner_cells:
-            self.assertEqual(len(corner_cell.neighbor_cell_map), 3)
+            self.assertEqual(len(corner_cell.get_neighbor_map()), 3)
 
         edge_cells = (
             board.get_cell_from_grid(row_number=0, col_number=1),
@@ -60,14 +58,14 @@ class TestBoardSetup(TestBoard):
             board.get_cell_from_grid(row_number=2, col_number=2),
         )
         for edge_cell in edge_cells:
-            self.assertEqual(len(edge_cell.neighbor_cell_map), 5)
+            self.assertEqual(len(edge_cell.get_neighbor_map()), 5)
 
         center_cells = (
             board.get_cell_from_grid(row_number=1, col_number=1),
             board.get_cell_from_grid(row_number=1, col_number=2),
         )
         for center_cell in center_cells:
-            self.assertEqual(len(center_cell.neighbor_cell_map), 8)
+            self.assertEqual(len(center_cell.get_neighbor_map()), 8)
 
 
 class TestBoardAsSimpleStringList(TestBoard):

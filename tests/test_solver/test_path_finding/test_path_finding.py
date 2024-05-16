@@ -10,9 +10,7 @@ from .build_path_finder import PathFinderInfo, build_path_finder, extract_blank_
 
 
 class TestPathFinding(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
+    screen = MagicMock(name='Screen')
 
     def create_board(self, board_details: list[str]) -> Board:
         return build_board(self.screen, extract_blank_board_details(board_details))

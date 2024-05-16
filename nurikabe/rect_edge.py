@@ -19,8 +19,10 @@ class RectEdge:
     def __str__(self) -> str:
         return f'RectEdge({self.start_pixel_position}, {self.end_pixel_position})'
 
-    def __eq__(self, other_rect_edge: RectEdge) -> bool:
+    def __eq__(self, other_rect_edge: object) -> bool:
         """Accounts for the fact that the edge a-b is the same as the edge b-a."""
+        if not isinstance(other_rect_edge, RectEdge):
+            return NotImplemented
         return (self.start_pixel_position == other_rect_edge.start_pixel_position and
                 self.end_pixel_position == other_rect_edge.end_pixel_position) or \
            (self.start_pixel_position == other_rect_edge.end_pixel_position and

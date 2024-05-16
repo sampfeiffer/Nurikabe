@@ -13,7 +13,7 @@ from .abstract_solver_rule import SolverRule
 @dataclass(frozen=True)
 class PathToGardenInfo:
     garden: Garden
-    path_cell_tuple: tuple[Cell]
+    path_cell_tuple: tuple[Cell, ...]
 
 
 class EnsureGardenWithoutClueCanExpand(SolverRule):

@@ -7,9 +7,7 @@ from .build_path_finder import BadPathFinderSetupError, PathFinderInfo, build_pa
 
 
 class TestBuildPathFinder(TestCase):
-    @classmethod
-    def setUpClass(cls) -> None:
-        cls.screen = MagicMock(name='Screen')
+    screen = MagicMock(name='Screen')
 
     def create_path_finder_info(self, board_details: list[str]) -> PathFinderInfo:
         return build_path_finder(self.screen, board_details)
