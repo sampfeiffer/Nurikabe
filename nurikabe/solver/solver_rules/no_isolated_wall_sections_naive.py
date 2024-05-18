@@ -24,7 +24,7 @@ class NoIsolatedWallSectionsNaive(SolverRule):
             if len(escape_routes) == 0:
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Isolated wall section',
-                    problem_cell_groups={wall_section},
+                    problem_cell_groups=frozenset({wall_section}),
                 )
             if len(escape_routes) == 1:
                 only_escape_route = next(iter(escape_routes))  # Get first item in the list

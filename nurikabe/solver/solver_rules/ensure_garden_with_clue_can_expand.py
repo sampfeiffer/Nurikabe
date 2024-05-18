@@ -41,7 +41,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             if len(potentially_reachable_cells_from_garden) < clue_value:
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Incomplete garden with clue cannot expand to appropriate size',
-                    problem_cell_groups={incomplete_garden_with_clue},
+                    problem_cell_groups=frozenset({incomplete_garden_with_clue}),
                 )
 
             # Farther filter down the potentially_reachable_cells_from_garden to only include cells that we need to
