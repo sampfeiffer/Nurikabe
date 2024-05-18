@@ -33,6 +33,9 @@ class Cell:
         self.clue = clue
         self.screen = screen
 
+        self._key = self._get_key()
+        self._hash = self._get_hash()
+
         self.has_clue = self.clue is not None
         self.is_clickable = not self.has_clue
         self.cell_state = CellState.CLUE if self.has_clue else CellState.EMPTY
@@ -41,6 +44,14 @@ class Cell:
         self.draw_cell()
 
         self._neighbor_cell_map: dict[Direction, Cell] | None = None
+        self._adjacent_neighbors: set[Cell] | None = None
+
+    def _get_key(self) -> tuple[int, int, int]:
+        clue_int = 0 if self.clue is None else self.clue
+        return self.row_number, self.col_number, clue_int
+
+    def _get_hash(self) -> int:
+        return hash(self._key)
 
     def get_rect(self, pixel_position: PixelPosition) -> pygame.Rect:
         width = self.screen.cell_width
@@ -102,12 +113,25 @@ class Cell:
 
     def set_neighbor_map(self, neighbor_cell_map: dict[Direction, Cell]) -> None:
         self._neighbor_cell_map = neighbor_cell_map
+        self.set_adjacent_neighbors()
+
+    def set_adjacent_neighbors(self) -> None:
+        """Set the list of adjacent (non-diagonal) Cells."""
+        self._adjacent_neighbors = {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
+                                    if direction in self.get_neighbor_map()}
 
     def get_neighbor_map(self) -> dict[Direction, Cell]:
         if self._neighbor_cell_map is None:
             msg = 'self._neighbor_cell_map must first be set'
             raise RuntimeError(msg)
         return self._neighbor_cell_map
+
+    def get_adjacent_neighbors(self) -> set[Cell]:
+        """Get a list of adjacent (non-diagonal) Cells."""
+        if self._adjacent_neighbors is None:
+            msg = 'self._adjacent_neighbors must first be set'
+            raise RuntimeError(msg)
+        return self._adjacent_neighbors
 
     def is_inside_cell(self, event_position: PixelPosition) -> bool:
         return self.rect.collidepoint(event_position.coordinates)
@@ -125,11 +149,6 @@ class Cell:
         self.draw_cell()
         return CellChangeInfo(grid_coordinate=self.grid_coordinate, before_state=old_cell_state,
                               after_state=self.cell_state)
-
-    def get_adjacent_neighbors(self) -> set[Cell]:
-        """Get a list of adjacent (non-diagonal) Cells."""
-        return {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
-                if direction in self.get_neighbor_map()}
 
     def get_neighbor_set(self, direction_list: Iterable[Direction]) -> set[Cell]:
         return {self.get_neighbor(direction) for direction in direction_list}
@@ -186,14 +205,10 @@ class Cell:
             }[self.cell_state]
         return cell_str
 
-    def __key(self) -> tuple[int, int, int]:
-        clue_int = 0 if self.clue is None else self.clue
-        return self.row_number, self.col_number, clue_int
-
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Cell):
             return NotImplemented
-        return self.__key() == other.__key()
+        return self._key == other._key
 
     def __hash__(self) -> int:
-        return hash(self.__key())
+        return self._hash
