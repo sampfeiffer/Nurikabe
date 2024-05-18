@@ -34,7 +34,7 @@ class PathFinder:
     """
 
     def __init__(self, start_cell_group: Cell | CellGroup, end_cell_group: Cell | CellGroup,
-                 off_limit_cells: set[Cell] | None = None, other_cell_groups: set[CellGroup] | None = None):
+                 off_limit_cells: set[Cell] | None = None, other_cell_groups: frozenset[CellGroup] | None = None):
         """
         :param start_cell_group: The CellGroup that the path starts from.
         :param end_cell_group: The CellGroup where the path should end.
@@ -56,7 +56,7 @@ class PathFinder:
             self.off_limit_cells = off_limit_cells
 
         if other_cell_groups is None:
-            self.other_cell_groups: set[CellGroup] = set()
+            self.other_cell_groups: frozenset[CellGroup] = frozenset()
         else:
             self.other_cell_groups = other_cell_groups
 
@@ -206,7 +206,7 @@ class PathFinder:
         return distance_between_cells
 
     @staticmethod
-    def get_adjacent_cell_groups(root_cell: Cell, unvisited_other_cell_groups: set[CellGroup]) -> set[CellGroup]:
+    def get_adjacent_cell_groups(root_cell: Cell, unvisited_other_cell_groups: frozenset[CellGroup]) -> set[CellGroup]:
         root_cell_adjacent_neighbors = root_cell.get_adjacent_neighbors()
         return {cell_group for cell_group in unvisited_other_cell_groups
                 if cell_group.does_include_cell(root_cell_adjacent_neighbors)}

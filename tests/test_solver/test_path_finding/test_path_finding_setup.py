@@ -64,7 +64,7 @@ class TestPathFindingSetup(TestCase):
 
         with self.assertRaises(PathSetupError):
             PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, off_limit_cells=off_limit_cells,
-                       other_cell_groups=other_cell_groups)
+                       other_cell_groups=frozenset(other_cell_groups))
 
     def test_other_cell_groups_adjacent_to_start_cell_group(self) -> None:
         """
@@ -84,7 +84,8 @@ class TestPathFindingSetup(TestCase):
         })}
 
         with self.assertRaises(PathSetupError):
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=other_cell_groups)
+            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell,
+                       other_cell_groups=frozenset(other_cell_groups))
 
     def test_other_cell_groups_adjacent_to_end_cell_group(self) -> None:
         """
@@ -104,7 +105,8 @@ class TestPathFindingSetup(TestCase):
         })}
 
         try:
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=other_cell_groups)
+            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell,
+                       other_cell_groups=frozenset(other_cell_groups))
         except PathSetupError:
             self.fail('find_shortest_path_between_cells raised PathSetupError unexpectedly')
 
@@ -130,4 +132,5 @@ class TestPathFindingSetup(TestCase):
         }
 
         with self.assertRaises(PathSetupError):
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=other_cell_groups)
+            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell,
+                       other_cell_groups=frozenset(other_cell_groups))

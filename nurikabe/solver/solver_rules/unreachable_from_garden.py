@@ -45,7 +45,7 @@ class UnreachableFromGarden(SolverRule):
         if not source_garden.does_have_exactly_one_clue():
             raise NoPossibleSolutionFromCurrentStateError(
                 message='Cannot determine reach of garden since there is not exactly one clue',
-                problem_cell_groups={source_garden},
+                problem_cell_groups=frozenset({source_garden}),
             )
 
         # Determine which cells are not able to be a part of the source_garden
@@ -73,7 +73,7 @@ class UnreachableFromGarden(SolverRule):
                     start_cell_group=source_garden,
                     end_cell_group=target_cell,
                     off_limit_cells=off_limit_cells,
-                    other_cell_groups=gardens_without_clue,
+                    other_cell_groups=frozenset(gardens_without_clue),
                 ).get_path_info(max_path_length=num_of_remaining_garden_cells + 1)
                 reachable_cells.add(target_cell)
             except NoPathFoundError:

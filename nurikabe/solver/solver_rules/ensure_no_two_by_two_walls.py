@@ -29,6 +29,6 @@ class EnsureNoTwoByTwoWalls(SolverRule):
                 elif two_by_two_section_num_of_walls == self.CELL_COUNT_IN_TWO_BY_TWO_SECTION:
                     raise NoPossibleSolutionFromCurrentStateError(
                         message='There is a two-by-two section of walls',
-                        problem_cell_groups={CellGroup(two_by_two_section)},
+                        problem_cell_groups=frozenset({CellGroup(two_by_two_section)}),
                     )
         return cell_changes

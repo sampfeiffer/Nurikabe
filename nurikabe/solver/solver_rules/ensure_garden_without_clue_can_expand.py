@@ -41,7 +41,7 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
             if len(reachable_gardens_and_path) == 0:
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden without clue cannot reach a clue cell',
-                    problem_cell_groups={garden_without_clue},
+                    problem_cell_groups=frozenset({garden_without_clue}),
                 )
 
             # Extract the set of empty cells that are in all the paths the reachable incomplete gardens with a clue.
@@ -197,7 +197,7 @@ class GardenInfo:
             start_cell_group=source_garden_without_clue,
             end_cell_group=destination_garden_with_clue,
             off_limit_cells=off_limit_cells,
-            other_cell_groups=other_gardens_without_clue,
+            other_cell_groups=frozenset(other_gardens_without_clue),
         )
         max_total_path_length = destination_garden_with_clue.get_clue_value()
         remaining_available_cells = max_total_path_length - len(source_garden_without_clue.cells) - \

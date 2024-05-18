@@ -29,7 +29,7 @@ class EnsureGardenCanExpandOneRoute(SolverRule):
             else:
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden contains more than one clue',
-                    problem_cell_groups={garden},
+                    problem_cell_groups=frozenset({garden}),
                 )
             if cell_changes.has_any_changes():
                 # Since some cells were marked as non-walls, the previously calculated all_gardens is no longer valid

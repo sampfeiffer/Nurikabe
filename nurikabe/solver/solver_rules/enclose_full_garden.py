@@ -24,6 +24,6 @@ class EncloseFullGarden(SolverRule):
             else:
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden contains more than one clue',
-                    problem_cell_groups={garden},
+                    problem_cell_groups=frozenset({garden}),
                 )
         return cell_changes

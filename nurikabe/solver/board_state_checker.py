@@ -9,12 +9,12 @@ class NoPossibleSolutionFromCurrentStateError(Exception):
     Nurikabe puzzle.
     """
 
-    def __init__(self, message: str, problem_cell_groups: set[CellGroup] | None = None):
+    def __init__(self, message: str, problem_cell_groups: frozenset[CellGroup] | None = None):
         """Optionally can include information about which cell groups are causing the problem."""
         super().__init__(message)
 
         if problem_cell_groups is None:
-            self.problem_cell_groups: set[CellGroup] = set()
+            self.problem_cell_groups: frozenset[CellGroup] = frozenset()
         else:
             self.problem_cell_groups = problem_cell_groups
 
@@ -38,7 +38,7 @@ class BoardStateChecker:
         if self.board.has_two_by_two_wall():
             raise NoPossibleSolutionFromCurrentStateError(
                 message='There is a two-by-two section of walls',
-                problem_cell_groups={CellGroup(self.board.get_two_by_two_wall_sections())},
+                problem_cell_groups=frozenset({CellGroup(self.board.get_two_by_two_wall_sections())}),
             )
 
     def check_for_isolated_walls(self, non_garden_cell_groups_with_walls: set[CellGroup] | None = None) -> None:
@@ -54,7 +54,7 @@ class BoardStateChecker:
             }
             raise NoPossibleSolutionFromCurrentStateError(
                 message='Wall cells cannot connect',
-                problem_cell_groups=problem_wall_groups,
+                problem_cell_groups=frozenset(problem_wall_groups),
             )
 
     def check_for_garden_with_multiple_clues(self) -> None:
@@ -63,7 +63,7 @@ class BoardStateChecker:
             if garden.get_number_of_clues() > 1:
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='A garden cannot contain more than one clue',
-                    problem_cell_groups={garden},
+                    problem_cell_groups=frozenset({garden}),
                 )
 
     def check_for_too_small_garden(self) -> None:
@@ -75,7 +75,7 @@ class BoardStateChecker:
             if len(weak_garden.cells) < weak_garden.get_expected_garden_size():
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden is too small',
-                    problem_cell_groups={weak_garden},
+                    problem_cell_groups=frozenset({weak_garden}),
                 )
 
     def check_for_too_large_garden(self) -> None:
@@ -85,7 +85,7 @@ class BoardStateChecker:
             if len(garden.cells) > garden.get_expected_garden_size():
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden is too large',
-                    problem_cell_groups={garden},
+                    problem_cell_groups=frozenset({garden}),
                 )
 
     def check_for_enclosed_garden_with_no_clue(self) -> None:
@@ -96,5 +96,5 @@ class BoardStateChecker:
         if len(gardens_with_no_clue) > 0:
             raise NoPossibleSolutionFromCurrentStateError(
                 message='Garden has no clue',
-                problem_cell_groups=gardens_with_no_clue,
+                problem_cell_groups=frozenset(gardens_with_no_clue),
             )
