@@ -33,7 +33,7 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = [
-    "E", "F", "W", "I", "N", "UP", "YTT", "ANN", "ASYNC", "TRIO", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ",
+    "E", "F", "W", "I", "N", "UP", "YTT", "ANN", "ASYNC", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ",
     "T10", "DJ", "EM", "EXE", "FA", "ISC", "ICN", "LOG", "G", "INP", "PIE", "T20", "PYI", "Q", "RSE", "RET", "SLF",
     "SLOT", "SIM", "TCH", "INT", "ARG", "PTH", "TD", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF",
     "RUF", "TID", "D", "C90"
@@ -42,11 +42,6 @@ ignore = [
     "D100",  # Checks for undocumented public module definitions.
     "D101",  # Checks for undocumented public class definitions.
     "D102",  # Checks for undocumented public method definitions.
-    "ANN101",  # Checks that instance method self arguments have type annotations.
-    "ANN102",  # Checks that class method cls arguments have type annotations.
-    "TD002",  # Checks that a TODO comment includes an author.
-    "TD003",  # Checks that a TODO comment is associated with a link to a relevant issue or ticket.
-    "TID252",  # Checks for relative imports.
     "D103",  # Checks for undocumented public function definitions.
     "D104",  # Checks for undocumented public package definitions.
     "D105",  # Checks for undocumented magic method definitions.
@@ -57,6 +52,9 @@ ignore = [
     "D212",  # Checks for docstring summary lines that are not positioned on the first physical line of the docstring.
     "D401",  # Checks for docstring first lines that are not in an imperative mood.
     "D404",  # Checks for docstrings that start with "This".
+    "TD002",  # Checks that a TODO comment includes an author.
+    "TD003",  # Checks that a TODO comment is associated with a link to a relevant issue or ticket.
+    "TID252",  # Checks for relative imports.
 ]
 
 [tool.ruff.lint.flake8-annotations]
