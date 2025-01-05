@@ -25,8 +25,8 @@ class NonExistentNeighborError(Exception):
 class Cell:
     CENTER_DOT = '\u2022'
 
-    def __init__(self, row_number: int, col_number: int, clue: int | None,  # noqa: PLR0913
-                 pixel_position: PixelPosition, screen: Screen):
+    def __init__(self, row_number: int, col_number: int, clue: int | None, pixel_position: PixelPosition,
+                 screen: Screen):
         self.row_number = row_number
         self.col_number = col_number
         self.grid_coordinate = GridCoordinate(row_number, col_number)
