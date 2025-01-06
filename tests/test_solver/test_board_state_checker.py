@@ -259,8 +259,7 @@ class TestCheckForEnclosedGardenWithNoClue(TestBoardStateChecker):
             board_state_checker.check_for_enclosed_garden_with_no_clue()
         except NoPossibleSolutionFromCurrentStateError:
             self.fail(
-                'check_for_enclosed_garden_with_no_clue() raised NoPossibleSolutionFromCurrentStateError '
-                'unexpectedly'
+                'check_for_enclosed_garden_with_no_clue() raised NoPossibleSolutionFromCurrentStateError unexpectedly'
             )
 
     def test_has_clueless_enclosed_garden(self) -> None:
