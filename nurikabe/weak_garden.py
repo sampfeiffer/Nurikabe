@@ -11,8 +11,12 @@ class WeakGarden(CellGroup):
     """
 
     @staticmethod
+    def is_weak_garden_static(cell: Cell) -> bool:
+        return cell.cell_state.is_weak_garden()
+
+    @staticmethod
     def get_cell_criteria_func() -> Callable[[Cell], bool]:
-        return lambda cell: cell.cell_state.is_weak_garden()
+        return WeakGarden.is_weak_garden_static
 
     def does_have_exactly_one_clue(self) -> bool:
         return self.get_number_of_clues() == 1

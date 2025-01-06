@@ -19,7 +19,7 @@ def str_to_bool(boolean_like_string: str) -> bool:
 
 def parse_command_line_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Play Nurikabe')
-    parser.add_argument('--level', default=1, type=int, help='Which level to play (default: %(default)s)')
+    parser.add_argument('--level', default=9, type=int, help='Which level to play (default: %(default)s)')
     parser.add_argument(
         '--log-level', default='info', choices=('debug', 'info'), help='Log level (default: %(default)s)'
     )

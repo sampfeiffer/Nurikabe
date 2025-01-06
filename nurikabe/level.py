@@ -14,7 +14,7 @@ class Level:
     """
 
     def __init__(self, level_setup: list[list[int | None]]):
-        """level_setup is a 2 dimensional list. Each outer list represents a row."""
+        """level_setup is a two-dimensional list. Each outer list represents a row."""
         self.level_setup = level_setup
         self.number_of_rows = len(self.level_setup)
         self.number_of_columns = len(self.level_setup[0])

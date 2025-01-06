@@ -10,5 +10,9 @@ class WallSection(CellGroup):
     """
 
     @staticmethod
+    def is_wall_section_static(cell: Cell) -> bool:
+        return cell.cell_state.is_wall()
+
+    @staticmethod
     def get_cell_criteria_func() -> Callable[[Cell], bool]:
-        return lambda cell: cell.cell_state.is_wall()
+        return WallSection.is_wall_section_static

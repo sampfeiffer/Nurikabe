@@ -1,3 +1,4 @@
+import time
 from collections.abc import Callable
 
 import pygame
@@ -5,6 +6,7 @@ import pygame
 from .cell import Cell
 from .cell_change_info import CellChangeInfo, CellChanges
 from .cell_group import CellGroup
+from .cell_groups_cache import CellGroupsCache
 from .color import Color
 from .direction import Direction
 from .garden import Garden
@@ -33,6 +35,14 @@ class Board:
         self.is_board_frozen = False
 
         self.ensure_no_adjacent_clues()
+
+        self.cell_groups_cache = CellGroupsCache()
+        self.cache_stats = {'found_in_cache': 0, 'not_in_cache': 0, 'not_in_cache_total_time': 0}
+
+    def __del__(self):
+        print(f'found_in_cache: {self.cache_stats["found_in_cache"]:,.0f}')
+        print(f'not_in_cache: {self.cache_stats["not_in_cache"]:,.0f}')
+        print(f'not_in_cache_total_time: {self.cache_stats["not_in_cache_total_time"]:,.2f}')
 
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.screen.top_left_of_board
@@ -141,16 +151,39 @@ class Board:
             garden.paint_garden_if_completed()
 
     def get_all_gardens(self) -> set[Garden]:
-        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=Garden.get_cell_criteria_func())
+        all_cell_groups = self.get_all_cell_groups_with_cache(cell_criteria_func=Garden.get_cell_criteria_func())
         return {Garden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_weak_gardens(self) -> set[WeakGarden]:
-        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=WeakGarden.get_cell_criteria_func())
+        all_cell_groups = self.get_all_cell_groups_with_cache(cell_criteria_func=WeakGarden.get_cell_criteria_func())
         return {WeakGarden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_wall_sections(self) -> set[WallSection]:
-        all_cell_groups = self.get_all_cell_groups(cell_criteria_func=WallSection.get_cell_criteria_func())
+        all_cell_groups = self.get_all_cell_groups_with_cache(cell_criteria_func=WallSection.get_cell_criteria_func())
         return {WallSection(cell_group.cells) for cell_group in all_cell_groups}
+
+    def get_all_cell_groups_with_cache(self, cell_criteria_func: Callable[[Cell], bool]) -> set[CellGroup]:
+        cell_criteria_func_hash = hash(cell_criteria_func)
+        cell_state_hash = self.get_cell_state_hash()
+        all_cell_groups_from_cache = self.cell_groups_cache.extract_from_cache(
+            cell_criteria_func_hash=cell_criteria_func_hash,
+            cell_state_hash=cell_state_hash,
+        )
+        if all_cell_groups_from_cache is not None:
+            self.cache_stats['found_in_cache'] += 1
+            return all_cell_groups_from_cache
+
+        self.cache_stats['not_in_cache'] += 1
+
+        st = time.time()
+        all_cell_groups = self.get_all_cell_groups(cell_criteria_func)
+        self.cache_stats['not_in_cache_total_time'] += time.time() - st
+        self.cell_groups_cache.add_to_cache(
+            cell_criteria_func_hash=cell_criteria_func_hash,
+            cell_state_hash=cell_state_hash,
+            all_cell_groups=all_cell_groups
+        )
+        return all_cell_groups
 
     def get_all_cell_groups(self, cell_criteria_func: Callable[[Cell], bool]) -> set[CellGroup]:
         all_cell_groups: set[CellGroup] = set()
@@ -193,6 +226,14 @@ class Board:
                 self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells)
 
         return connected_cells
+
+    # def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool]) -> set[Cell]:
+    #     """
+    #     Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
+    #     returns True.
+    #     """
+    #     cell_state_hash = self.get_cell_state_hash()
+    #     return self.flood_fill.get_connected_cells(cell_state_hash, starting_cell, cell_criteria_func)
 
     def freeze_cells(self) -> None:
         self.is_board_frozen = True
@@ -242,6 +283,8 @@ class Board:
         off_limit_cells = self.get_garden_cells()
         if additional_off_limit_cell is not None:
             off_limit_cells.add(additional_off_limit_cell)
+
+        # TODO: figure out how to make this not a lambda so we can use caching
         non_garden_cell_groups = self.get_all_cell_groups(
             cell_criteria_func=lambda cell: cell not in off_limit_cells,
         )
@@ -250,6 +293,33 @@ class Board:
             for non_garden_cell_group in non_garden_cell_groups
             if non_garden_cell_group.does_contain_wall()
         }
+
+    # def get_all_non_garden_cell_groups_with_walls(self, additional_off_limit_cell: Cell | None = None) \
+    #         -> set[CellGroup]:
+    #     off_limit_cells = self.get_garden_cells()
+    #     if additional_off_limit_cell is not None:
+    #         off_limit_cells.add(additional_off_limit_cell)
+    #
+    #     def is_cell_not_off_limits(set_of_off_limit_cells: set[Cell], cell: Cell) -> bool:
+    #         return cell not in set_of_off_limit_cells
+    #
+    #     from functools import partial
+    #     is_cell_not_off_limits_partial = partial(is_cell_not_off_limits, off_limit_cells)
+    #
+    #     non_garden_cell_groups = self.get_all_cell_groups(
+    #         cell_criteria_func=is_cell_not_off_limits_partial,
+    #     )
+    #     res = {
+    #         non_garden_cell_group for non_garden_cell_group in non_garden_cell_groups
+    #         if non_garden_cell_group.does_contain_wall()
+    #     }
+    #
+    #     print(f'{additional_off_limit_cell=}')
+    #     print(f'number of cell groups: {len(res)}')
+    #     for i, cg in enumerate(res):
+    #         print(f'cell group {i} has {len(cg.cells)} cells')
+    #
+    #     return res
 
     def as_simple_string_list(self) -> list[str]:
         """
@@ -263,3 +333,7 @@ class Board:
         ]
         """
         return [','.join([cell.as_simple_string() for cell in row]) for row in self.cell_grid]
+
+    def get_cell_state_hash(self) -> int:
+        """Get a hash representation of the state of the cells in the board."""
+        return hash(tuple(cell.cell_state.value for cell in self.flat_cell_list))

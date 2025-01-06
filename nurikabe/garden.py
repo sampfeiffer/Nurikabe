@@ -6,14 +6,18 @@ from .weak_garden import WeakGarden
 
 class Garden(WeakGarden):
     """
-    A garden is a connected section of cells that are strictly not walls (either empty or clues). Note that this is a
-    stricter version of a weak garden since a weak garden can also contain empty cells. Being connected to something
-    diagonally does not count as connected.
+    A garden is a connected section of cells that are strictly not walls (either marked as a non-wall cell or a clue
+    cell). Note that this is a stricter version of a weak garden since a weak garden can also contain empty cells. Being
+    connected to something diagonally does not count as connected.
     """
 
     @staticmethod
+    def is_garden_static(cell: Cell) -> bool:
+        return cell.cell_state.is_garden()
+
+    @staticmethod
     def get_cell_criteria_func() -> Callable[[Cell], bool]:
-        return lambda cell: cell.cell_state.is_garden()
+        return Garden.is_garden_static
 
     def get_num_of_remaining_garden_cells(self) -> int:
         expected_garden_size = self.get_expected_garden_size()
