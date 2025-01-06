@@ -53,8 +53,10 @@ class Board:
         self.screen.draw_rect(color=Color.BLACK, rect=rect, width=border_width)
 
     def create_cell_grid(self) -> list[list[Cell]]:
-        return [[self.create_cell(row_number, col_number, cell_clue) for col_number, cell_clue in enumerate(row)]
-                for row_number, row in enumerate(self.level.level_setup)]
+        return [
+            [self.create_cell(row_number, col_number, cell_clue) for col_number, cell_clue in enumerate(row)]
+            for row_number, row in enumerate(self.level.level_setup)
+        ]
 
     def create_cell(self, row_number: int, col_number: int, cell_clue: int | None) -> Cell:
         cell_pixel_position = self.screen.get_cell_location(self.rect, row_number, col_number)
@@ -80,15 +82,18 @@ class Board:
     def get_neighbor_cell(self, cell: Cell, direction: Direction) -> Cell | None:
         neighbor_coordinate = cell.grid_coordinate.get_offset(direction)
         if self.is_valid_cell_coordinate(neighbor_coordinate):
-            neighbor_cell = self.get_cell_from_grid(row_number=neighbor_coordinate.row_number,
-                                                    col_number=neighbor_coordinate.col_number)
+            neighbor_cell = self.get_cell_from_grid(
+                row_number=neighbor_coordinate.row_number, col_number=neighbor_coordinate.col_number
+            )
         else:
             neighbor_cell = None
         return neighbor_cell
 
     def is_valid_cell_coordinate(self, grid_coordinate: GridCoordinate) -> bool:
-        return 0 <= grid_coordinate.row_number < self.level.number_of_rows and \
-            0 <= grid_coordinate.col_number < self.level.number_of_columns
+        return (
+            0 <= grid_coordinate.row_number < self.level.number_of_rows
+            and 0 <= grid_coordinate.col_number < self.level.number_of_columns
+        )
 
     def get_cell_from_grid(self, row_number: int, col_number: int) -> Cell:
         return self.cell_grid[row_number][col_number]
@@ -170,8 +175,9 @@ class Board:
         cells = self.get_connected_cells(starting_cell, cell_criteria_func)
         return CellGroup(cells)
 
-    def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool],
-                            connected_cells: set[Cell] | None = None) -> set[Cell]:
+    def get_connected_cells(
+        self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool], connected_cells: set[Cell] | None = None
+    ) -> set[Cell]:
         """
         Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
         returns True.
@@ -214,8 +220,10 @@ class Board:
 
     def apply_cell_changes(self, cell_changes: CellChanges) -> None:
         for cell_change_info in cell_changes.cell_change_list:
-            cell = self.get_cell_from_grid(row_number=cell_change_info.grid_coordinate.row_number,
-                                           col_number=cell_change_info.grid_coordinate.col_number)
+            cell = self.get_cell_from_grid(
+                row_number=cell_change_info.grid_coordinate.row_number,
+                col_number=cell_change_info.grid_coordinate.col_number,
+            )
             cell.update_cell_state(new_cell_state=cell_change_info.after_state)
 
     def has_two_by_two_wall(self) -> bool:
@@ -228,8 +236,9 @@ class Board:
                 two_by_two_wall_section_cells.update(cell.get_two_by_two_section())
         return two_by_two_wall_section_cells
 
-    def get_all_non_garden_cell_groups_with_walls(self, additional_off_limit_cell: Cell | None = None) \
-            -> set[CellGroup]:
+    def get_all_non_garden_cell_groups_with_walls(
+        self, additional_off_limit_cell: Cell | None = None
+    ) -> set[CellGroup]:
         off_limit_cells = self.get_garden_cells()
         if additional_off_limit_cell is not None:
             off_limit_cells.add(additional_off_limit_cell)
@@ -237,7 +246,8 @@ class Board:
             cell_criteria_func=lambda cell: cell not in off_limit_cells,
         )
         return {
-            non_garden_cell_group for non_garden_cell_group in non_garden_cell_groups
+            non_garden_cell_group
+            for non_garden_cell_group in non_garden_cell_groups
             if non_garden_cell_group.does_contain_wall()
         }
 

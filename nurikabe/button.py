@@ -10,8 +10,18 @@ class Button:
     ENABLED_TEXT_COLOR = Color.BLACK
     DISABLED_TEXT_COLOR = Color.GRAY
 
-    def __init__(self, screen: Screen, left: int, top: int, width: int, height: int,  # noqa: PLR0913
-                 text: str | None = None, image: pygame.Surface | None = None, *, is_clickable: bool = True):
+    def __init__(  # noqa: PLR0913
+        self,
+        screen: Screen,
+        left: int,
+        top: int,
+        width: int,
+        height: int,
+        text: str | None = None,
+        image: pygame.Surface | None = None,
+        *,
+        is_clickable: bool = True,
+    ):
         self.screen = screen
         self.text = text
         self.image = image
@@ -47,8 +57,15 @@ class Button:
         else:
             color = Button.DISABLED_TEXT_COLOR
             image = self.image_disabled
-        self.screen.draw_rect(color=color, rect=self.rect, width=1, text=self.text,
-                              text_color=color, text_type=TextType.BUTTON, image=image)
+        self.screen.draw_rect(
+            color=color,
+            rect=self.rect,
+            width=1,
+            text=self.text,
+            text_color=color,
+            text_type=TextType.BUTTON,
+            image=image,
+        )
 
     def get_background_color(self) -> Color:
         if not self.is_clickable or not self.is_mouse_on_button:

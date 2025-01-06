@@ -14,6 +14,7 @@ class FillCorrectlySizedWeakGarden(SolverRule):
             if weak_garden.does_have_exactly_one_clue() and weak_garden.is_garden_correct_size():
                 empty_cells = {cell for cell in weak_garden.cells if cell.cell_state.is_empty()}
                 for cell in empty_cells:
-                    cell_changes.add_change(self.set_cell_to_state(cell, CellState.NON_WALL,
-                                                                   reason='Fill completed weak garden'))
+                    cell_changes.add_change(
+                        self.set_cell_to_state(cell, CellState.NON_WALL, reason='Fill completed weak garden')
+                    )
         return cell_changes

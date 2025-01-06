@@ -211,8 +211,10 @@ class TestCellGroups(TestBoard):
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
         # Check that the garden contains the all 5 cells
-        self.assertEqual(board.get_garden(clue_cell).cells,
-                         {clue_cell, adjacent_cell1, adjacent_cell2, diagonal_cell, adjacent_cell3})
+        self.assertEqual(
+            board.get_garden(clue_cell).cells,
+            {clue_cell, adjacent_cell1, adjacent_cell2, diagonal_cell, adjacent_cell3},
+        )
 
         # It shouldn't matter which cell is considered the "root" of the garden
         self.assertEqual(board.get_garden(diagonal_cell).cells, board.get_garden(clue_cell).cells)
@@ -314,11 +316,13 @@ class TestCellGroups(TestBoard):
             '_,_,_,_,_,_',
         ]
         board = self.create_board(board_details)
-        cell_group = CellGroup(cells={
-            board.get_cell_from_grid(row_number=0, col_number=1),
-            board.get_cell_from_grid(row_number=1, col_number=1),
-            board.get_cell_from_grid(row_number=1, col_number=2),
-        })
+        cell_group = CellGroup(
+            cells={
+                board.get_cell_from_grid(row_number=0, col_number=1),
+                board.get_cell_from_grid(row_number=1, col_number=1),
+                board.get_cell_from_grid(row_number=1, col_number=2),
+            }
+        )
         adjacent_neighbor_cells = cell_group.get_adjacent_neighbors()
         expected_adjacent_neighbors = {
             board.get_cell_from_grid(row_number=0, col_number=0),

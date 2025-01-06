@@ -100,8 +100,11 @@ class TestCellNeighbors(TestCell):
         cell.set_neighbor_map(neighbor_cell_map)
 
         adjacent_neighbors = cell.get_adjacent_neighbors()
-        expected = {neighbor_cell_map[Direction.UP], neighbor_cell_map[Direction.RIGHT],
-                    neighbor_cell_map[Direction.LEFT]}
+        expected = {
+            neighbor_cell_map[Direction.UP],
+            neighbor_cell_map[Direction.RIGHT],
+            neighbor_cell_map[Direction.LEFT],
+        }
         self.assertEqual(adjacent_neighbors, expected)
 
     def test_two_by_two_section(self) -> None:
@@ -120,8 +123,12 @@ class TestCellNeighbors(TestCell):
         cell.set_neighbor_map(neighbor_cell_map)
 
         two_by_two_section = cell.get_two_by_two_section()
-        expected = {cell, neighbor_cell_map[Direction.RIGHT], neighbor_cell_map[Direction.RIGHT_DOWN],
-                    neighbor_cell_map[Direction.DOWN]}
+        expected = {
+            cell,
+            neighbor_cell_map[Direction.RIGHT],
+            neighbor_cell_map[Direction.RIGHT_DOWN],
+            neighbor_cell_map[Direction.DOWN],
+        }
         self.assertEqual(two_by_two_section, expected)
 
     def test_two_by_two_section_edge(self) -> None:

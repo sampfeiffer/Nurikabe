@@ -25,8 +25,9 @@ class NonExistentNeighborError(Exception):
 class Cell:
     CENTER_DOT = '\u2022'
 
-    def __init__(self, row_number: int, col_number: int, clue: int | None, pixel_position: PixelPosition,
-                 screen: Screen):
+    def __init__(
+        self, row_number: int, col_number: int, clue: int | None, pixel_position: PixelPosition, screen: Screen
+    ):
         self.row_number = row_number
         self.col_number = col_number
         self.grid_coordinate = GridCoordinate(row_number, col_number)
@@ -117,8 +118,9 @@ class Cell:
 
     def set_adjacent_neighbors(self) -> None:
         """Set the list of adjacent (non-diagonal) Cells."""
-        self._adjacent_neighbors = {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS
-                                    if direction in self.get_neighbor_map()}
+        self._adjacent_neighbors = {
+            self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS if direction in self.get_neighbor_map()
+        }
 
     def get_neighbor_map(self) -> dict[Direction, Cell]:
         if self._neighbor_cell_map is None:
@@ -147,8 +149,9 @@ class Cell:
         old_cell_state = self.cell_state
         self.cell_state = new_cell_state
         self.draw_cell()
-        return CellChangeInfo(grid_coordinate=self.grid_coordinate, before_state=old_cell_state,
-                              after_state=self.cell_state)
+        return CellChangeInfo(
+            grid_coordinate=self.grid_coordinate, before_state=old_cell_state, after_state=self.cell_state
+        )
 
     def get_neighbor_set(self, direction_list: Iterable[Direction]) -> set[Cell]:
         return {self.get_neighbor(direction) for direction in direction_list}
@@ -190,8 +193,7 @@ class Cell:
         return get_rect_edges(self.rect)
 
     def __repr__(self) -> str:
-        return (f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, '
-                f'clue={self.clue})')
+        return f'Cell(row={self.row_number}, col={self.col_number}, state={self.cell_state}, clue={self.clue})'
 
     def as_simple_string(self) -> str:
         """Useful for printing the board with each cell state shown as a simple string."""

@@ -65,8 +65,9 @@ class TestPathFindingBetweenCells(TestPathFinding):
         self.assertEqual(shortest_path_between_cells.cell_list, expected)
 
         # The path from end_cell to start_cell should be the reverse of the path above
-        backwards_path = PathFinder(start_cell_group=path_finder.end_cell_group,
-                                    end_cell_group=path_finder.start_cell_group).get_path_info()
+        backwards_path = PathFinder(
+            start_cell_group=path_finder.end_cell_group, end_cell_group=path_finder.start_cell_group
+        ).get_path_info()
         self.assertEqual(backwards_path.cell_list, shortest_path_between_cells.cell_list[::-1])
 
     def test_diagonal_path_between_cells(self) -> None:
@@ -380,20 +381,25 @@ class TestPathFindingBetweenCellGroups(TestPathFinding):
             '_,_,_,_',
         ]
         board = self.create_board(board_details)
-        start_cell_group = CellGroup(cells={
-            board.get_cell_from_grid(row_number=1, col_number=2),
-            board.get_cell_from_grid(row_number=2, col_number=2),
-            board.get_cell_from_grid(row_number=2, col_number=3),
-        })
+        start_cell_group = CellGroup(
+            cells={
+                board.get_cell_from_grid(row_number=1, col_number=2),
+                board.get_cell_from_grid(row_number=2, col_number=2),
+                board.get_cell_from_grid(row_number=2, col_number=3),
+            }
+        )
 
-        end_cell_group = CellGroup(cells={
-            board.get_cell_from_grid(row_number=1, col_number=2),
-            board.get_cell_from_grid(row_number=0, col_number=2),
-            board.get_cell_from_grid(row_number=0, col_number=3),
-        })
+        end_cell_group = CellGroup(
+            cells={
+                board.get_cell_from_grid(row_number=1, col_number=2),
+                board.get_cell_from_grid(row_number=0, col_number=2),
+                board.get_cell_from_grid(row_number=0, col_number=3),
+            }
+        )
 
-        shortest_path_between_cell_groups = PathFinder(start_cell_group=start_cell_group,
-                                                       end_cell_group=end_cell_group).get_path_info()
+        shortest_path_between_cell_groups = PathFinder(
+            start_cell_group=start_cell_group, end_cell_group=end_cell_group
+        ).get_path_info()
         self.assertEqual(shortest_path_between_cell_groups.path_length, 1)
 
     def test_path_between_cell_groups(self) -> None:

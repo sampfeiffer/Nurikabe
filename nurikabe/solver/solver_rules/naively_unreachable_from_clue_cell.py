@@ -19,6 +19,7 @@ class NaivelyUnreachableFromClueCell(SolverRule):
                     is_cell_reachable_by_a_clue = True
                     break
             if not is_cell_reachable_by_a_clue:
-                cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL,
-                                                               reason='Not Manhattan reachable by any clue cells'))
+                cell_changes.add_change(
+                    self.set_cell_to_state(cell, CellState.WALL, reason='Not Manhattan reachable by any clue cells')
+                )
         return cell_changes

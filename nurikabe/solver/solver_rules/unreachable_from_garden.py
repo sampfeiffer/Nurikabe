@@ -40,8 +40,9 @@ class UnreachableFromGarden(SolverRule):
                 # TODO: should this return right away?
         return cell_changes
 
-    def get_cells_reachable_from_garden(self, source_garden: Garden, other_gardens_with_clues: set[Garden],
-                                        gardens_without_clue: set[Garden]) -> set[Cell]:
+    def get_cells_reachable_from_garden(
+        self, source_garden: Garden, other_gardens_with_clues: set[Garden], gardens_without_clue: set[Garden]
+    ) -> set[Cell]:
         if not source_garden.does_have_exactly_one_clue():
             raise NoPossibleSolutionFromCurrentStateError(
                 message='Cannot determine reach of garden since there is not exactly one clue',

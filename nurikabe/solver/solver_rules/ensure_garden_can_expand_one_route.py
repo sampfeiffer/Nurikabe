@@ -41,6 +41,7 @@ class EnsureGardenCanExpandOneRoute(SolverRule):
         escape_route_cells = non_wall_cell_group.get_empty_adjacent_neighbors()
         if len(escape_route_cells) == 1:
             only_escape_route_cell = next(iter(escape_route_cells))
-            cell_changes.add_change(self.set_cell_to_state(only_escape_route_cell, CellState.NON_WALL,
-                                                           reason='Ensure garden can expand'))
+            cell_changes.add_change(
+                self.set_cell_to_state(only_escape_route_cell, CellState.NON_WALL, reason='Ensure garden can expand')
+            )
         return cell_changes

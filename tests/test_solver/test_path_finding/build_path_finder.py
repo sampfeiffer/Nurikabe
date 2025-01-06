@@ -94,7 +94,4 @@ def check_path_endpoints(start_cell_group: set[Cell], end_cell_group: set[Cell])
 
 
 def extract_blank_board_details(board_details: list[str]) -> list[str]:
-    return [
-        ','.join(['_' for _ in row_details.split(',')])
-        for row_details in board_details
-    ]
+    return [','.join(['_' for _ in row_details.split(',')]) for row_details in board_details]

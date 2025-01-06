@@ -33,8 +33,9 @@ class CellGroup:
 
     def get_adjacent_neighbors(self) -> set[Cell]:
         list_of_neighbor_cell_sets: list[set[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]
-        return {cell for neighbor_cells in list_of_neighbor_cell_sets
-                for cell in neighbor_cells if cell not in self.cells}
+        return {
+            cell for neighbor_cells in list_of_neighbor_cell_sets for cell in neighbor_cells if cell not in self.cells
+        }
 
     def does_contain_clue(self) -> bool:
         return self.get_number_of_clues() > 0
@@ -69,8 +70,12 @@ class CellGroup:
         return self.get_shortest_manhattan_distance_to_cell(destination_cell) + 1
 
     def get_shortest_manhattan_distance_to_cell_group(self, destination_cell_group: CellGroup) -> int:
-        return min([self.get_shortest_manhattan_distance_to_cell(cell_in_destination_group)
-                    for cell_in_destination_group in destination_cell_group.cells])
+        return min(
+            [
+                self.get_shortest_manhattan_distance_to_cell(cell_in_destination_group)
+                for cell_in_destination_group in destination_cell_group.cells
+            ]
+        )
 
     def get_shortest_naive_path_length_to_cell_group(self, destination_cell_group: CellGroup) -> int:
         return self.get_shortest_manhattan_distance_to_cell_group(destination_cell_group) + 1

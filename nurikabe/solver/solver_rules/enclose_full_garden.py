@@ -19,8 +19,9 @@ class EncloseFullGarden(SolverRule):
                 if len(garden.cells) == clue:
                     empty_adjacent_neighbors = garden.get_empty_adjacent_neighbors()
                     for cell in empty_adjacent_neighbors:
-                        cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL,
-                                                                       reason='Enclose full garden'))
+                        cell_changes.add_change(
+                            self.set_cell_to_state(cell, CellState.WALL, reason='Enclose full garden')
+                        )
             else:
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='Garden contains more than one clue',

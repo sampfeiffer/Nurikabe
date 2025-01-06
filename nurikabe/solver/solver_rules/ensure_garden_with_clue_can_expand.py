@@ -53,8 +53,9 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             # incomplete_garden_with_clue
             remaining_garden_size = incomplete_garden_with_clue.get_num_of_remaining_garden_cells()
             escape_route_cells = {
-                cell for cell in escape_route_cells if
-                incomplete_garden_with_clue.get_shortest_manhattan_distance_to_cell(cell) <= remaining_garden_size
+                cell
+                for cell in escape_route_cells
+                if incomplete_garden_with_clue.get_shortest_manhattan_distance_to_cell(cell) <= remaining_garden_size
             }
 
             prioritized_escape_route_cells = self.get_prioritized_escape_route_cells(
@@ -72,11 +73,13 @@ class EnsureGardenWithClueCanExpand(SolverRule):
                     cell_criteria_func=lambda x: x not in off_limit_cells_for_this_escape_route,  # noqa: B023
                 )
                 if len(potentially_reachable_cells) < clue_value:
-                    cell_changes.add_change(self.set_cell_to_state(
-                        escape_route_cell,
-                        CellState.NON_WALL,
-                        reason='Ensure garden with clue can expand',
-                    ))
+                    cell_changes.add_change(
+                        self.set_cell_to_state(
+                            escape_route_cell,
+                            CellState.NON_WALL,
+                            reason='Ensure garden with clue can expand',
+                        )
+                    )
 
                     # Since some cells were marked as non-walls, the previously calculated all_gardens is no longer
                     # valid

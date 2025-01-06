@@ -28,8 +28,9 @@ class TestCheckForTwoByTwoSectionOfWalls(TestBoardStateChecker):
         try:
             board_state_checker.check_for_two_by_two_section_of_walls()
         except NoPossibleSolutionFromCurrentStateError:
-            self.fail('check_for_two_by_two_section_of_walls() raised NoPossibleSolutionFromCurrentStateError '
-                      'unexpectedly')
+            self.fail(
+                'check_for_two_by_two_section_of_walls() raised NoPossibleSolutionFromCurrentStateError unexpectedly'
+            )
 
     def test_has_two_by_two_section_of_walls(self) -> None:
         """
@@ -124,8 +125,9 @@ class TestCheckForGardenWithMultipleClues(TestBoardStateChecker):
         try:
             board_state_checker.check_for_garden_with_multiple_clues()
         except NoPossibleSolutionFromCurrentStateError:
-            self.fail('check_for_garden_with_multiple_clues() raised NoPossibleSolutionFromCurrentStateError '
-                      'unexpectedly')
+            self.fail(
+                'check_for_garden_with_multiple_clues() raised NoPossibleSolutionFromCurrentStateError unexpectedly'
+            )
 
     def test_has_multiple_clue_gardens(self) -> None:
         """Check that when there is a garden with multiple clues, NoPossibleSolutionFromCurrentStateError is raised."""
@@ -256,8 +258,10 @@ class TestCheckForEnclosedGardenWithNoClue(TestBoardStateChecker):
         try:
             board_state_checker.check_for_enclosed_garden_with_no_clue()
         except NoPossibleSolutionFromCurrentStateError:
-            self.fail('check_for_enclosed_garden_with_no_clue() raised NoPossibleSolutionFromCurrentStateError '
-                      'unexpectedly')
+            self.fail(
+                'check_for_enclosed_garden_with_no_clue() raised NoPossibleSolutionFromCurrentStateError '
+                'unexpectedly'
+            )
 
     def test_has_clueless_enclosed_garden(self) -> None:
         """
