@@ -39,6 +39,7 @@ select = [
     "RUF", "TID", "D", "C90"
 ]
 ignore = [
+    "COM812",  # Checks for the absence of trailing commas.
     "D100",  # Checks for undocumented public module definitions.
     "D101",  # Checks for undocumented public class definitions.
     "D102",  # Checks for undocumented public method definitions.

@@ -62,15 +62,17 @@ class Screen:
         return PixelPosition(x_coordinate=left, y_coordinate=top)
 
     def get_cell_width(self, *, number_of_rows: int, number_of_columns: int, should_include_grid_numbers: bool) -> int:
-        width_for_non_board_components = \
-            self.get_suggested_left_side_of_board_width(should_include_grid_numbers=should_include_grid_numbers) + \
-            self.get_right_side_of_board_width()
+        width_for_non_board_components = (
+            self.get_suggested_left_side_of_board_width(should_include_grid_numbers=should_include_grid_numbers)
+            + self.get_right_side_of_board_width()
+        )
         max_board_width = self.SCREEN_WIDTH - width_for_non_board_components
         max_cell_width = int(max_board_width / number_of_columns)
 
-        height_for_non_board_components = \
-            self.get_top_of_board_height(should_include_grid_numbers=should_include_grid_numbers) + \
-            self.get_bottom_of_board_height()
+        height_for_non_board_components = (
+            self.get_top_of_board_height(should_include_grid_numbers=should_include_grid_numbers)
+            + self.get_bottom_of_board_height()
+        )
         max_board_height = self.SCREEN_HEIGHT - height_for_non_board_components
         max_cell_height = int(max_board_height / number_of_rows)
 
@@ -99,8 +101,9 @@ class Screen:
         return self.MIN_BORDER + self.GAME_STATUS_RECT_HEIGHT + self.BUTTON_RECT_HEIGHT
 
     def get_top_left_of_board(self, number_of_columns: int, *, should_include_grid_numbers: bool) -> PixelPosition:
-        suggested_left_border_size = \
-            self.get_suggested_left_side_of_board_width(should_include_grid_numbers=should_include_grid_numbers)
+        suggested_left_border_size = self.get_suggested_left_side_of_board_width(
+            should_include_grid_numbers=should_include_grid_numbers
+        )
         if should_include_grid_numbers:
             left_border_size = suggested_left_border_size
         else:
@@ -128,12 +131,24 @@ class Screen:
     def display_grid_numbering(self, level: Level) -> None:
         for row_number in range(level.number_of_rows):
             row_label_rect = self.get_row_label_rect(row_number)
-            self.draw_rect(color=Screen.BACKGROUND_COLOR, rect=row_label_rect, width=0, text=str(row_number),
-                           text_color=Color.BLACK, text_type=TextType.GRID_NUMBERING)
+            self.draw_rect(
+                color=Screen.BACKGROUND_COLOR,
+                rect=row_label_rect,
+                width=0,
+                text=str(row_number),
+                text_color=Color.BLACK,
+                text_type=TextType.GRID_NUMBERING,
+            )
         for column_number in range(level.number_of_columns):
             row_label_rect = self.get_column_label_rect(column_number)
-            self.draw_rect(color=Screen.BACKGROUND_COLOR, rect=row_label_rect, width=0, text=str(column_number),
-                           text_color=Color.BLACK, text_type=TextType.GRID_NUMBERING)
+            self.draw_rect(
+                color=Screen.BACKGROUND_COLOR,
+                rect=row_label_rect,
+                width=0,
+                text=str(column_number),
+                text_color=Color.BLACK,
+                text_type=TextType.GRID_NUMBERING,
+            )
 
     def get_row_label_rect(self, row_number: int) -> pygame.Rect:
         left = self.top_left_of_board.x_coordinate - self.GRID_NUMBERING_WIDTH
@@ -154,10 +169,16 @@ class Screen:
         top = board_rect.top + self.cell_width * row_number
         return PixelPosition(x_coordinate=left, y_coordinate=top)
 
-    def draw_rect(self, color: Color, rect: pygame.Rect, width: int, text: str | None = None,  # noqa: PLR0913
-                  text_color: Color | None = None, text_type: TextType = TextType.CELL,
-                  image: pygame.Surface | None = None) -> None:
-
+    def draw_rect(  # noqa: PLR0913
+        self,
+        color: Color,
+        rect: pygame.Rect,
+        width: int,
+        text: str | None = None,
+        text_color: Color | None = None,
+        text_type: TextType = TextType.CELL,
+        image: pygame.Surface | None = None,
+    ) -> None:
         if text is not None and image is not None:
             msg = 'Cannot have both text and an image'
             raise ValueError(msg)
@@ -173,7 +194,7 @@ class Screen:
             image_rect = image.get_rect(center=rect.center)
             self.screen.blit(image, dest=image_rect.topleft)
 
-    def draw_text(self, rect: pygame.Rect, text: str,  text_color: Color, text_type: TextType) -> None:
+    def draw_text(self, rect: pygame.Rect, text: str, text_color: Color, text_type: TextType) -> None:
         font = self.font_map[text_type]
         text_surface = font.render(text, self.SHOULD_APPLY_ANTI_ALIAS, text_color.value)
         text_rect = text_surface.get_rect(center=rect.center)

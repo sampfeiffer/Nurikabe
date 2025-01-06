@@ -68,8 +68,15 @@ class UndoButton(Button):
     def __init__(self, screen: Screen, board: Board):
         left = self.get_left_coordinate(board)
         top = board.rect.bottom + screen.MIN_BORDER
-        super().__init__(screen, left, top, width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
-                         height=Screen.BUTTON_RECT_HEIGHT, image=self.get_image(), is_clickable=False)
+        super().__init__(
+            screen,
+            left,
+            top,
+            width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
+            height=Screen.BUTTON_RECT_HEIGHT,
+            image=self.get_image(),
+            is_clickable=False,
+        )
 
     @staticmethod
     def get_left_coordinate(board: Board) -> int:
@@ -86,8 +93,15 @@ class RedoButton(Button):
     def __init__(self, screen: Screen, board: Board):
         left = self.get_left_coordinate(board)
         top = board.rect.bottom + screen.MIN_BORDER
-        super().__init__(screen, left, top, width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
-                         height=Screen.BUTTON_RECT_HEIGHT, image=self.get_image(), is_clickable=False)
+        super().__init__(
+            screen,
+            left,
+            top,
+            width=Screen.UNDO_REDO_BUTTON_RECT_WIDTH,
+            height=Screen.BUTTON_RECT_HEIGHT,
+            image=self.get_image(),
+            is_clickable=False,
+        )
 
     @staticmethod
     def get_left_coordinate(board: Board) -> int:

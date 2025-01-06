@@ -33,8 +33,13 @@ class PathFinder:
     the change in heuristic never over-estimates the actual cost of the step.
     """
 
-    def __init__(self, start_cell_group: Cell | CellGroup, end_cell_group: Cell | CellGroup,
-                 off_limit_cells: set[Cell] | None = None, other_cell_groups: frozenset[CellGroup] | None = None):
+    def __init__(
+        self,
+        start_cell_group: Cell | CellGroup,
+        end_cell_group: Cell | CellGroup,
+        off_limit_cells: set[Cell] | None = None,
+        other_cell_groups: frozenset[CellGroup] | None = None,
+    ):
         """
         :param start_cell_group: The CellGroup that the path starts from.
         :param end_cell_group: The CellGroup where the path should end.
@@ -112,8 +117,9 @@ class PathFinder:
             group.
         """
         # The shortest possible path length is 1 plus the Manhattan distance between the closest cells in the two groups
-        min_possible_path_length = \
-            self.start_cell_group.get_shortest_naive_path_length_to_cell_group(self.end_cell_group)
+        min_possible_path_length = self.start_cell_group.get_shortest_naive_path_length_to_cell_group(
+            self.end_cell_group
+        )
         if max_path_length is not None and min_possible_path_length > max_path_length:
             raise NoPathFoundError(self.get_no_path_error_string(max_path_length))
 
@@ -136,15 +142,19 @@ class PathFinder:
                 return path_info_to_cell[current_cell]
 
             # Get the list of non-off-limit cells that neighbor the current cell
-            neighbor_cells_to_explore = [neighbor_cell for neighbor_cell in current_cell.get_adjacent_neighbors()
-                                         if neighbor_cell not in self.off_limit_cells]
+            neighbor_cells_to_explore = [
+                neighbor_cell
+                for neighbor_cell in current_cell.get_adjacent_neighbors()
+                if neighbor_cell not in self.off_limit_cells
+            ]
 
             unvisited_other_cell_groups = self.other_cell_groups - path_info_to_cell[current_cell].adjacent_cell_groups
             for neighbor_cell in neighbor_cells_to_explore:
                 distance_from_current_to_neighbor = self.get_distance_between_cells(current_cell, neighbor_cell)
                 newly_adjacent_cell_groups = self.get_adjacent_cell_groups(neighbor_cell, unvisited_other_cell_groups)
-                size_of_newly_adjacent_cell_groups = sum(len(newly_adjacent_cell_group.cells)
-                                                         for newly_adjacent_cell_group in newly_adjacent_cell_groups)
+                size_of_newly_adjacent_cell_groups = sum(
+                    len(newly_adjacent_cell_group.cells) for newly_adjacent_cell_group in newly_adjacent_cell_groups
+                )
                 distance_from_current_to_neighbor += size_of_newly_adjacent_cell_groups
 
                 # Determine the tentative g-score for the neighbor using the current best known optimal path to the
@@ -208,8 +218,11 @@ class PathFinder:
     @staticmethod
     def get_adjacent_cell_groups(root_cell: Cell, unvisited_other_cell_groups: frozenset[CellGroup]) -> set[CellGroup]:
         root_cell_adjacent_neighbors = root_cell.get_adjacent_neighbors()
-        return {cell_group for cell_group in unvisited_other_cell_groups
-                if cell_group.does_include_cell(root_cell_adjacent_neighbors)}
+        return {
+            cell_group
+            for cell_group in unvisited_other_cell_groups
+            if cell_group.does_include_cell(root_cell_adjacent_neighbors)
+        }
 
     def get_min_possible_remaining_distance(self, neighbor_cell: Cell) -> int:
         cell_group_containing_neighbor_cell: CellGroup | None = None

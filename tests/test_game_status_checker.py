@@ -10,11 +10,13 @@ from nurikabe.level import LevelBuilderFromStringList
 
 class TestGameStatusChecker(TestCase):
     screen = MagicMock(name='Screen')
-    level = LevelBuilderFromStringList(level_details=[
-        '1,,,',
-        ',,,',
-        ',3,,',
-    ]).build_level()
+    level = LevelBuilderFromStringList(
+        level_details=[
+            '1,,,',
+            ',,,',
+            ',3,,',
+        ]
+    ).build_level()
 
     def setUp(self) -> None:
         self.board = Board(self.level, self.screen)

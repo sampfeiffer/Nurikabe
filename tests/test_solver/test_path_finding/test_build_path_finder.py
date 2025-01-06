@@ -88,12 +88,16 @@ class TestBuildPathFinder(TestCase):
         self.assertEqual(path_finder.off_limit_cells, expected_off_limit_cells)
 
         expected_other_cell_groups = {
-            CellGroup(cells={
-                board.get_cell_from_grid(row_number=3, col_number=1),
-                board.get_cell_from_grid(row_number=3, col_number=2),
-            }),
-            CellGroup(cells={
-                board.get_cell_from_grid(row_number=2, col_number=2),
-            }),
+            CellGroup(
+                cells={
+                    board.get_cell_from_grid(row_number=3, col_number=1),
+                    board.get_cell_from_grid(row_number=3, col_number=2),
+                }
+            ),
+            CellGroup(
+                cells={
+                    board.get_cell_from_grid(row_number=2, col_number=2),
+                }
+            ),
         }
         self.assertEqual(path_finder.other_cell_groups, expected_other_cell_groups)

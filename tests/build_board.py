@@ -53,7 +53,4 @@ def create_level_from_string_list(level_details: list[str]) -> Level:
 
 
 def extract_level_details(board_details: list[str]) -> list[str]:
-    return [
-        row.replace('_', '').replace('W', '').replace('O', '')
-        for row in board_details
-    ]
+    return [row.replace('_', '').replace('W', '').replace('O', '') for row in board_details]

@@ -28,8 +28,11 @@ class NoIsolatedWallSectionsNaive(SolverRule):
                 )
             if len(escape_routes) == 1:
                 only_escape_route = next(iter(escape_routes))  # Get first item in the list
-                cell_changes.add_change(self.set_cell_to_state(only_escape_route, CellState.WALL,
-                                                               reason='Ensure no naively isolated wall sections'))
+                cell_changes.add_change(
+                    self.set_cell_to_state(
+                        only_escape_route, CellState.WALL, reason='Ensure no naively isolated wall sections'
+                    )
+                )
                 # Because a cell was changed to a wall, the previously calculated wall_sections is no longer valid
                 return cell_changes
         return cell_changes

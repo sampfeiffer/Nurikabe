@@ -54,17 +54,25 @@ class TestPathFindingSetup(TestCase):
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
-        other_cell_groups = {CellGroup(cells={
-            board.get_cell_from_grid(row_number=2, col_number=0),
-            board.get_cell_from_grid(row_number=2, col_number=1),
-        })}
+        other_cell_groups = {
+            CellGroup(
+                cells={
+                    board.get_cell_from_grid(row_number=2, col_number=0),
+                    board.get_cell_from_grid(row_number=2, col_number=1),
+                }
+            )
+        }
         off_limit_cells = {
             board.get_cell_from_grid(row_number=2, col_number=0),
         }
 
         with self.assertRaises(PathSetupError):
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, off_limit_cells=off_limit_cells,
-                       other_cell_groups=frozenset(other_cell_groups))
+            PathFinder(
+                start_cell_group=start_cell,
+                end_cell_group=end_cell,
+                off_limit_cells=off_limit_cells,
+                other_cell_groups=frozenset(other_cell_groups),
+            )
 
     def test_other_cell_groups_adjacent_to_start_cell_group(self) -> None:
         """
@@ -79,13 +87,18 @@ class TestPathFindingSetup(TestCase):
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
-        other_cell_groups = {CellGroup(cells={
-            board.get_cell_from_grid(row_number=1, col_number=0),
-        })}
+        other_cell_groups = {
+            CellGroup(
+                cells={
+                    board.get_cell_from_grid(row_number=1, col_number=0),
+                }
+            )
+        }
 
         with self.assertRaises(PathSetupError):
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell,
-                       other_cell_groups=frozenset(other_cell_groups))
+            PathFinder(
+                start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=frozenset(other_cell_groups)
+            )
 
     def test_other_cell_groups_adjacent_to_end_cell_group(self) -> None:
         """
@@ -100,13 +113,18 @@ class TestPathFindingSetup(TestCase):
         board = self.create_board(board_details)
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
-        other_cell_groups = {CellGroup(cells={
-            board.get_cell_from_grid(row_number=1, col_number=3),
-        })}
+        other_cell_groups = {
+            CellGroup(
+                cells={
+                    board.get_cell_from_grid(row_number=1, col_number=3),
+                }
+            )
+        }
 
         try:
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell,
-                       other_cell_groups=frozenset(other_cell_groups))
+            PathFinder(
+                start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=frozenset(other_cell_groups)
+            )
         except PathSetupError:
             self.fail('find_shortest_path_between_cells raised PathSetupError unexpectedly')
 
@@ -121,16 +139,21 @@ class TestPathFindingSetup(TestCase):
         start_cell = board.get_cell_from_grid(row_number=0, col_number=0)
         end_cell = board.get_cell_from_grid(row_number=0, col_number=3)
         other_cell_groups = {
-            CellGroup(cells={
-                board.get_cell_from_grid(row_number=1, col_number=3),
-                board.get_cell_from_grid(row_number=2, col_number=3),
-            }),
-            CellGroup(cells={
-                board.get_cell_from_grid(row_number=2, col_number=2),
-                board.get_cell_from_grid(row_number=2, col_number=3),
-            }),
+            CellGroup(
+                cells={
+                    board.get_cell_from_grid(row_number=1, col_number=3),
+                    board.get_cell_from_grid(row_number=2, col_number=3),
+                }
+            ),
+            CellGroup(
+                cells={
+                    board.get_cell_from_grid(row_number=2, col_number=2),
+                    board.get_cell_from_grid(row_number=2, col_number=3),
+                }
+            ),
         }
 
         with self.assertRaises(PathSetupError):
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell,
-                       other_cell_groups=frozenset(other_cell_groups))
+            PathFinder(
+                start_cell_group=start_cell, end_cell_group=end_cell, other_cell_groups=frozenset(other_cell_groups)
+            )

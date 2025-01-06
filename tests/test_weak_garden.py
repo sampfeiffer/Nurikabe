@@ -15,8 +15,9 @@ class TestWeakGarden(TestCase):
         self.row_number = 0
 
     def get_cell(self, clue: int | None = None) -> Cell:
-        cell = Cell(row_number=self.row_number, col_number=0, clue=clue, pixel_position=self.pixel_position,
-                    screen=self.screen)
+        cell = Cell(
+            row_number=self.row_number, col_number=0, clue=clue, pixel_position=self.pixel_position, screen=self.screen
+        )
         self.row_number += 1
         return cell
 

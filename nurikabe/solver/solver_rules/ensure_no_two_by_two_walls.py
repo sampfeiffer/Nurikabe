@@ -19,13 +19,15 @@ class EnsureNoTwoByTwoWalls(SolverRule):
         for row in self.board.cell_grid[:-1]:
             for cell in row[:-1]:
                 two_by_two_section = cell.get_two_by_two_section()
-                two_by_two_section_num_of_walls = len([cell for cell in two_by_two_section
-                                                       if cell.cell_state.is_wall()])
+                two_by_two_section_num_of_walls = len(
+                    [cell for cell in two_by_two_section if cell.cell_state.is_wall()]
+                )
                 if two_by_two_section_num_of_walls == self.CELL_COUNT_IN_TWO_BY_TWO_SECTION - 1:
                     for cell_corner in two_by_two_section:
                         if cell_corner.cell_state.is_empty():
-                            cell_changes.add_change(self.set_cell_to_state(cell_corner, CellState.NON_WALL,
-                                                                           reason='No two-by-two walls'))
+                            cell_changes.add_change(
+                                self.set_cell_to_state(cell_corner, CellState.NON_WALL, reason='No two-by-two walls')
+                            )
                 elif two_by_two_section_num_of_walls == self.CELL_COUNT_IN_TWO_BY_TWO_SECTION:
                     raise NoPossibleSolutionFromCurrentStateError(
                         message='There is a two-by-two section of walls',

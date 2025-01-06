@@ -45,8 +45,9 @@ class BoardStateChecker:
         if non_garden_cell_groups_with_walls is None:
             non_garden_cell_groups_with_walls = self.board.get_all_non_garden_cell_groups_with_walls()
         if len(non_garden_cell_groups_with_walls) > 1:
-            largest_non_garden_cell_group = max(non_garden_cell_groups_with_walls,
-                                                key=lambda cell_group: len(cell_group.cells))
+            largest_non_garden_cell_group = max(
+                non_garden_cell_groups_with_walls, key=lambda cell_group: len(cell_group.cells)
+            )
             problem_cell_groups = non_garden_cell_groups_with_walls - {largest_non_garden_cell_group}
             problem_wall_groups = {
                 CellGroup(cells={cell for cell in problem_cell_group.cells if cell.cell_state.is_wall()})
@@ -68,8 +69,9 @@ class BoardStateChecker:
 
     def check_for_too_small_garden(self) -> None:
         weak_gardens = self.board.get_all_weak_gardens()
-        weak_gardens_with_one_clue = {weak_garden for weak_garden in weak_gardens
-                                      if weak_garden.does_have_exactly_one_clue()}
+        weak_gardens_with_one_clue = {
+            weak_garden for weak_garden in weak_gardens if weak_garden.does_have_exactly_one_clue()
+        }
 
         for weak_garden in weak_gardens_with_one_clue:
             if len(weak_garden.cells) < weak_garden.get_expected_garden_size():
@@ -90,8 +92,11 @@ class BoardStateChecker:
 
     def check_for_enclosed_garden_with_no_clue(self) -> None:
         weak_gardens = self.board.get_all_weak_gardens()
-        gardens_with_no_clue = {weak_garden for weak_garden in weak_gardens
-                                if not weak_garden.does_contain_clue() and weak_garden.has_non_wall_cell()}
+        gardens_with_no_clue = {
+            weak_garden
+            for weak_garden in weak_gardens
+            if not weak_garden.does_contain_clue() and weak_garden.has_non_wall_cell()
+        }
 
         if len(gardens_with_no_clue) > 0:
             raise NoPossibleSolutionFromCurrentStateError(

@@ -18,7 +18,8 @@ class SeparateGardensWithClues(SolverRule):
             empty_adjacent_cells = incomplete_garden.get_empty_adjacent_neighbors()
             for cell in empty_adjacent_cells:
                 if cell in all_empty_adjacent_cells:
-                    cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL,
-                                                                   reason='Adjacent to multiple gardens'))
+                    cell_changes.add_change(
+                        self.set_cell_to_state(cell, CellState.WALL, reason='Adjacent to multiple gardens')
+                    )
                 all_empty_adjacent_cells.add(cell)
         return cell_changes
