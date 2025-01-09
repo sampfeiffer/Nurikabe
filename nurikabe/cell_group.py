@@ -3,8 +3,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
-
     from .cell import Cell
     from .color import Color
     from .rect_edge import RectEdge
@@ -20,10 +18,6 @@ class MultipleCluesInCellGroupError(Exception):
 
 
 class CellGroup:
-    @staticmethod
-    def get_cell_criteria_func() -> Callable[[Cell], bool]:
-        raise NotImplementedError('Unknown criteria for general CellGroup')  # noqa: EM101
-
     def __init__(self, cells: set[Cell]):
         self.cells = cells
 

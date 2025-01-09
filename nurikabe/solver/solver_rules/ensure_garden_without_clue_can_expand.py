@@ -160,7 +160,7 @@ class GardenInfo:
         )
         return self.board.get_connected_cells(
             starting_cell=next(iter(source_garden_without_clue.cells)),
-            cell_criteria_func=lambda cell: cell not in off_limit_cells,
+            valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells),
         )
 
     def get_manhattan_reachable_incomplete_gardens_with_clue(self, source_garden_without_clue: Garden) -> set[Garden]:

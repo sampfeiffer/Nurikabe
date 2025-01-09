@@ -58,7 +58,7 @@ class UnreachableFromGarden(SolverRule):
         # Get the cells that can be accessed from source_garden without going through a cell in off_limit_cells
         potentially_reachable_cells = self.board.get_connected_cells(
             starting_cell=source_garden.get_clue_cell(),
-            cell_criteria_func=lambda x: x not in off_limit_cells,
+            valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells),
         )
 
         # From among the potentially reachable cells, extract the set of cells for which we want to check for

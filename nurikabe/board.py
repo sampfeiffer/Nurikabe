@@ -31,6 +31,7 @@ class Board:
         self.draw_board_rect()
         self.cell_grid = self.create_cell_grid()
         self.flat_cell_list = self.get_flat_cell_list()
+        self.flat_cell_frozenset = frozenset(self.flat_cell_list)
         self.set_cell_neighbors()
         self.is_board_frozen = False
 
@@ -39,10 +40,10 @@ class Board:
         self.cell_groups_cache = CellGroupsCache()
         self.cache_stats = {'found_in_cache': 0, 'not_in_cache': 0, 'not_in_cache_total_time': 0}
 
-    def __del__(self):
-        print(f'found_in_cache: {self.cache_stats["found_in_cache"]:,.0f}')
-        print(f'not_in_cache: {self.cache_stats["not_in_cache"]:,.0f}')
-        print(f'not_in_cache_total_time: {self.cache_stats["not_in_cache_total_time"]:,.2f}')
+    # def __del__(self):
+    #     print(f'found_in_cache: {self.cache_stats["found_in_cache"]:,.0f}')
+    #     print(f'not_in_cache: {self.cache_stats["not_in_cache"]:,.0f}')
+    #     print(f'not_in_cache_total_time: {self.cache_stats["not_in_cache_total_time"]:,.2f}')
 
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.screen.top_left_of_board
@@ -151,22 +152,25 @@ class Board:
             garden.paint_garden_if_completed()
 
     def get_all_gardens(self) -> set[Garden]:
-        all_cell_groups = self.get_all_cell_groups_with_cache(cell_criteria_func=Garden.get_cell_criteria_func())
+        garden_cells = frozenset(self.get_garden_cells())
+        all_cell_groups = self.get_all_cell_groups_with_cache(valid_cells=garden_cells)
         return {Garden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_weak_gardens(self) -> set[WeakGarden]:
-        all_cell_groups = self.get_all_cell_groups_with_cache(cell_criteria_func=WeakGarden.get_cell_criteria_func())
+        weak_garden_cells = frozenset(self.get_weak_garden_cells())
+        all_cell_groups = self.get_all_cell_groups_with_cache(valid_cells=weak_garden_cells)
         return {WeakGarden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_wall_sections(self) -> set[WallSection]:
-        all_cell_groups = self.get_all_cell_groups_with_cache(cell_criteria_func=WallSection.get_cell_criteria_func())
+        wall_cells = frozenset(self.get_wall_cells())
+        all_cell_groups = self.get_all_cell_groups_with_cache(valid_cells=wall_cells)
         return {WallSection(cell_group.cells) for cell_group in all_cell_groups}
 
-    def get_all_cell_groups_with_cache(self, cell_criteria_func: Callable[[Cell], bool]) -> set[CellGroup]:
-        cell_criteria_func_hash = hash(cell_criteria_func)
+    def get_all_cell_groups_with_cache(self, valid_cells: frozenset[Cell]) -> set[CellGroup]:
+        valid_cells_hash = hash(valid_cells)
         cell_state_hash = self.get_cell_state_hash()
         all_cell_groups_from_cache = self.cell_groups_cache.extract_from_cache(
-            cell_criteria_func_hash=cell_criteria_func_hash,
+            valid_cells_hash=valid_cells_hash,
             cell_state_hash=cell_state_hash,
         )
         if all_cell_groups_from_cache is not None:
@@ -176,54 +180,56 @@ class Board:
         self.cache_stats['not_in_cache'] += 1
 
         st = time.time()
-        all_cell_groups = self.get_all_cell_groups(cell_criteria_func)
+        all_cell_groups = self.get_all_cell_groups(valid_cells)
         self.cache_stats['not_in_cache_total_time'] += time.time() - st
         self.cell_groups_cache.add_to_cache(
-            cell_criteria_func_hash=cell_criteria_func_hash,
+            valid_cells_hash=valid_cells_hash,
             cell_state_hash=cell_state_hash,
             all_cell_groups=all_cell_groups
         )
         return all_cell_groups
 
-    def get_all_cell_groups(self, cell_criteria_func: Callable[[Cell], bool]) -> set[CellGroup]:
+    def get_all_cell_groups(self, valid_cells: frozenset[Cell]) -> set[CellGroup]:
         all_cell_groups: set[CellGroup] = set()
         calls_already_in_a_group: set[Cell] = set()  # to prevent double counting
         for cell in self.flat_cell_list:
-            if cell in calls_already_in_a_group or not cell_criteria_func(cell):
+            if cell in calls_already_in_a_group or cell not in valid_cells:
                 continue
-            cell_group = self.get_cell_group(starting_cell=cell, cell_criteria_func=cell_criteria_func)
+            cell_group = self.get_cell_group(starting_cell=cell, valid_cells=valid_cells)
             all_cell_groups.add(cell_group)
             calls_already_in_a_group = calls_already_in_a_group.union(cell_group.cells)
         return all_cell_groups
 
     def get_garden(self, starting_cell: Cell) -> Garden:
-        cells = self.get_connected_cells(starting_cell, cell_criteria_func=Garden.get_cell_criteria_func())
+        garden_cells = frozenset(self.get_garden_cells())
+        cells = self.get_connected_cells(starting_cell, valid_cells=garden_cells)
         return Garden(cells)
 
     def get_wall_section(self, starting_cell: Cell) -> WallSection:
-        cells = self.get_connected_cells(starting_cell, cell_criteria_func=WallSection.get_cell_criteria_func())
+        wall_cells = frozenset(self.get_wall_cells())
+        cells = self.get_connected_cells(starting_cell, valid_cells=wall_cells)
         return WallSection(cells)
 
-    def get_cell_group(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool]) -> CellGroup:
-        cells = self.get_connected_cells(starting_cell, cell_criteria_func)
+    def get_cell_group(self, starting_cell: Cell, valid_cells: frozenset[Cell]) -> CellGroup:
+        cells = self.get_connected_cells(starting_cell, valid_cells)
         return CellGroup(cells)
 
     def get_connected_cells(
-        self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool], connected_cells: set[Cell] | None = None
+        self, starting_cell: Cell, valid_cells: frozenset[Cell], connected_cells: set[Cell] | None = None
     ) -> set[Cell]:
         """
-        Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
-        returns True.
+        Get a list of cells that are connected (non-diagonally) to the starting cell where the cell is in valid_cells.
+        Basically this is a flood fill.
         """
         if connected_cells is None:
             connected_cells = set()
         if starting_cell in connected_cells:
             # Already visited this cell
             return connected_cells
-        if cell_criteria_func(starting_cell):
+        if starting_cell in valid_cells:
             connected_cells.add(starting_cell)
             for neighbor_cell in starting_cell.get_adjacent_neighbors():
-                self.get_connected_cells(neighbor_cell, cell_criteria_func, connected_cells)
+                self.get_connected_cells(neighbor_cell, valid_cells, connected_cells)
 
         return connected_cells
 
@@ -284,42 +290,13 @@ class Board:
         if additional_off_limit_cell is not None:
             off_limit_cells.add(additional_off_limit_cell)
 
-        # TODO: figure out how to make this not a lambda so we can use caching
-        non_garden_cell_groups = self.get_all_cell_groups(
-            cell_criteria_func=lambda cell: cell not in off_limit_cells,
-        )
+        valid_cells = frozenset(self.flat_cell_frozenset - off_limit_cells)
+        non_garden_cell_groups = self.get_all_cell_groups_with_cache(valid_cells)
         return {
             non_garden_cell_group
             for non_garden_cell_group in non_garden_cell_groups
             if non_garden_cell_group.does_contain_wall()
         }
-
-    # def get_all_non_garden_cell_groups_with_walls(self, additional_off_limit_cell: Cell | None = None) \
-    #         -> set[CellGroup]:
-    #     off_limit_cells = self.get_garden_cells()
-    #     if additional_off_limit_cell is not None:
-    #         off_limit_cells.add(additional_off_limit_cell)
-    #
-    #     def is_cell_not_off_limits(set_of_off_limit_cells: set[Cell], cell: Cell) -> bool:
-    #         return cell not in set_of_off_limit_cells
-    #
-    #     from functools import partial
-    #     is_cell_not_off_limits_partial = partial(is_cell_not_off_limits, off_limit_cells)
-    #
-    #     non_garden_cell_groups = self.get_all_cell_groups(
-    #         cell_criteria_func=is_cell_not_off_limits_partial,
-    #     )
-    #     res = {
-    #         non_garden_cell_group for non_garden_cell_group in non_garden_cell_groups
-    #         if non_garden_cell_group.does_contain_wall()
-    #     }
-    #
-    #     print(f'{additional_off_limit_cell=}')
-    #     print(f'number of cell groups: {len(res)}')
-    #     for i, cg in enumerate(res):
-    #         print(f'cell group {i} has {len(cg.cells)} cells')
-    #
-    #     return res
 
     def as_simple_string_list(self) -> list[str]:
         """

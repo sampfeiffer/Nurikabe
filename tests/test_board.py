@@ -230,7 +230,7 @@ class TestCellGroups(TestBoard):
         # There should only be one weak garden containing all cells in board
         all_weak_gardens = board.get_all_weak_gardens()
         self.assertEqual(len(all_weak_gardens), 1)
-        self.assertEqual(next(iter(all_weak_gardens)).cells, set(board.flat_cell_list))
+        self.assertEqual(next(iter(all_weak_gardens)).cells, board.flat_cell_frozenset)
 
         # Corner off some cells
         wall_cells = {
@@ -255,7 +255,7 @@ class TestCellGroups(TestBoard):
             board.get_cell_from_grid(row_number=0, col_number=5),
             board.get_cell_from_grid(row_number=1, col_number=5),
         }
-        weak_garden2 = set(board.flat_cell_list) - wall_cells.union(weak_garden1)
+        weak_garden2 = board.flat_cell_frozenset - wall_cells.union(weak_garden1)
 
         for weak_garden in all_weak_gardens:
             weak_garden_cells = weak_garden.cells

@@ -10,7 +10,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
     def apply_rule(self) -> CellChanges:
         """
         If there is an incomplete garden with a clue and marking an empty cell as a wall would make it so that the
-        garden would not be able to expand the required size, that empty cell cannot be a wall, so mark it as a
+        garden would not be able to expand to the required size, that empty cell cannot be a wall, so mark it as a
         non-wall.
         """
         BoardStateChecker(self.board).check_for_garden_with_multiple_clues()
@@ -33,7 +33,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             clue_value = clue_cell.get_non_null_clue()
             potentially_reachable_cells_from_garden = self.board.get_connected_cells(
                 starting_cell=clue_cell,
-                cell_criteria_func=lambda cell: cell not in off_limit_cells,  # noqa: B023
+                valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells),
             )
 
             # If the number of potentially reachable cells is fewer than the clue value, then the garden does not have
@@ -44,7 +44,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
                     problem_cell_groups=frozenset({incomplete_garden_with_clue}),
                 )
 
-            # Farther filter down the potentially_reachable_cells_from_garden to only include cells that we need to
+            # Further filter down the potentially_reachable_cells_from_garden to only include cells that we need to
             # for its "blocking" capability.
             escape_route_cells = potentially_reachable_cells_from_garden - incomplete_garden_with_clue.cells
             escape_route_cells = {cell for cell in escape_route_cells if cell.cell_state.is_empty()}
@@ -58,6 +58,8 @@ class EnsureGardenWithClueCanExpand(SolverRule):
                 if incomplete_garden_with_clue.get_shortest_manhattan_distance_to_cell(cell) <= remaining_garden_size
             }
 
+            # TODO: this is re-calcing get_shortest_manhattan_distance_to_cell. Instead, save the value for each cell
+            #  from the previous step and reuse here.
             prioritized_escape_route_cells = self.get_prioritized_escape_route_cells(
                 escape_route_cells=escape_route_cells,
                 source_garden=incomplete_garden_with_clue,
@@ -70,7 +72,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
                 off_limit_cells_for_this_escape_route = off_limit_cells.union({escape_route_cell})
                 potentially_reachable_cells = self.board.get_connected_cells(
                     starting_cell=clue_cell,
-                    cell_criteria_func=lambda x: x not in off_limit_cells_for_this_escape_route,  # noqa: B023
+                    valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells_for_this_escape_route),
                 )
                 if len(potentially_reachable_cells) < clue_value:
                     cell_changes.add_change(
