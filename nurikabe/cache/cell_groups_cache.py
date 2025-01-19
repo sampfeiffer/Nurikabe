@@ -1,7 +1,13 @@
-from .cell_group import CellGroup
+from nurikabe.cell_group import CellGroup
 
 
 class CellGroupsCache:
+    """
+    Facilitate caching of sets of CellGroups for a given set of valid cells and a given cell state.
+
+    For example, given the set of a wall cells when the board has a specific cell state, this class facilitates caching
+    of the set of each wall group.
+    """
     def __init__(self):
         # dictionary of valid_cells_hash -> cell_state_hash -> set[CellGroup]
         self.cache: dict[int, dict[int, set[CellGroup]]] = {}

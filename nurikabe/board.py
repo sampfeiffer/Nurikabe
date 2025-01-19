@@ -1,12 +1,13 @@
 import time
 from collections.abc import Callable
+from line_profiler import profile
 
 import pygame
 
+from .cache.cache import Cache
 from .cell import Cell
 from .cell_change_info import CellChangeInfo, CellChanges
 from .cell_group import CellGroup
-from .cell_groups_cache import CellGroupsCache
 from .color import Color
 from .direction import Direction
 from .garden import Garden
@@ -37,13 +38,23 @@ class Board:
 
         self.ensure_no_adjacent_clues()
 
-        self.cell_groups_cache = CellGroupsCache()
+        self.clues_cells = self.get_clue_cells()
+
+        self.cell_state_hash: int | None = None
+
+        self.cache = Cache()
         self.cache_stats = {'found_in_cache': 0, 'not_in_cache': 0, 'not_in_cache_total_time': 0}
 
-    # def __del__(self):
-    #     print(f'found_in_cache: {self.cache_stats["found_in_cache"]:,.0f}')
-    #     print(f'not_in_cache: {self.cache_stats["not_in_cache"]:,.0f}')
-    #     print(f'not_in_cache_total_time: {self.cache_stats["not_in_cache_total_time"]:,.2f}')
+    def __del__(self):
+        pass
+        # print(f'found_in_cache: {self.cache_stats["found_in_cache"]:,.0f}')
+        # print(f'not_in_cache: {self.cache_stats["not_in_cache"]:,.0f}')
+        # print(f'not_in_cache_total_time: {self.cache_stats["not_in_cache_total_time"]:,.2f}')
+
+        # print(f'\nCell State')
+        # print(f'called: {self.cell_state_hash_cache["called"]:,.0f}')
+        # print(f'calced: {self.cell_state_hash_cache["calced"]:,.0f}')
+        # print(f'already_cached: {self.cell_state_hash_cache["already_cached"]:,.0f}')
 
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.screen.top_left_of_board
@@ -127,6 +138,7 @@ class Board:
         for cell in self.flat_cell_list:
             if cell.is_inside_cell(event_position):
                 cell_change_info = cell.handle_cell_click()
+                self.reset_cell_state_hash()
                 self.update_painted_gardens()
                 return cell_change_info
 
@@ -152,43 +164,44 @@ class Board:
             garden.paint_garden_if_completed()
 
     def get_all_gardens(self) -> set[Garden]:
-        garden_cells = frozenset(self.get_garden_cells())
+        garden_cells = self.get_garden_cells()
         all_cell_groups = self.get_all_cell_groups_with_cache(valid_cells=garden_cells)
         return {Garden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_weak_gardens(self) -> set[WeakGarden]:
-        weak_garden_cells = frozenset(self.get_weak_garden_cells())
+        weak_garden_cells = self.get_weak_garden_cells()
         all_cell_groups = self.get_all_cell_groups_with_cache(valid_cells=weak_garden_cells)
         return {WeakGarden(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_wall_sections(self) -> set[WallSection]:
-        wall_cells = frozenset(self.get_wall_cells())
+        wall_cells = self.get_wall_cells()
         all_cell_groups = self.get_all_cell_groups_with_cache(valid_cells=wall_cells)
         return {WallSection(cell_group.cells) for cell_group in all_cell_groups}
 
     def get_all_cell_groups_with_cache(self, valid_cells: frozenset[Cell]) -> set[CellGroup]:
         valid_cells_hash = hash(valid_cells)
         cell_state_hash = self.get_cell_state_hash()
-        all_cell_groups_from_cache = self.cell_groups_cache.extract_from_cache(
+        all_cell_groups_from_cache = self.cache.cell_groups_cache.extract_from_cache(
             valid_cells_hash=valid_cells_hash,
             cell_state_hash=cell_state_hash,
         )
         if all_cell_groups_from_cache is not None:
-            self.cache_stats['found_in_cache'] += 1
+            # self.cache_stats['found_in_cache'] += 1
             return all_cell_groups_from_cache
 
-        self.cache_stats['not_in_cache'] += 1
+        # self.cache_stats['not_in_cache'] += 1
 
         st = time.time()
         all_cell_groups = self.get_all_cell_groups(valid_cells)
-        self.cache_stats['not_in_cache_total_time'] += time.time() - st
-        self.cell_groups_cache.add_to_cache(
+        # self.cache_stats['not_in_cache_total_time'] += time.time() - st
+        self.cache.cell_groups_cache.add_to_cache(
             valid_cells_hash=valid_cells_hash,
             cell_state_hash=cell_state_hash,
             all_cell_groups=all_cell_groups
         )
         return all_cell_groups
 
+    @profile
     def get_all_cell_groups(self, valid_cells: frozenset[Cell]) -> set[CellGroup]:
         all_cell_groups: set[CellGroup] = set()
         calls_already_in_a_group: set[Cell] = set()  # to prevent double counting
@@ -200,20 +213,24 @@ class Board:
             calls_already_in_a_group = calls_already_in_a_group.union(cell_group.cells)
         return all_cell_groups
 
+    @profile
     def get_garden(self, starting_cell: Cell) -> Garden:
-        garden_cells = frozenset(self.get_garden_cells())
+        garden_cells = self.get_garden_cells()
         cells = self.get_connected_cells(starting_cell, valid_cells=garden_cells)
         return Garden(cells)
 
+    @profile
     def get_wall_section(self, starting_cell: Cell) -> WallSection:
-        wall_cells = frozenset(self.get_wall_cells())
+        wall_cells = self.get_wall_cells()
         cells = self.get_connected_cells(starting_cell, valid_cells=wall_cells)
         return WallSection(cells)
 
+    @profile
     def get_cell_group(self, starting_cell: Cell, valid_cells: frozenset[Cell]) -> CellGroup:
         cells = self.get_connected_cells(starting_cell, valid_cells)
         return CellGroup(cells)
 
+    @profile
     def get_connected_cells(
         self, starting_cell: Cell, valid_cells: frozenset[Cell], connected_cells: set[Cell] | None = None
     ) -> set[Cell]:
@@ -244,27 +261,43 @@ class Board:
     def freeze_cells(self) -> None:
         self.is_board_frozen = True
 
-    def filter_cells(self, cell_criteria_func: Callable[[Cell], bool]) -> set[Cell]:
-        return {cell for cell in self.flat_cell_list if cell_criteria_func(cell)}
+    @profile
+    def filter_cells(self, cell_criteria_func: Callable[[Cell], bool]) -> frozenset[Cell]:
+        return frozenset({cell for cell in self.flat_cell_list if cell_criteria_func(cell)})
 
-    def get_empty_cells(self) -> set[Cell]:
+    @profile
+    def get_empty_cells(self) -> frozenset[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_empty())
 
-    def get_wall_cells(self) -> set[Cell]:
+    @profile
+    def get_wall_cells(self) -> frozenset[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_wall())
 
-    def get_non_wall_cells(self) -> set[Cell]:
-        return self.filter_cells(lambda cell: cell.cell_state.is_non_wall())
-
-    def get_clue_cells(self) -> set[Cell]:
+    @profile
+    def get_clue_cells(self) -> frozenset[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_clue())
 
-    def get_garden_cells(self) -> set[Cell]:
-        return self.filter_cells(lambda cell: cell.cell_state.is_garden())
+    @profile
+    def get_garden_cells(self) -> frozenset[Cell]:
+        cell_state_hash = self.get_cell_state_hash()
+        garden_cells_from_cache = self.cache.garden_cells_cache.extract_from_cache(cell_state_hash)
+        if garden_cells_from_cache is not None:
+            self.cache_stats['found_in_cache'] += 1
+            return garden_cells_from_cache
 
-    def get_weak_garden_cells(self) -> set[Cell]:
+        self.cache_stats['not_in_cache'] += 1
+
+        st = time.time()
+        garden_cells = self.filter_cells(lambda cell: cell.cell_state.is_garden())
+        self.cache_stats['not_in_cache_total_time'] += time.time() - st
+        self.cache.garden_cells_cache.add_to_cache(cell_state_hash=cell_state_hash, cells=garden_cells)
+        return garden_cells
+
+    @profile
+    def get_weak_garden_cells(self) -> frozenset[Cell]:
         return self.filter_cells(lambda cell: cell.cell_state.is_weak_garden())
 
+    @profile
     def apply_cell_changes(self, cell_changes: CellChanges) -> None:
         for cell_change_info in cell_changes.cell_change_list:
             cell = self.get_cell_from_grid(
@@ -273,9 +306,11 @@ class Board:
             )
             cell.update_cell_state(new_cell_state=cell_change_info.after_state)
 
+    @profile
     def has_two_by_two_wall(self) -> bool:
         return any(cell.does_form_two_by_two_walls() for cell in self.flat_cell_list)
 
+    @profile
     def get_two_by_two_wall_sections(self) -> set[Cell]:
         two_by_two_wall_section_cells: set[Cell] = set()
         for cell in self.flat_cell_list:
@@ -283,10 +318,11 @@ class Board:
                 two_by_two_wall_section_cells.update(cell.get_two_by_two_section())
         return two_by_two_wall_section_cells
 
+    @profile
     def get_all_non_garden_cell_groups_with_walls(
         self, additional_off_limit_cell: Cell | None = None
     ) -> set[CellGroup]:
-        off_limit_cells = self.get_garden_cells()
+        off_limit_cells = set(self.get_garden_cells())
         if additional_off_limit_cell is not None:
             off_limit_cells.add(additional_off_limit_cell)
 
@@ -311,6 +347,12 @@ class Board:
         """
         return [','.join([cell.as_simple_string() for cell in row]) for row in self.cell_grid]
 
+    def reset_cell_state_hash(self) -> None:
+        self.cell_state_hash = None
+
+    @profile
     def get_cell_state_hash(self) -> int:
         """Get a hash representation of the state of the cells in the board."""
-        return hash(tuple(cell.cell_state.value for cell in self.flat_cell_list))
+        if self.cell_state_hash is None:
+            self.cell_state_hash = hash(tuple(cell.cell_state.value for cell in self.flat_cell_list))
+        return self.cell_state_hash

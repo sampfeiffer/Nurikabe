@@ -11,10 +11,9 @@ class NaivelyUnreachableFromClueCell(SolverRule):
         This is a much cheaper check compared to proper path finding algorithms.
         """
         cell_changes = CellChanges()
-        clue_cells = self.board.get_clue_cells()
         for cell in self.board.get_empty_cells():
             is_cell_reachable_by_a_clue = False
-            for clue_cell in clue_cells:
+            for clue_cell in self.board.clues_cells:
                 if cell.get_shortest_naive_path_length(clue_cell) <= clue_cell.get_non_null_clue():
                     is_cell_reachable_by_a_clue = True
                     break

@@ -188,6 +188,8 @@ class TestCellGroups(TestBoard):
         diagonal_cell = board.get_cell_from_grid(row_number=2, col_number=0)
         diagonal_cell.update_cell_state(CellState.NON_WALL)
 
+        board.reset_cell_state_hash()  # So that we don't pull the garden cell set from the cache
+
         expected_board_state = [
             '_,O,_,_,_,_',
             '_,1,O,_,_,_',
@@ -202,6 +204,8 @@ class TestCellGroups(TestBoard):
         # garden
         adjacent_cell3 = board.get_cell_from_grid(row_number=2, col_number=1)
         adjacent_cell3.update_cell_state(CellState.NON_WALL)
+
+        board.reset_cell_state_hash()  # So that we don't pull the garden cell set from the cache
 
         expected_board_state = [
             '_,O,_,_,_,_',

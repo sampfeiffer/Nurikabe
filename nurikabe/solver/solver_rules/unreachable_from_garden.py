@@ -50,7 +50,7 @@ class UnreachableFromGarden(SolverRule):
             )
 
         # Determine which cells are not able to be a part of the source_garden
-        off_limit_cells = self.board.get_wall_cells()
+        off_limit_cells = set(self.board.get_wall_cells())
         for garden in other_gardens_with_clues:
             off_limit_cells = off_limit_cells.union(garden.cells)
             off_limit_cells = off_limit_cells.union(garden.get_adjacent_neighbors())
