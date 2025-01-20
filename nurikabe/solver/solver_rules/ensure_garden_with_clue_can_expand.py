@@ -16,7 +16,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
         BoardStateChecker(self.board).check_for_garden_with_multiple_clues()
 
         all_gardens = self.board.get_all_gardens()
-        gardens_with_clue = {garden for garden in all_gardens if garden.does_contain_clue()}
+        gardens_with_clue = frozenset({garden for garden in all_gardens if garden.does_contain_clue()})
         incomplete_gardens_with_clue = {garden for garden in gardens_with_clue if not garden.is_garden_correct_size()}
 
         cell_changes = CellChanges()
@@ -101,7 +101,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
         """
         return sorted(escape_route_cells, key=lambda cell: source_garden.get_shortest_manhattan_distance_to_cell(cell))
 
-    def get_off_limit_cells(self, gardens_with_clue: set[Garden], this_garden: Garden) -> set[Cell]:
+    def get_off_limit_cells(self, gardens_with_clue: frozenset[Garden], this_garden: Garden) -> frozenset[Cell]:
         off_limit_cells: set[Cell] = set()
         off_limit_cells.update(self.board.get_wall_cells())
 
@@ -109,4 +109,4 @@ class EnsureGardenWithClueCanExpand(SolverRule):
         for garden in other_gardens_with_clue:
             off_limit_cells.update(garden.get_adjacent_neighbors())
 
-        return off_limit_cells
+        return frozenset(off_limit_cells)

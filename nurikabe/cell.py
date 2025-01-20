@@ -153,8 +153,8 @@ class Cell:
             grid_coordinate=self.grid_coordinate, before_state=old_cell_state, after_state=self.cell_state
         )
 
-    def get_neighbor_set(self, direction_list: Iterable[Direction]) -> set[Cell]:
-        return {self.get_neighbor(direction) for direction in direction_list}
+    def get_neighbor_set(self, direction_list: Iterable[Direction]) -> frozenset[Cell]:
+        return frozenset({self.get_neighbor(direction) for direction in direction_list})
 
     def get_neighbor(self, direction: Direction) -> Cell:
         try:
@@ -173,7 +173,7 @@ class Cell:
             # neighbors do not exist
             return False
 
-    def get_two_by_two_section(self) -> set[Cell]:
+    def get_two_by_two_section(self) -> frozenset[Cell]:
         """Return the two-by-two section of cells where this cell is the top-left corner."""
         direction_list = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
         neighbor_cells = self.get_neighbor_set(direction_list)
@@ -189,7 +189,7 @@ class Cell:
     def get_shortest_naive_path_length(self, other_cell: Cell) -> int:
         return self.get_manhattan_distance(other_cell) + 1
 
-    def get_edges(self) -> set[RectEdge]:
+    def get_edges(self) -> frozenset[RectEdge]:
         return get_rect_edges(self.rect)
 
     def __repr__(self) -> str:

@@ -27,11 +27,11 @@ class SolverRule(ABC):
         self.board.reset_cell_state_hash()
         return cell_change_info
 
-    def get_incomplete_gardens(self, *, with_clue_only: bool) -> set[Garden]:
+    def get_incomplete_gardens(self, *, with_clue_only: bool) -> frozenset[Garden]:
         all_gardens = self.board.get_all_gardens()
         incomplete_gardens = {
             garden for garden in all_gardens if not garden.does_contain_clue() or not garden.is_garden_correct_size()
         }
         if with_clue_only:
             incomplete_gardens = {garden for garden in incomplete_gardens if garden.does_contain_clue()}
-        return incomplete_gardens
+        return frozenset(incomplete_gardens)

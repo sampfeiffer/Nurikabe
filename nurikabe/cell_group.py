@@ -78,13 +78,13 @@ class CellGroup:
         for edge in self.get_edges():
             screen.draw_edge(edge, color, width=2)
 
-    def get_edges(self) -> set[RectEdge]:
+    def get_edges(self) -> frozenset[RectEdge]:
         """
         Get the set of edges of the cell group. Note that this just includes the outer edges. It does not include the
         cell edges that are common to more than one cell in the cell group.
         """
         all_cell_edges = [rect_edge for cell in self.cells for rect_edge in cell.get_edges()]
-        return {cell_edges for cell_edges in all_cell_edges if all_cell_edges.count(cell_edges) == 1}
+        return frozenset({cell_edges for cell_edges in all_cell_edges if all_cell_edges.count(cell_edges) == 1})
 
     def does_include_cell(self, cells: frozenset[Cell]) -> bool:
         return len(self.cells.intersection(cells)) > 0

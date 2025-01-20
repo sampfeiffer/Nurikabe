@@ -10,7 +10,7 @@ class CellSetCache:
     """
 
     def __init__(self) -> None:
-        # dictionary of cell_state_hash -> set[Cell]
+        # dictionary of cell_state_hash -> frozenset[Cell]
         self.cache: dict[int, frozenset[Cell]] = {}
 
     def add_to_cache(self, cell_state_hash: int, cells: frozenset[Cell]) -> None:

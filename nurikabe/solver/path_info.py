@@ -21,7 +21,7 @@ class PathInfo:
         self.adjacent_cell_groups.add(cell_group)
 
     def get_extended_path_info(
-        self, new_cell: Cell, additional_path_length: int, additional_adjacent_cell_groups: set[CellGroup]
+        self, new_cell: Cell, additional_path_length: int, additional_adjacent_cell_groups: frozenset[CellGroup]
     ) -> PathInfo:
         return PathInfo(
             cell_list=[*self.cell_list, new_cell],
