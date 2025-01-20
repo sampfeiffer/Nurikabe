@@ -1,12 +1,10 @@
-from collections.abc import Callable
-
 import pygame
 
 from .cache.cache import Cache
 from .cell import Cell
 from .cell_change_info import CellChangeInfo, CellChanges
 from .cell_group import CellGroup
-from .cell_state import CellState
+from .cell_state import CellState, CellStateCriteriaFunc
 from .color import Color
 from .direction import Direction
 from .garden import Garden
@@ -269,7 +267,8 @@ class Board:
     def freeze_cells(self) -> None:
         self.is_board_frozen = True
 
-    def filter_cells(self, cell_state_criteria_func: Callable[[CellState], bool]) -> frozenset[Cell]:
+    def filter_cells(self, cell_state_criteria_func: CellStateCriteriaFunc) -> frozenset[Cell]:
+        """Returns a frozenset of Cells whose state meets the cell_state_criteria_func. Leverages caching."""
         cell_state_hash = self.get_cell_state_hash()
         cell_set_from_cache = self.cache.cell_set_cache.extract_from_cache(cell_state_hash, cell_state_criteria_func)
         if cell_set_from_cache is not None:
