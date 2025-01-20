@@ -103,7 +103,7 @@ class GardenInfo:
             garden for garden in self.gardens_with_clue if not garden.is_garden_correct_size()
         }
         self.incomplete_gardens = self.incomplete_gardens_with_clue.union(self.gardens_without_clue)
-        self.complete_gardens = self.all_gardens - self.incomplete_gardens
+        self.complete_gardens = frozenset(self.all_gardens - self.incomplete_gardens)
         self.wall_cells = self.board.get_wall_cells()
 
     def get_reachable_gardens_and_path(
@@ -149,7 +149,7 @@ class GardenInfo:
 
     def get_flood_fill_reachable_cells(
         self, source_garden_without_clue: Garden, additional_off_limit_cell: Cell | None = None
-    ) -> set[Cell]:
+    ) -> frozenset[Cell]:
         """
         Get the cells that can be accessed from the source_garden_without_clue without going through an off limit cell.
         Off limit cells are wall cells and any cell adjacent to a complete garden.
@@ -211,7 +211,7 @@ class GardenInfo:
     ) -> list[Cell]:
         """Find the (shortest) path from the source_garden_without_clue to the destination_garden_with_clue."""
         other_gardens_without_clue = self.gardens_without_clue - {source_garden_without_clue}
-        other_gardens_with_clue = self.gardens_with_clue - {destination_garden_with_clue}
+        other_gardens_with_clue = frozenset(self.gardens_with_clue - {destination_garden_with_clue})
         off_limit_cells = self.get_off_limit_cells(
             adjacent_off_limit_gardens=other_gardens_with_clue,
             additional_off_limit_cell=additional_off_limit_cell,
@@ -233,8 +233,8 @@ class GardenInfo:
         return path_info.cell_list
 
     def get_off_limit_cells(
-        self, adjacent_off_limit_gardens: set[Garden], additional_off_limit_cell: Cell | None = None
-    ) -> set[Cell]:
+        self, adjacent_off_limit_gardens: frozenset[Garden], additional_off_limit_cell: Cell | None = None
+    ) -> frozenset[Cell]:
         off_limit_cells: set[Cell] = set()
         off_limit_cells.update(self.wall_cells)
 
@@ -244,4 +244,4 @@ class GardenInfo:
         if additional_off_limit_cell is not None:
             off_limit_cells.add(additional_off_limit_cell)
 
-        return off_limit_cells
+        return frozenset(off_limit_cells)

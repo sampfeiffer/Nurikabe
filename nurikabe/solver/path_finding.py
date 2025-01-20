@@ -37,7 +37,7 @@ class PathFinder:
         self,
         start_cell_group: Cell | CellGroup,
         end_cell_group: Cell | CellGroup,
-        off_limit_cells: set[Cell] | None = None,
+        off_limit_cells: frozenset[Cell] | None = None,
         other_cell_groups: frozenset[CellGroup] | None = None,
     ):
         """
@@ -56,7 +56,7 @@ class PathFinder:
         self.end_cell_group = self.to_cell_group(end_cell_group)
 
         if off_limit_cells is None:
-            self.off_limit_cells: set[Cell] = set()
+            self.off_limit_cells: frozenset[Cell] = frozenset()
         else:
             self.off_limit_cells = off_limit_cells
 

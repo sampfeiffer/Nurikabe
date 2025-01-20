@@ -11,9 +11,9 @@ class CellGroupsCache:
 
     def __init__(self) -> None:
         # dictionary of cell_state_hash -> valid_cells_hash -> set[CellGroup]
-        self.cache: dict[int, dict[int, set[CellGroup]]] = {}
+        self.cache: dict[int, dict[int, frozenset[CellGroup]]] = {}
 
-    def add_to_cache(self, cell_state_hash: int, valid_cells_hash: int, all_cell_groups: set[CellGroup]) -> None:
+    def add_to_cache(self, cell_state_hash: int, valid_cells_hash: int, all_cell_groups: frozenset[CellGroup]) -> None:
         if cell_state_hash not in self.cache:
             self.cache[cell_state_hash] = {}
 
@@ -21,7 +21,7 @@ class CellGroupsCache:
             self.cache[cell_state_hash][valid_cells_hash] = all_cell_groups
 
 
-    def extract_from_cache(self, cell_state_hash: int, valid_cells_hash: int) -> set[CellGroup] | None:
+    def extract_from_cache(self, cell_state_hash: int, valid_cells_hash: int) -> frozenset[CellGroup] | None:
         try:
             return self.cache[cell_state_hash][valid_cells_hash]
         except KeyError:

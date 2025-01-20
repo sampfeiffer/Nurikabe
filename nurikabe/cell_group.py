@@ -18,18 +18,18 @@ class MultipleCluesInCellGroupError(Exception):
 
 
 class CellGroup:
-    def __init__(self, cells: set[Cell]):
-        self.cells = cells
+    def __init__(self, cells: frozenset[Cell] | set[Cell]):
+        self.cells = frozenset(cells)
 
-    def get_empty_adjacent_neighbors(self) -> set[Cell]:
+    def get_empty_adjacent_neighbors(self) -> frozenset[Cell]:
         adjacent_neighbors = self.get_adjacent_neighbors()
-        return {cell for cell in adjacent_neighbors if cell.cell_state.is_empty()}
+        return frozenset({cell for cell in adjacent_neighbors if cell.cell_state.is_empty()})
 
-    def get_adjacent_neighbors(self) -> set[Cell]:
-        list_of_neighbor_cell_sets: list[set[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]
-        return {
+    def get_adjacent_neighbors(self) -> frozenset[Cell]:
+        list_of_neighbor_cell_sets: list[frozenset[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]
+        return frozenset({
             cell for neighbor_cells in list_of_neighbor_cell_sets for cell in neighbor_cells if cell not in self.cells
-        }
+        })
 
     def does_contain_clue(self) -> bool:
         return self.get_number_of_clues() > 0
@@ -86,7 +86,7 @@ class CellGroup:
         all_cell_edges = [rect_edge for cell in self.cells for rect_edge in cell.get_edges()]
         return {cell_edges for cell_edges in all_cell_edges if all_cell_edges.count(cell_edges) == 1}
 
-    def does_include_cell(self, cells: set[Cell]) -> bool:
+    def does_include_cell(self, cells: frozenset[Cell]) -> bool:
         return len(self.cells.intersection(cells)) > 0
 
     def __repr__(self) -> str:

@@ -47,16 +47,16 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             # Further filter down the potentially_reachable_cells_from_garden to only include cells that we need to
             # for its "blocking" capability.
             escape_route_cells = potentially_reachable_cells_from_garden - incomplete_garden_with_clue.cells
-            escape_route_cells = {cell for cell in escape_route_cells if cell.cell_state.is_empty()}
+            escape_route_cells = frozenset({cell for cell in escape_route_cells if cell.cell_state.is_empty()})
 
             # Additionally, filter to only include cells that are Manhattan reachable from the
             # incomplete_garden_with_clue
             remaining_garden_size = incomplete_garden_with_clue.get_num_of_remaining_garden_cells()
-            escape_route_cells = {
+            escape_route_cells = frozenset({
                 cell
                 for cell in escape_route_cells
                 if incomplete_garden_with_clue.get_shortest_manhattan_distance_to_cell(cell) <= remaining_garden_size
-            }
+            })
 
             # TODO: this is re-calcing get_shortest_manhattan_distance_to_cell. Instead, save the value for each cell
             #  from the previous step and reuse here.
@@ -90,7 +90,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
         return cell_changes
 
     @staticmethod
-    def get_prioritized_escape_route_cells(escape_route_cells: set[Cell], source_garden: Garden) -> list[Cell]:
+    def get_prioritized_escape_route_cells(escape_route_cells: frozenset[Cell], source_garden: Garden) -> list[Cell]:
         """
         Set the order in which to check the escape route cells. In a somewhat hand wavy way, we think that cells
         closer to the source_garden are more likely to be critical, so prioritize based on distance to the

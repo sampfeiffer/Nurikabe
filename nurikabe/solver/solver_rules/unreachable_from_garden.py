@@ -41,7 +41,7 @@ class UnreachableFromGarden(SolverRule):
         return cell_changes
 
     def get_cells_reachable_from_garden(
-        self, source_garden: Garden, other_gardens_with_clues: set[Garden], gardens_without_clue: set[Garden]
+        self, source_garden: Garden, other_gardens_with_clues: set[Garden], gardens_without_clue: frozenset[Garden]
     ) -> set[Cell]:
         if not source_garden.does_have_exactly_one_clue():
             raise NoPossibleSolutionFromCurrentStateError(
@@ -73,8 +73,8 @@ class UnreachableFromGarden(SolverRule):
                 PathFinder(
                     start_cell_group=source_garden,
                     end_cell_group=target_cell,
-                    off_limit_cells=off_limit_cells,
-                    other_cell_groups=frozenset(gardens_without_clue),
+                    off_limit_cells=frozenset(off_limit_cells),
+                    other_cell_groups=gardens_without_clue,
                 ).get_path_info(max_path_length=num_of_remaining_garden_cells + 1)
                 reachable_cells.add(target_cell)
             except NoPathFoundError:

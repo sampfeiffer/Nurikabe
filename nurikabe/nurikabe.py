@@ -3,7 +3,6 @@ import sys
 from typing import TYPE_CHECKING
 
 import pygame
-from line_profiler import profile
 
 from .board import Board
 from .cell_change_info import CellChanges
@@ -76,7 +75,6 @@ class Nurikabe:
         logger.info('exiting')
         sys.exit()
 
-    @profile
     def process_left_click_down(self, event_position: PixelPosition) -> None:
         for button in self.buttons:
             button.process_potential_left_click_down(event_position)
@@ -86,7 +84,6 @@ class Nurikabe:
             self.undo_redo_control.process_board_event(CellChanges([cell_change_info]))
             self.check_game_status(CellChanges([cell_change_info]))
 
-    @profile
     def process_left_click_up(self, event_position: PixelPosition) -> None:
         self.undo_redo_control.process_potential_left_click_up(event_position)
         if self.should_use_solver and self.solver_button.should_handle_mouse_event(event_position):

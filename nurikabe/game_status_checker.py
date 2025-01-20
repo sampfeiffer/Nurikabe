@@ -60,9 +60,9 @@ class GameStatusChecker:
         return first_wall_section.cells == all_walls
 
     @staticmethod
-    def do_all_weak_gardens_have_exactly_one_clue(weak_gardens: set[WeakGarden]) -> bool:
+    def do_all_weak_gardens_have_exactly_one_clue(weak_gardens: frozenset[WeakGarden]) -> bool:
         return all(weak_garden.does_have_exactly_one_clue() for weak_garden in weak_gardens)
 
     @staticmethod
-    def are_all_weak_gardens_correct_size(weak_gardens: set[WeakGarden]) -> bool:
+    def are_all_weak_gardens_correct_size(weak_gardens: frozenset[WeakGarden]) -> bool:
         return all(weak_garden.is_garden_correct_size() for weak_garden in weak_gardens)

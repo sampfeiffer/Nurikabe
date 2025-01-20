@@ -45,7 +45,7 @@ class Cell:
         self.draw_cell()
 
         self._neighbor_cell_map: dict[Direction, Cell] | None = None
-        self._adjacent_neighbors: set[Cell] | None = None
+        self._adjacent_neighbors: frozenset[Cell] | None = None
 
     def _get_key(self) -> tuple[int, int, int]:
         clue_int = 0 if self.clue is None else self.clue
@@ -118,9 +118,9 @@ class Cell:
 
     def set_adjacent_neighbors(self) -> None:
         """Set the list of adjacent (non-diagonal) Cells."""
-        self._adjacent_neighbors = {
+        self._adjacent_neighbors = frozenset({
             self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS if direction in self.get_neighbor_map()
-        }
+        })
 
     def get_neighbor_map(self) -> dict[Direction, Cell]:
         if self._neighbor_cell_map is None:
@@ -128,8 +128,8 @@ class Cell:
             raise RuntimeError(msg)
         return self._neighbor_cell_map
 
-    def get_adjacent_neighbors(self) -> set[Cell]:
-        """Get a list of adjacent (non-diagonal) Cells."""
+    def get_adjacent_neighbors(self) -> frozenset[Cell]:
+        """Get a set of adjacent (non-diagonal) Cells."""
         if self._adjacent_neighbors is None:
             msg = 'self._adjacent_neighbors must first be set'
             raise RuntimeError(msg)
