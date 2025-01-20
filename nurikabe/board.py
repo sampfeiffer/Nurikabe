@@ -279,6 +279,7 @@ class Board:
                 col_number=cell_change_info.grid_coordinate.col_number,
             )
             cell.update_cell_state(new_cell_state=cell_change_info.after_state)
+        self.reset_cell_state_hash()
 
     def has_two_by_two_wall(self) -> bool:
         return any(cell.does_form_two_by_two_walls() for cell in self.flat_cell_list)
