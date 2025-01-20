@@ -56,7 +56,7 @@ class UnreachableFromGarden(SolverRule):
             off_limit_cells = off_limit_cells.union(garden.get_adjacent_neighbors())
 
         # Get the cells that can be accessed from source_garden without going through a cell in off_limit_cells
-        potentially_reachable_cells = self.board.get_connected_cells(
+        potentially_reachable_cells = self.board.get_connected_cells_with_cache(
             starting_cell=source_garden.get_clue_cell(),
             valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells),
         )

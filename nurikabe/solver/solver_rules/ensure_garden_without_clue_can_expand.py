@@ -158,7 +158,7 @@ class GardenInfo:
             adjacent_off_limit_gardens=self.complete_gardens,
             additional_off_limit_cell=additional_off_limit_cell,
         )
-        return self.board.get_connected_cells(
+        return self.board.get_connected_cells_with_cache(
             starting_cell=next(iter(source_garden_without_clue.cells)),
             valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells),
         )

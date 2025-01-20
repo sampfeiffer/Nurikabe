@@ -8,7 +8,8 @@ class CellSetCache:
     For example, when the board has a specific cell state, this class facilitates caching
     of the set of all wall cells.
     """
-    def __init__(self):
+
+    def __init__(self) -> None:
         # dictionary of cell_state_hash -> set[Cell]
         self.cache: dict[int, frozenset[Cell]] = {}
 

@@ -31,7 +31,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             # cells
             clue_cell = incomplete_garden_with_clue.get_clue_cell()
             clue_value = clue_cell.get_non_null_clue()
-            potentially_reachable_cells_from_garden = self.board.get_connected_cells(
+            potentially_reachable_cells_from_garden = self.board.get_connected_cells_with_cache(
                 starting_cell=clue_cell,
                 valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells),
             )
@@ -70,7 +70,7 @@ class EnsureGardenWithClueCanExpand(SolverRule):
                 # expand to the appropriate size? If not, then the escape_route_cell cannot be a wall and is therefore
                 # marked as a non-wall.
                 off_limit_cells_for_this_escape_route = off_limit_cells.union({escape_route_cell})
-                potentially_reachable_cells = self.board.get_connected_cells(
+                potentially_reachable_cells = self.board.get_connected_cells_with_cache(
                     starting_cell=clue_cell,
                     valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells_for_this_escape_route),
                 )

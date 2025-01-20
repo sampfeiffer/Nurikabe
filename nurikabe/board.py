@@ -1,8 +1,8 @@
 import time
 from collections.abc import Callable
-from line_profiler import profile
 
 import pygame
+from line_profiler import profile
 
 from .cache.cache import Cache
 from .cell import Cell
@@ -182,8 +182,8 @@ class Board:
         valid_cells_hash = hash(valid_cells)
         cell_state_hash = self.get_cell_state_hash()
         all_cell_groups_from_cache = self.cache.cell_groups_cache.extract_from_cache(
-            valid_cells_hash=valid_cells_hash,
             cell_state_hash=cell_state_hash,
+            valid_cells_hash=valid_cells_hash,
         )
         if all_cell_groups_from_cache is not None:
             # self.cache_stats['found_in_cache'] += 1
@@ -195,8 +195,8 @@ class Board:
         all_cell_groups = self.get_all_cell_groups(valid_cells)
         # self.cache_stats['not_in_cache_total_time'] += time.time() - st
         self.cache.cell_groups_cache.add_to_cache(
-            valid_cells_hash=valid_cells_hash,
             cell_state_hash=cell_state_hash,
+            valid_cells_hash=valid_cells_hash,
             all_cell_groups=all_cell_groups
         )
         return all_cell_groups
@@ -216,26 +216,51 @@ class Board:
     @profile
     def get_garden(self, starting_cell: Cell) -> Garden:
         garden_cells = self.get_garden_cells()
-        cells = self.get_connected_cells(starting_cell, valid_cells=garden_cells)
+        cells = self.get_connected_cells_with_cache(starting_cell, valid_cells=garden_cells)
         return Garden(cells)
 
     @profile
     def get_wall_section(self, starting_cell: Cell) -> WallSection:
         wall_cells = self.get_wall_cells()
-        cells = self.get_connected_cells(starting_cell, valid_cells=wall_cells)
+        cells = self.get_connected_cells_with_cache(starting_cell, valid_cells=wall_cells)
         return WallSection(cells)
 
     @profile
     def get_cell_group(self, starting_cell: Cell, valid_cells: frozenset[Cell]) -> CellGroup:
-        cells = self.get_connected_cells(starting_cell, valid_cells)
+        cells = self.get_connected_cells_with_cache(starting_cell, valid_cells)
         return CellGroup(cells)
+
+    def get_connected_cells_with_cache(self, starting_cell: Cell, valid_cells: frozenset[Cell]) -> set[Cell]:
+        cell_state_hash = self.get_cell_state_hash()
+        valid_cells_hash = hash(valid_cells)
+        connected_cells_from_cache = self.cache.connected_cells_cache.extract_from_cache(
+            cell_state_hash=cell_state_hash,
+            valid_cells_hash=valid_cells_hash,
+            starting_cell=starting_cell,
+        )
+        if connected_cells_from_cache is not None:
+            self.cache_stats['found_in_cache'] += 1
+            return connected_cells_from_cache
+
+        self.cache_stats['not_in_cache'] += 1
+
+        st = time.time()
+        connected_cells = self.get_connected_cells(starting_cell, valid_cells)
+        self.cache_stats['not_in_cache_total_time'] += time.time() - st
+        self.cache.connected_cells_cache.add_to_cache(
+            cell_state_hash=cell_state_hash,
+            valid_cells_hash=valid_cells_hash,
+            starting_cell=starting_cell,
+            connected_cells=frozenset(connected_cells),
+        )
+        return set(connected_cells)
 
     @profile
     def get_connected_cells(
         self, starting_cell: Cell, valid_cells: frozenset[Cell], connected_cells: set[Cell] | None = None
     ) -> set[Cell]:
         """
-        Get a list of cells that are connected (non-diagonally) to the starting cell where the cell is in valid_cells.
+        Get a set of cells that are connected (non-diagonally) to the starting cell where the cell is in valid_cells.
         Basically this is a flood fill.
         """
         if connected_cells is None:
@@ -249,14 +274,6 @@ class Board:
                 self.get_connected_cells(neighbor_cell, valid_cells, connected_cells)
 
         return connected_cells
-
-    # def get_connected_cells(self, starting_cell: Cell, cell_criteria_func: Callable[[Cell], bool]) -> set[Cell]:
-    #     """
-    #     Get a list of cells that are connected (non-diagonally) to the starting cell where the cell_criteria_func
-    #     returns True.
-    #     """
-    #     cell_state_hash = self.get_cell_state_hash()
-    #     return self.flood_fill.get_connected_cells(cell_state_hash, starting_cell, cell_criteria_func)
 
     def freeze_cells(self) -> None:
         self.is_board_frozen = True
@@ -282,14 +299,9 @@ class Board:
         cell_state_hash = self.get_cell_state_hash()
         garden_cells_from_cache = self.cache.garden_cells_cache.extract_from_cache(cell_state_hash)
         if garden_cells_from_cache is not None:
-            self.cache_stats['found_in_cache'] += 1
             return garden_cells_from_cache
 
-        self.cache_stats['not_in_cache'] += 1
-
-        st = time.time()
         garden_cells = self.filter_cells(lambda cell: cell.cell_state.is_garden())
-        self.cache_stats['not_in_cache_total_time'] += time.time() - st
         self.cache.garden_cells_cache.add_to_cache(cell_state_hash=cell_state_hash, cells=garden_cells)
         return garden_cells
 

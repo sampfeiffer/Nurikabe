@@ -3,6 +3,7 @@ import sys
 from typing import TYPE_CHECKING
 
 import pygame
+from line_profiler import profile
 
 from .board import Board
 from .cell_change_info import CellChanges
@@ -15,7 +16,6 @@ from .screen import Screen
 from .solver.solver import Solver
 from .solver_button import SolverButton
 from .undo_redo_control import UndoRedoControl
-from line_profiler import profile
 
 if TYPE_CHECKING:
     from .button import Button
