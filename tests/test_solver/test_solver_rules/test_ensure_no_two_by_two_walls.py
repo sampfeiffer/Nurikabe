@@ -2,10 +2,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.ensure_no_two_by_two_walls import (
-    EnsureNoTwoByTwoWalls,
-    NoPossibleSolutionFromCurrentStateError,
-)
+from nurikabe.solver.board_state_checker import NoPossibleSolutionFromCurrentStateError
+from nurikabe.solver.solver_rules.ensure_no_two_by_two_walls import EnsureNoTwoByTwoWalls
 from tests.build_board import build_board
 
 

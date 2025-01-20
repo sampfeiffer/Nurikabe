@@ -2,7 +2,8 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
-from nurikabe.solver.solver_rules.enclose_full_garden import EncloseFullGarden, NoPossibleSolutionFromCurrentStateError
+from nurikabe.solver.board_state_checker import NoPossibleSolutionFromCurrentStateError
+from nurikabe.solver.solver_rules.enclose_full_garden import EncloseFullGarden
 from tests.build_board import build_board
 
 
