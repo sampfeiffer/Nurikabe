@@ -20,7 +20,6 @@ class CellGroupsCache:
         if valid_cells_hash not in self.cache[cell_state_hash]:
             self.cache[cell_state_hash][valid_cells_hash] = all_cell_groups
 
-
     def extract_from_cache(self, cell_state_hash: int, valid_cells_hash: int) -> frozenset[CellGroup] | None:
         try:
             return self.cache[cell_state_hash][valid_cells_hash]

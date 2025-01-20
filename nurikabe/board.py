@@ -176,9 +176,7 @@ class Board:
 
         all_cell_groups = self.get_all_cell_groups(valid_cells)
         self.cache.cell_groups_cache.add_to_cache(
-            cell_state_hash=cell_state_hash,
-            valid_cells_hash=valid_cells_hash,
-            all_cell_groups=all_cell_groups
+            cell_state_hash=cell_state_hash, valid_cells_hash=valid_cells_hash, all_cell_groups=all_cell_groups
         )
         return frozenset(all_cell_groups)
 
@@ -293,8 +291,7 @@ class Board:
         return frozenset(two_by_two_wall_section_cells)
 
     def get_all_non_garden_cell_groups_with_walls(
-        self,
-        additional_off_limit_cell: Cell | None = None
+        self, additional_off_limit_cell: Cell | None = None
     ) -> frozenset[CellGroup]:
         off_limit_cells = set(self.get_garden_cells())
         if additional_off_limit_cell is not None:
@@ -302,11 +299,13 @@ class Board:
 
         valid_cells = frozenset(self.flat_cell_frozenset - off_limit_cells)
         non_garden_cell_groups = self.get_all_cell_groups_with_cache(valid_cells)
-        return frozenset({
-            non_garden_cell_group
-            for non_garden_cell_group in non_garden_cell_groups
-            if non_garden_cell_group.does_contain_wall()
-        })
+        return frozenset(
+            {
+                non_garden_cell_group
+                for non_garden_cell_group in non_garden_cell_groups
+                if non_garden_cell_group.does_contain_wall()
+            }
+        )
 
     def as_simple_string_list(self) -> list[str]:
         """

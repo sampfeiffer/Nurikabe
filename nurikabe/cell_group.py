@@ -27,9 +27,9 @@ class CellGroup:
 
     def get_adjacent_neighbors(self) -> frozenset[Cell]:
         list_of_neighbor_cell_sets: list[frozenset[Cell]] = [cell.get_adjacent_neighbors() for cell in self.cells]
-        return frozenset({
-            cell for neighbor_cells in list_of_neighbor_cell_sets for cell in neighbor_cells if cell not in self.cells
-        })
+        return frozenset(
+            {cell for neighbor_cells in list_of_neighbor_cell_sets for cell in neighbor_cells if cell not in self.cells}
+        )
 
     def does_contain_clue(self) -> bool:
         return self.get_number_of_clues() > 0

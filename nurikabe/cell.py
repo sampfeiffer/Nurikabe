@@ -118,9 +118,9 @@ class Cell:
 
     def set_adjacent_neighbors(self) -> None:
         """Set the list of adjacent (non-diagonal) Cells."""
-        self._adjacent_neighbors = frozenset({
-            self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS if direction in self.get_neighbor_map()
-        })
+        self._adjacent_neighbors = frozenset(
+            {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS if direction in self.get_neighbor_map()}
+        )
 
     def get_neighbor_map(self) -> dict[Direction, Cell]:
         if self._neighbor_cell_map is None:

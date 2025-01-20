@@ -52,11 +52,14 @@ class EnsureGardenWithClueCanExpand(SolverRule):
             # Additionally, filter to only include cells that are Manhattan reachable from the
             # incomplete_garden_with_clue
             remaining_garden_size = incomplete_garden_with_clue.get_num_of_remaining_garden_cells()
-            escape_route_cells = frozenset({
-                cell
-                for cell in escape_route_cells
-                if incomplete_garden_with_clue.get_shortest_manhattan_distance_to_cell(cell) <= remaining_garden_size
-            })
+            escape_route_cells = frozenset(
+                {
+                    cell
+                    for cell in escape_route_cells
+                    if incomplete_garden_with_clue.get_shortest_manhattan_distance_to_cell(cell)
+                    <= remaining_garden_size
+                }
+            )
 
             # TODO: this is re-calcing get_shortest_manhattan_distance_to_cell. Instead, save the value for each cell
             #  from the previous step and reuse here.
