@@ -79,7 +79,7 @@ class Nurikabe:
         for button in self.buttons:
             button.process_potential_left_click_down(event_position)
 
-        cell_change_info = self.board.handle_board_click(event_position)
+        cell_change_info = self.board.process_potential_left_click_down(event_position)
         if cell_change_info is not None:
             self.undo_redo_control.process_board_event(CellChanges([cell_change_info]))
             self.check_game_status(CellChanges([cell_change_info]))

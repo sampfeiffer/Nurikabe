@@ -7,4 +7,4 @@ class Cache:
     def __init__(self) -> None:
         self.cell_groups_cache = CellGroupsCache()
         self.connected_cells_cache = ConnectedCellsCache()
-        self.garden_cells_cache = CellSetCache()
+        self.cell_set_cache = CellSetCache()

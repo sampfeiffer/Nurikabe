@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from enum import Enum, auto
 
 
@@ -42,3 +43,26 @@ class CellState(Enum):
             msg = 'This should not be possible'
             raise RuntimeError(msg)
         return cell_state
+
+    @staticmethod
+    def is_empty_static(cell_state: CellState) -> bool:
+        return cell_state.is_empty()
+
+    @staticmethod
+    def is_wall_static(cell_state: CellState) -> bool:
+        return cell_state.is_wall()
+
+    @staticmethod
+    def is_clue_static(cell_state: CellState) -> bool:
+        return cell_state.is_clue()
+
+    @staticmethod
+    def is_garden_static(cell_state: CellState) -> bool:
+        return cell_state.is_garden()
+
+    @staticmethod
+    def is_weak_garden_static(cell_state: CellState) -> bool:
+        return cell_state.is_weak_garden()
+
+
+CellStateCriteriaFunc = Callable[[CellState], bool]

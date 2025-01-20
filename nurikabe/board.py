@@ -6,6 +6,7 @@ from .cache.cache import Cache
 from .cell import Cell
 from .cell_change_info import CellChangeInfo, CellChanges
 from .cell_group import CellGroup
+from .cell_state import CellState
 from .color import Color
 from .direction import Direction
 from .garden import Garden
@@ -22,6 +23,8 @@ class AdjacentCluesError(Exception):
 
 
 class Board:
+    """Represents a board of cells."""
+
     def __init__(self, level: Level, screen: Screen):
         self.level = level
         self.screen = screen
@@ -36,11 +39,10 @@ class Board:
 
         self.ensure_no_adjacent_clues()
 
-        self.clues_cells = self.get_clue_cells()
-
         self.cell_state_hash: int | None = None
-
         self.cache = Cache()
+
+        self.clues_cells = self.get_clue_cells()
 
     def get_board_rect(self) -> pygame.Rect:
         top_left_of_board = self.screen.top_left_of_board
@@ -61,6 +63,7 @@ class Board:
         self.screen.draw_rect(color=Color.BLACK, rect=rect, width=border_width)
 
     def create_cell_grid(self) -> list[list[Cell]]:
+        """Create a two-dimensional grid of cells."""
         return [
             [self.create_cell(row_number, col_number, cell_clue) for col_number, cell_clue in enumerate(row)]
             for row_number, row in enumerate(self.level.level_setup)
@@ -88,6 +91,12 @@ class Board:
             cell.set_neighbor_map(neighbor_cell_map)
 
     def get_neighbor_cell(self, cell: Cell, direction: Direction) -> Cell | None:
+        """
+        Get the neighbor cell in the given direction.
+
+        Returns None if there is no cell in that direction. E.g. If this cell is the top row and we are trying to
+        extract the neighbor Direction.UP neighbor cell.
+        """
         neighbor_coordinate = cell.grid_coordinate.get_offset(direction)
         if self.is_valid_cell_coordinate(neighbor_coordinate):
             neighbor_cell = self.get_cell_from_grid(
@@ -116,11 +125,13 @@ class Board:
                 msg = 'This board setup is infeasible since there are adjacent clues'
                 raise AdjacentCluesError(msg)
 
-    def handle_board_click(self, event_position: PixelPosition) -> CellChangeInfo | None:
+    def process_potential_left_click_down(self, event_position: PixelPosition) -> CellChangeInfo | None:
         if self.is_board_frozen:
             return None
         if not self.is_inside_board(event_position):
             return None
+
+        # The click must be inside the board. Figure out which cell was clicked and process it appropriately
         for cell in self.flat_cell_list:
             if cell.is_inside_cell(event_position):
                 cell_change_info = cell.handle_cell_click()
@@ -146,6 +157,7 @@ class Board:
             cell.draw_cell()
 
     def paint_completed_gardens(self) -> None:
+        """Grays out completed gardens to indicate to the user that they are complete."""
         for garden in self.get_all_gardens():
             garden.paint_garden_if_completed()
 
@@ -165,6 +177,7 @@ class Board:
         return frozenset({WallSection(cell_group.cells) for cell_group in all_cell_groups})
 
     def get_all_cell_groups_with_cache(self, valid_cells: frozenset[Cell]) -> frozenset[CellGroup]:
+        """Calls get_all_cell_groups but leverages caching to speed up the code."""
         valid_cells_hash = hash(valid_cells)
         cell_state_hash = self.get_cell_state_hash()
         all_cell_groups_from_cache = self.cache.cell_groups_cache.extract_from_cache(
@@ -181,6 +194,14 @@ class Board:
         return frozenset(all_cell_groups)
 
     def get_all_cell_groups(self, valid_cells: frozenset[Cell]) -> frozenset[CellGroup]:
+        """
+        Gets a frozenset of all CellGroups as defined by the flood fill of valid cells.
+
+        For example, say valid_cells is a set of all wall cells. This function will the set of CellGroups where each
+        CellGroup is a connected section of wall cells.
+
+        Note that, as usual, the flood fill goes vertically and horizontally, but not diagonally.
+        """
         all_cell_groups: set[CellGroup] = set()
         calls_already_in_a_group: set[Cell] = set()  # to prevent double counting
         for cell in self.flat_cell_list:
@@ -206,6 +227,7 @@ class Board:
         return CellGroup(cells)
 
     def get_connected_cells_with_cache(self, starting_cell: Cell, valid_cells: frozenset[Cell]) -> frozenset[Cell]:
+        """Calls get_connected_cells but leverages caching to speed up the code."""
         cell_state_hash = self.get_cell_state_hash()
         valid_cells_hash = hash(valid_cells)
         connected_cells_from_cache = self.cache.connected_cells_cache.extract_from_cache(
@@ -247,30 +269,30 @@ class Board:
     def freeze_cells(self) -> None:
         self.is_board_frozen = True
 
-    def filter_cells(self, cell_criteria_func: Callable[[Cell], bool]) -> frozenset[Cell]:
-        return frozenset({cell for cell in self.flat_cell_list if cell_criteria_func(cell)})
+    def filter_cells(self, cell_state_criteria_func: Callable[[CellState], bool]) -> frozenset[Cell]:
+        cell_state_hash = self.get_cell_state_hash()
+        cell_set_from_cache = self.cache.cell_set_cache.extract_from_cache(cell_state_hash, cell_state_criteria_func)
+        if cell_set_from_cache is not None:
+            return cell_set_from_cache
+
+        cell_set = frozenset({cell for cell in self.flat_cell_frozenset if cell_state_criteria_func(cell.cell_state)})
+        self.cache.cell_set_cache.add_to_cache(cell_state_hash, cell_state_criteria_func, cells=cell_set)
+        return cell_set
 
     def get_empty_cells(self) -> frozenset[Cell]:
-        return self.filter_cells(lambda cell: cell.cell_state.is_empty())
+        return self.filter_cells(CellState.is_empty_static)
 
     def get_wall_cells(self) -> frozenset[Cell]:
-        return self.filter_cells(lambda cell: cell.cell_state.is_wall())
+        return self.filter_cells(CellState.is_wall_static)
 
     def get_clue_cells(self) -> frozenset[Cell]:
-        return self.filter_cells(lambda cell: cell.cell_state.is_clue())
+        return self.filter_cells(CellState.is_clue_static)
 
     def get_garden_cells(self) -> frozenset[Cell]:
-        cell_state_hash = self.get_cell_state_hash()
-        garden_cells_from_cache = self.cache.garden_cells_cache.extract_from_cache(cell_state_hash)
-        if garden_cells_from_cache is not None:
-            return garden_cells_from_cache
-
-        garden_cells = self.filter_cells(lambda cell: cell.cell_state.is_garden())
-        self.cache.garden_cells_cache.add_to_cache(cell_state_hash=cell_state_hash, cells=garden_cells)
-        return garden_cells
+        return self.filter_cells(CellState.is_garden_static)
 
     def get_weak_garden_cells(self) -> frozenset[Cell]:
-        return self.filter_cells(lambda cell: cell.cell_state.is_weak_garden())
+        return self.filter_cells(CellState.is_weak_garden_static)
 
     def apply_cell_changes(self, cell_changes: CellChanges) -> None:
         for cell_change_info in cell_changes.cell_change_list:

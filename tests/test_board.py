@@ -244,6 +244,7 @@ class TestCellGroups(TestBoard):
         }
         for wall_cell in wall_cells:
             wall_cell.update_cell_state(CellState.WALL)
+        board.reset_cell_state_hash()
 
         expected_board_state = [
             '_,_,_,_,W,_',
@@ -305,6 +306,7 @@ class TestCellGroups(TestBoard):
 
         # Now we connect those two wall sections via another wall, and they are merged into one large wall section
         board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.WALL)
+        board.reset_cell_state_hash()
         expected_board_state = [
             '_,_,_,_,W,_',
             '_,1,_,W,W,W',

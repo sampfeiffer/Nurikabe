@@ -33,6 +33,7 @@ class TestGameStatusChecker(TestCase):
         weak_garden_cell_list = list(self.board.get_weak_garden_cells())
         for cell in weak_garden_cell_list[:8]:
             cell.update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
 
         # Now we should only have 4 weak garden cells
         self.assertTrue(self.game_status_checker.has_expected_number_of_weak_garden_cells())
@@ -42,6 +43,7 @@ class TestGameStatusChecker(TestCase):
         # only required that wall cells are marked as walls.
         for cell in weak_garden_cell_list[-2:]:
             cell.update_cell_state(CellState.NON_WALL)
+        self.board.reset_cell_state_hash()
         self.assertTrue(self.game_status_checker.has_expected_number_of_weak_garden_cells())
 
     def test_are_all_walls_connected(self) -> None:
@@ -70,6 +72,7 @@ class TestGameStatusChecker(TestCase):
 
         # Set a non-adjacent cell as a wall. Now there are two separate sections of wall cells that are not connected.
         self.board.get_cell_from_grid(row_number=2, col_number=2).update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
@@ -81,6 +84,7 @@ class TestGameStatusChecker(TestCase):
         # Set another cell as a wall such that the new wall cell connects the two disjoint wall sections into one wall
         # section.
         self.board.get_cell_from_grid(row_number=1, col_number=2).update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,_,_',
             '_,W,W,_',
@@ -106,6 +110,7 @@ class TestGameStatusChecker(TestCase):
         # part of the same weak garden.
         for cell in cell_list[:2]:
             cell.update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
@@ -118,6 +123,7 @@ class TestGameStatusChecker(TestCase):
 
         # Set another cell as a wall. Now the two clue cells are completely separated into two distinct weak gardens
         cell_list[2].update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
@@ -130,6 +136,7 @@ class TestGameStatusChecker(TestCase):
 
         # Set that last cell as a non-wall and now the clue cells are once again part of the same weak garden
         cell_list[2].update_cell_state(CellState.NON_WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
@@ -155,6 +162,7 @@ class TestGameStatusChecker(TestCase):
         ]
         for cell in cell_list1:
             cell.update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,_,_',
             '_,W,_,_',
@@ -176,6 +184,7 @@ class TestGameStatusChecker(TestCase):
         ]
         for cell in cell_list2:
             cell.update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,W,W',
             '_,W,W,W',
@@ -189,6 +198,7 @@ class TestGameStatusChecker(TestCase):
 
         # Set another cell as a wall in a way that makes both weak gardens the correct size
         self.board.get_cell_from_grid(row_number=1, col_number=0).update_cell_state(CellState.WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,W,W',
             'W,W,W,W',
@@ -201,6 +211,7 @@ class TestGameStatusChecker(TestCase):
         # Set one of the empty cells as a non-wall cell. This has no impact since cells do not need to be marked as
         # non-walls for the board to be considered solved. It is only required that wall cells are marked as walls.
         self.board.get_cell_from_grid(row_number=2, col_number=2).update_cell_state(CellState.NON_WALL)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,W,W',
             'W,W,W,W',
@@ -212,6 +223,7 @@ class TestGameStatusChecker(TestCase):
 
         # Set a cell as empty so that there is a weak garden with no clue
         self.board.get_cell_from_grid(row_number=0, col_number=3).update_cell_state(CellState.EMPTY)
+        self.board.reset_cell_state_hash()
         expected_board_state = [
             '1,W,W,_',
             'W,W,W,W',
