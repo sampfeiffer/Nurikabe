@@ -18,19 +18,20 @@ class SolverRule(ABC):
     def apply_rule(self) -> CellChanges:
         raise NotImplementedError
 
-    @staticmethod
-    def set_cell_to_state(cell: Cell, target_cell_state: CellState, reason: str) -> CellChangeInfo:
+    def set_cell_to_state(self, cell: Cell, target_cell_state: CellState, reason: str) -> CellChangeInfo:
         if not cell.is_clickable:
             msg = f'cell is not clickable: {cell}'
             raise RuntimeError(msg)
         logger.debug('Setting %s to %s. Reason: %s', cell, target_cell_state, reason)
-        return cell.update_cell_state(target_cell_state)
+        cell_change_info = cell.update_cell_state(target_cell_state)
+        self.board.reset_cell_state_hash()
+        return cell_change_info
 
-    def get_incomplete_gardens(self, *, with_clue_only: bool) -> set[Garden]:
+    def get_incomplete_gardens(self, *, with_clue_only: bool) -> frozenset[Garden]:
         all_gardens = self.board.get_all_gardens()
         incomplete_gardens = {
             garden for garden in all_gardens if not garden.does_contain_clue() or not garden.is_garden_correct_size()
         }
         if with_clue_only:
             incomplete_gardens = {garden for garden in incomplete_gardens if garden.does_contain_clue()}
-        return incomplete_gardens
+        return frozenset(incomplete_gardens)

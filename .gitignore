@@ -7,3 +7,7 @@ __pycache__/
 .idea/
 
 venv/
+
+# Profiling files
+*.lprof
+profile_output*.txt

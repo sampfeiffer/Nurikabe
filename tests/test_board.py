@@ -188,6 +188,8 @@ class TestCellGroups(TestBoard):
         diagonal_cell = board.get_cell_from_grid(row_number=2, col_number=0)
         diagonal_cell.update_cell_state(CellState.NON_WALL)
 
+        board.reset_cell_state_hash()  # So that we don't pull the garden cell set from the cache
+
         expected_board_state = [
             '_,O,_,_,_,_',
             '_,1,O,_,_,_',
@@ -202,6 +204,8 @@ class TestCellGroups(TestBoard):
         # garden
         adjacent_cell3 = board.get_cell_from_grid(row_number=2, col_number=1)
         adjacent_cell3.update_cell_state(CellState.NON_WALL)
+
+        board.reset_cell_state_hash()  # So that we don't pull the garden cell set from the cache
 
         expected_board_state = [
             '_,O,_,_,_,_',
@@ -230,7 +234,7 @@ class TestCellGroups(TestBoard):
         # There should only be one weak garden containing all cells in board
         all_weak_gardens = board.get_all_weak_gardens()
         self.assertEqual(len(all_weak_gardens), 1)
-        self.assertEqual(next(iter(all_weak_gardens)).cells, set(board.flat_cell_list))
+        self.assertEqual(next(iter(all_weak_gardens)).cells, board.flat_cell_frozenset)
 
         # Corner off some cells
         wall_cells = {
@@ -240,6 +244,7 @@ class TestCellGroups(TestBoard):
         }
         for wall_cell in wall_cells:
             wall_cell.update_cell_state(CellState.WALL)
+        board.reset_cell_state_hash()
 
         expected_board_state = [
             '_,_,_,_,W,_',
@@ -255,7 +260,7 @@ class TestCellGroups(TestBoard):
             board.get_cell_from_grid(row_number=0, col_number=5),
             board.get_cell_from_grid(row_number=1, col_number=5),
         }
-        weak_garden2 = set(board.flat_cell_list) - wall_cells.union(weak_garden1)
+        weak_garden2 = board.flat_cell_frozenset - wall_cells.union(weak_garden1)
 
         for weak_garden in all_weak_gardens:
             weak_garden_cells = weak_garden.cells
@@ -301,6 +306,7 @@ class TestCellGroups(TestBoard):
 
         # Now we connect those two wall sections via another wall, and they are merged into one large wall section
         board.get_cell_from_grid(row_number=1, col_number=3).update_cell_state(CellState.WALL)
+        board.reset_cell_state_hash()
         expected_board_state = [
             '_,_,_,_,W,_',
             '_,1,_,W,W,W',

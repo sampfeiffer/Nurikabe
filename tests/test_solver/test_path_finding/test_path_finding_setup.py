@@ -25,7 +25,7 @@ class TestPathFindingSetup(TestCase):
         end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
 
         with self.assertRaises(PathSetupError):
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, off_limit_cells={start_cell})
+            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, off_limit_cells=frozenset({start_cell}))
 
     def test_end_cell_off_limits(self) -> None:
         """Since the start cell is off limits, we expect PathSetupError to be thrown."""
@@ -39,7 +39,7 @@ class TestPathFindingSetup(TestCase):
         end_cell = board.get_cell_from_grid(row_number=2, col_number=3)
 
         with self.assertRaises(PathSetupError):
-            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, off_limit_cells={end_cell})
+            PathFinder(start_cell_group=start_cell, end_cell_group=end_cell, off_limit_cells=frozenset({end_cell}))
 
     def test_other_cell_groups_contains_off_limit_cell(self) -> None:
         """
@@ -70,7 +70,7 @@ class TestPathFindingSetup(TestCase):
             PathFinder(
                 start_cell_group=start_cell,
                 end_cell_group=end_cell,
-                off_limit_cells=off_limit_cells,
+                off_limit_cells=frozenset(off_limit_cells),
                 other_cell_groups=frozenset(other_cell_groups),
             )
 

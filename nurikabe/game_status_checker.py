@@ -14,7 +14,7 @@ class GameStatusChecker:
         self.expected_number_of_weak_garden_cells = self.get_expected_number_of_weak_garden_cells()
 
     def get_expected_number_of_weak_garden_cells(self) -> int:
-        return sum(cell.get_non_null_clue() for cell in self.board.get_clue_cells())
+        return sum(cell.get_non_null_clue() for cell in self.board.clues_cells)
 
     def is_solution_correct(self, cell_changes: CellChanges) -> GameStatus:
         if not cell_changes.has_any_changes():
@@ -60,9 +60,9 @@ class GameStatusChecker:
         return first_wall_section.cells == all_walls
 
     @staticmethod
-    def do_all_weak_gardens_have_exactly_one_clue(weak_gardens: set[WeakGarden]) -> bool:
+    def do_all_weak_gardens_have_exactly_one_clue(weak_gardens: frozenset[WeakGarden]) -> bool:
         return all(weak_garden.does_have_exactly_one_clue() for weak_garden in weak_gardens)
 
     @staticmethod
-    def are_all_weak_gardens_correct_size(weak_gardens: set[WeakGarden]) -> bool:
+    def are_all_weak_gardens_correct_size(weak_gardens: frozenset[WeakGarden]) -> bool:
         return all(weak_garden.is_garden_correct_size() for weak_garden in weak_gardens)

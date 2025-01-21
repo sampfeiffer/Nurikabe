@@ -15,8 +15,8 @@ class EncloseFullGarden(SolverRule):
                 # This group of cells does not contain a clue. Therefore, it is not complete and should not be enclosed.
                 pass
             elif number_of_clues == 1:
-                clue = garden.get_clue_value()
-                if len(garden.cells) == clue:
+                clue_value = garden.get_clue_value()
+                if len(garden.cells) == clue_value:
                     empty_adjacent_neighbors = garden.get_empty_adjacent_neighbors()
                     for cell in empty_adjacent_neighbors:
                         cell_changes.add_change(

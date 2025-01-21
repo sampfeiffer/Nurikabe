@@ -41,7 +41,7 @@ class UnreachableFromGarden(SolverRule):
         return cell_changes
 
     def get_cells_reachable_from_garden(
-        self, source_garden: Garden, other_gardens_with_clues: set[Garden], gardens_without_clue: set[Garden]
+        self, source_garden: Garden, other_gardens_with_clues: set[Garden], gardens_without_clue: frozenset[Garden]
     ) -> set[Cell]:
         if not source_garden.does_have_exactly_one_clue():
             raise NoPossibleSolutionFromCurrentStateError(
@@ -50,15 +50,15 @@ class UnreachableFromGarden(SolverRule):
             )
 
         # Determine which cells are not able to be a part of the source_garden
-        off_limit_cells = self.board.get_wall_cells()
+        off_limit_cells = set(self.board.get_wall_cells())
         for garden in other_gardens_with_clues:
             off_limit_cells = off_limit_cells.union(garden.cells)
             off_limit_cells = off_limit_cells.union(garden.get_adjacent_neighbors())
 
         # Get the cells that can be accessed from source_garden without going through a cell in off_limit_cells
-        potentially_reachable_cells = self.board.get_connected_cells(
+        potentially_reachable_cells = self.board.get_connected_cells_with_cache(
             starting_cell=source_garden.get_clue_cell(),
-            cell_criteria_func=lambda x: x not in off_limit_cells,
+            valid_cells=frozenset(self.board.flat_cell_frozenset - off_limit_cells),
         )
 
         # From among the potentially reachable cells, extract the set of cells for which we want to check for
@@ -73,8 +73,8 @@ class UnreachableFromGarden(SolverRule):
                 PathFinder(
                     start_cell_group=source_garden,
                     end_cell_group=target_cell,
-                    off_limit_cells=off_limit_cells,
-                    other_cell_groups=frozenset(gardens_without_clue),
+                    off_limit_cells=frozenset(off_limit_cells),
+                    other_cell_groups=gardens_without_clue,
                 ).get_path_info(max_path_length=num_of_remaining_garden_cells + 1)
                 reachable_cells.add(target_cell)
             except NoPathFoundError:

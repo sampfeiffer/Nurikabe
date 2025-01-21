@@ -45,7 +45,7 @@ class Cell:
         self.draw_cell()
 
         self._neighbor_cell_map: dict[Direction, Cell] | None = None
-        self._adjacent_neighbors: set[Cell] | None = None
+        self._adjacent_neighbors: frozenset[Cell] | None = None
 
     def _get_key(self) -> tuple[int, int, int]:
         clue_int = 0 if self.clue is None else self.clue
@@ -118,9 +118,9 @@ class Cell:
 
     def set_adjacent_neighbors(self) -> None:
         """Set the list of adjacent (non-diagonal) Cells."""
-        self._adjacent_neighbors = {
-            self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS if direction in self.get_neighbor_map()
-        }
+        self._adjacent_neighbors = frozenset(
+            {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS if direction in self.get_neighbor_map()}
+        )
 
     def get_neighbor_map(self) -> dict[Direction, Cell]:
         if self._neighbor_cell_map is None:
@@ -128,8 +128,8 @@ class Cell:
             raise RuntimeError(msg)
         return self._neighbor_cell_map
 
-    def get_adjacent_neighbors(self) -> set[Cell]:
-        """Get a list of adjacent (non-diagonal) Cells."""
+    def get_adjacent_neighbors(self) -> frozenset[Cell]:
+        """Get a set of adjacent (non-diagonal) Cells."""
         if self._adjacent_neighbors is None:
             msg = 'self._adjacent_neighbors must first be set'
             raise RuntimeError(msg)
@@ -153,8 +153,8 @@ class Cell:
             grid_coordinate=self.grid_coordinate, before_state=old_cell_state, after_state=self.cell_state
         )
 
-    def get_neighbor_set(self, direction_list: Iterable[Direction]) -> set[Cell]:
-        return {self.get_neighbor(direction) for direction in direction_list}
+    def get_neighbor_set(self, direction_list: Iterable[Direction]) -> frozenset[Cell]:
+        return frozenset({self.get_neighbor(direction) for direction in direction_list})
 
     def get_neighbor(self, direction: Direction) -> Cell:
         try:
@@ -173,7 +173,7 @@ class Cell:
             # neighbors do not exist
             return False
 
-    def get_two_by_two_section(self) -> set[Cell]:
+    def get_two_by_two_section(self) -> frozenset[Cell]:
         """Return the two-by-two section of cells where this cell is the top-left corner."""
         direction_list = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
         neighbor_cells = self.get_neighbor_set(direction_list)
@@ -189,7 +189,7 @@ class Cell:
     def get_shortest_naive_path_length(self, other_cell: Cell) -> int:
         return self.get_manhattan_distance(other_cell) + 1
 
-    def get_edges(self) -> set[RectEdge]:
+    def get_edges(self) -> frozenset[RectEdge]:
         return get_rect_edges(self.rect)
 
     def __repr__(self) -> str:

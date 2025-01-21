@@ -74,8 +74,8 @@ class TestNoIsolatedWallSections(TestCase):
 
     def test_only_escape_route_with_multiple_wall_sections(self) -> None:
         """
-        If there are is a cell that provides the only escape route for a wall section, and there are other wall
-        sections to connect to, then the escape route cell should be marked as a wall.
+        If there is a cell that provides the only escape route for a wall section, and there are other wall sections to
+        connect to, then the escape route cell should be marked as a wall.
         """
         board_details = [
             '1,_,_,_',

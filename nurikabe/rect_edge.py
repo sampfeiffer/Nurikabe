@@ -32,7 +32,7 @@ class RectEdge:
         )
 
 
-def get_rect_edges(rect: pygame.Rect) -> set[RectEdge]:
+def get_rect_edges(rect: pygame.Rect) -> frozenset[RectEdge]:
     """Get all four edges of a pygame.Rect object."""
     left_edge = RectEdge(
         PixelPosition(x_coordinate=rect.left, y_coordinate=rect.top),
@@ -50,4 +50,4 @@ def get_rect_edges(rect: pygame.Rect) -> set[RectEdge]:
         PixelPosition(x_coordinate=rect.left, y_coordinate=rect.bottom),
         PixelPosition(x_coordinate=rect.right, y_coordinate=rect.bottom),
     )
-    return {left_edge, right_edge, top_edge, bottom_edge}
+    return frozenset({left_edge, right_edge, top_edge, bottom_edge})

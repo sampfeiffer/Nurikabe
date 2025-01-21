@@ -78,7 +78,7 @@ def build_path_finder(screen: Screen, board_details: list[str]) -> PathFinderInf
     path_finder = PathFinder(
         start_cell_group=CellGroup(start_cell_group),
         end_cell_group=CellGroup(end_cell_group),
-        off_limit_cells=off_limit_cells,
+        off_limit_cells=frozenset(off_limit_cells),
         other_cell_groups=frozenset(other_cell_groups),
     )
     return PathFinderInfo(board, path_finder)

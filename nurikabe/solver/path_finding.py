@@ -37,7 +37,7 @@ class PathFinder:
         self,
         start_cell_group: Cell | CellGroup,
         end_cell_group: Cell | CellGroup,
-        off_limit_cells: set[Cell] | None = None,
+        off_limit_cells: frozenset[Cell] | None = None,
         other_cell_groups: frozenset[CellGroup] | None = None,
     ):
         """
@@ -56,7 +56,7 @@ class PathFinder:
         self.end_cell_group = self.to_cell_group(end_cell_group)
 
         if off_limit_cells is None:
-            self.off_limit_cells: set[Cell] = set()
+            self.off_limit_cells: frozenset[Cell] = frozenset()
         else:
             self.off_limit_cells = off_limit_cells
 
@@ -216,13 +216,17 @@ class PathFinder:
         return distance_between_cells
 
     @staticmethod
-    def get_adjacent_cell_groups(root_cell: Cell, unvisited_other_cell_groups: frozenset[CellGroup]) -> set[CellGroup]:
+    def get_adjacent_cell_groups(
+        root_cell: Cell, unvisited_other_cell_groups: frozenset[CellGroup]
+    ) -> frozenset[CellGroup]:
         root_cell_adjacent_neighbors = root_cell.get_adjacent_neighbors()
-        return {
-            cell_group
-            for cell_group in unvisited_other_cell_groups
-            if cell_group.does_include_cell(root_cell_adjacent_neighbors)
-        }
+        return frozenset(
+            {
+                cell_group
+                for cell_group in unvisited_other_cell_groups
+                if cell_group.does_include_cell(root_cell_adjacent_neighbors)
+            }
+        )
 
     def get_min_possible_remaining_distance(self, neighbor_cell: Cell) -> int:
         cell_group_containing_neighbor_cell: CellGroup | None = None
