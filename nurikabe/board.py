@@ -201,13 +201,13 @@ class Board:
         Note that, as usual, the flood fill goes vertically and horizontally, but not diagonally.
         """
         all_cell_groups: set[CellGroup] = set()
-        calls_already_in_a_group: set[Cell] = set()  # to prevent double counting
-        for cell in self.flat_cell_list:
-            if cell in calls_already_in_a_group or cell not in valid_cells:
+        cells_already_in_a_group: set[Cell] = set()  # to prevent double counting
+        for cell in valid_cells:
+            if cell in cells_already_in_a_group:
                 continue
             cell_group = self.get_cell_group(starting_cell=cell, valid_cells=valid_cells)
             all_cell_groups.add(cell_group)
-            calls_already_in_a_group = calls_already_in_a_group.union(cell_group.cells)
+            cells_already_in_a_group = cells_already_in_a_group.union(cell_group.cells)
         return frozenset(all_cell_groups)
 
     def get_garden(self, starting_cell: Cell) -> Garden:
@@ -254,13 +254,11 @@ class Board:
         """
         if connected_cells is None:
             connected_cells = set()
-        if starting_cell in connected_cells:
-            # Already visited this cell
-            return connected_cells
-        if starting_cell in valid_cells:
-            connected_cells.add(starting_cell)
-            for neighbor_cell in starting_cell.get_adjacent_neighbors():
-                self.get_connected_cells(neighbor_cell, valid_cells, connected_cells)
+        connected_cells.add(starting_cell)
+
+        additional_cells_to_check = starting_cell.get_adjacent_neighbors().intersection(valid_cells) - connected_cells
+        for neighbor_cell in additional_cells_to_check:
+            self.get_connected_cells(neighbor_cell, valid_cells, connected_cells)
 
         return connected_cells
 
