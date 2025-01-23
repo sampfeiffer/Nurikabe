@@ -46,30 +46,35 @@ class Solver:
         self.ensure_garden_without_clue_can_expand = EnsureGardenWithoutClueCanExpand(self.board)
         self.no_isolated_wall_sections = NoIsolatedWallSections(self.board)
 
+    # @profile
     def run_solver(self) -> CellChanges:
         cell_changes = CellChanges()
+        cell_change_start_count = len(cell_changes.cell_change_list)
+        first_run = True
+        while first_run or len(cell_changes.cell_change_list) > cell_change_start_count:
+            first_run = False
+            cell_change_start_count = len(cell_changes.cell_change_list)
+            try:
+                self.board_state_checker.check_for_board_state_issue()
 
-        try:
-            self.board_state_checker.check_for_board_state_issue()
-
-            cell_changes.add_changes(self.separate_clues.apply_rule())
-            cell_changes.add_changes(self.no_isolated_wall_sections_naive.apply_rule())
-            cell_changes.add_changes(self.ensure_garden_can_expand_one_route.apply_rule())
-            cell_changes.add_changes(self.enclose_full_garden.apply_rule())
-            cell_changes.add_changes(self.ensure_no_two_by_two_walls.apply_rule())
-            cell_changes.add_changes(self.naively_unreachable_from_clue_cell.apply_rule())
-            cell_changes.add_changes(self.naively_unreachable_from_garden.apply_rule())
-            cell_changes.add_changes(self.separate_gardens_with_clues.apply_rule())
-            cell_changes.add_changes(self.fill_correctly_sized_weak_garden.apply_rule())
-            cell_changes.add_changes(self.unreachable_from_garden.apply_rule())
-            cell_changes.add_changes(self.ensure_garden_with_clue_can_expand.apply_rule())
-            cell_changes.add_changes(self.ensure_garden_without_clue_can_expand.apply_rule())
-            cell_changes.add_changes(self.no_isolated_wall_sections.apply_rule())
-            self.board.update_painted_gardens()
-        except NoPossibleSolutionFromCurrentStateError as error:
-            logger.exception('Cannot solve from current state')
-            for cell_group in error.problem_cell_groups:
-                cell_group.draw_edges(self.screen, color=Color.RED)
+                cell_changes.add_changes(self.separate_clues.apply_rule())
+                cell_changes.add_changes(self.ensure_garden_can_expand_one_route.apply_rule())
+                cell_changes.add_changes(self.separate_gardens_with_clues.apply_rule())
+                cell_changes.add_changes(self.naively_unreachable_from_clue_cell.apply_rule())
+                cell_changes.add_changes(self.no_isolated_wall_sections_naive.apply_rule())
+                cell_changes.add_changes(self.enclose_full_garden.apply_rule())
+                cell_changes.add_changes(self.fill_correctly_sized_weak_garden.apply_rule())
+                cell_changes.add_changes(self.ensure_no_two_by_two_walls.apply_rule())
+                cell_changes.add_changes(self.naively_unreachable_from_garden.apply_rule())
+                cell_changes.add_changes(self.ensure_garden_without_clue_can_expand.apply_rule())
+                cell_changes.add_changes(self.ensure_garden_with_clue_can_expand.apply_rule())
+                cell_changes.add_changes(self.unreachable_from_garden.apply_rule())
+                cell_changes.add_changes(self.no_isolated_wall_sections.apply_rule())
+                self.board.update_painted_gardens()
+            except NoPossibleSolutionFromCurrentStateError as error:
+                logger.exception('Cannot solve from current state')
+                for cell_group in error.problem_cell_groups:
+                    cell_group.draw_edges(self.screen, color=Color.RED)
 
         self.undo_redo_control.process_board_event(cell_changes)
         return cell_changes

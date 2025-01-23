@@ -10,7 +10,10 @@ class SeparateClues(SolverRule):
         have more than one clue.
         """
         cell_changes = CellChanges()
-        for cell in self.board.get_empty_cells():
-            if len([cell for adjacent_cell in cell.get_adjacent_neighbors() if adjacent_cell.has_clue]) > 1:
-                cell_changes.add_change(self.set_cell_to_state(cell, CellState.WALL, reason='separate clues'))
+        for empty_cell in self.board.get_empty_cells():
+            neighbors_with_clue = [
+                adjacent_cell for adjacent_cell in empty_cell.get_adjacent_neighbors() if adjacent_cell.has_clue
+            ]
+            if len(neighbors_with_clue) > 1:
+                cell_changes.add_change(self.set_cell_to_state(empty_cell, CellState.WALL, reason='separate clues'))
         return cell_changes
