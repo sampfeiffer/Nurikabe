@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import Board
+from nurikabe.solver.board_state_checker import NoPossibleSolutionFromCurrentStateError
 from nurikabe.solver.solver_rules.separate_gardens_with_clues import SeparateGardensWithClues
 from tests.build_board import build_board
 
@@ -42,8 +43,8 @@ class TestSeparateGardensWithClues(TestCase):
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
-    def test_separate_gardens_with_clues(self) -> None:
-        """This solver rule should separate gardens that have clues."""
+    def test_separate_incomplete_gardens_with_clues(self) -> None:
+        """This solver rule should separate incomplete gardens that have clues."""
         board_details = [
             '_,_,_,3',
             '_,4,_,O',
@@ -57,6 +58,24 @@ class TestSeparateGardensWithClues(TestCase):
             '_,_,_,3',
             '_,4,W,O',
             '_,O,O,W',
+        ]
+        self.assertEqual(board.as_simple_string_list(), expected_board_state)
+
+    def test_separate_complete_gardens_with_clues(self) -> None:
+        """This solver rule should separate incomplete gardens that have clues."""
+        board_details = [
+            '_,_,_,3',
+            '_,4,_,O',
+            'O,O,O,_',
+        ]
+        board = self.create_board(board_details)
+        cell_changes = SeparateGardensWithClues(board).apply_rule()
+
+        self.assertTrue(cell_changes.has_any_changes())
+        expected_board_state = [
+            '_,_,_,3',
+            '_,4,W,O',
+            'O,O,O,W',
         ]
         self.assertEqual(board.as_simple_string_list(), expected_board_state)
 
@@ -74,3 +93,14 @@ class TestSeparateGardensWithClues(TestCase):
         cell_changes = SeparateGardensWithClues(board).apply_rule()
         self.assertFalse(cell_changes.has_any_changes())
         self.assertEqual(board.as_simple_string_list(), board_details)
+
+    def test_garden_with_multiple_clues(self) -> None:
+        """If a garden has more than one clue, then the board is in a bad state and an error should be thrown."""
+        board_details = [
+            '3,_,_,_',
+            'O,4,_,_',
+            '_,_,2,_',
+        ]
+        board = self.create_board(board_details)
+        with self.assertRaises(NoPossibleSolutionFromCurrentStateError):
+            SeparateGardensWithClues(board).apply_rule()

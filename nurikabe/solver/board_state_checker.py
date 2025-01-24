@@ -61,7 +61,7 @@ class BoardStateChecker:
     def check_for_garden_with_multiple_clues(self) -> None:
         gardens = self.board.get_all_gardens()
         for garden in gardens:
-            if garden.get_number_of_clues() > 1:
+            if garden.has_multiple_clues():
                 raise NoPossibleSolutionFromCurrentStateError(
                     message='A garden cannot contain more than one clue',
                     problem_cell_groups=frozenset({garden}),

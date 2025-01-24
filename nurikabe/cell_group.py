@@ -34,6 +34,9 @@ class CellGroup:
     def does_contain_clue(self) -> bool:
         return self.get_number_of_clues() > 0
 
+    def has_multiple_clues(self) -> bool:
+        return self.get_number_of_clues() > 1
+
     def get_number_of_clues(self) -> int:
         return len([cell for cell in self.cells if cell.has_clue])
 
