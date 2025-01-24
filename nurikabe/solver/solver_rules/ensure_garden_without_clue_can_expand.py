@@ -45,7 +45,7 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
                     problem_cell_groups=frozenset({garden_without_clue}),
                 )
 
-            # Extract the set of empty cells that are in all the paths the reachable incomplete gardens with a clue.
+            # Extract the set of empty cells that are in all the paths to reachable incomplete gardens with a clue.
             # These are the only possible cells that, if they were a wall, have the potential to block every path to the
             # aforementioned gardens.
             cells_in_all_paths: set[Cell] = set.intersection(
@@ -56,7 +56,7 @@ class EnsureGardenWithoutClueCanExpand(SolverRule):
             )
             empty_cells_in_all_paths = {cell for cell in cells_in_all_paths if cell.cell_state.is_empty()}
 
-            # Each of the cells above have the *potential* to block every path to the aforementioned gardens. We'll need
+            # Each of the cells above has the *potential* to block every path to the aforementioned gardens. We'll need
             # to check each cell one-by-one. Set the order in which to check the cells. In a somewhat hand wavy way, we
             # think that cells closer to the garden_without_clue are more likely to be critical to all paths, so
             # prioritize based on distance to the garden_without_clue.

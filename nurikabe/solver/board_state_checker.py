@@ -41,9 +41,11 @@ class BoardStateChecker:
                 problem_cell_groups=frozenset({CellGroup(self.board.get_two_by_two_wall_section_cells())}),
             )
 
-    def check_for_isolated_walls(self, non_garden_cell_groups_with_walls: frozenset[CellGroup] | None = None) -> None:
-        if non_garden_cell_groups_with_walls is None:
-            non_garden_cell_groups_with_walls = self.board.get_all_non_garden_cell_groups_with_walls()
+    def check_for_isolated_walls(self) -> None:
+        if len(self.board.get_wall_cells()) <= 1:
+            return
+
+        non_garden_cell_groups_with_walls = self.board.get_all_non_garden_cell_groups_with_walls()
         if len(non_garden_cell_groups_with_walls) > 1:
             largest_non_garden_cell_group = max(
                 non_garden_cell_groups_with_walls, key=lambda cell_group: len(cell_group.cells)

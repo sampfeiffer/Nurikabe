@@ -46,7 +46,6 @@ class Solver:
         self.ensure_garden_without_clue_can_expand = EnsureGardenWithoutClueCanExpand(self.board)
         self.no_isolated_wall_sections = NoIsolatedWallSections(self.board)
 
-    # @profile
     def run_solver(self) -> CellChanges:
         cell_changes = CellChanges()
         cell_change_start_count = len(cell_changes.cell_change_list)

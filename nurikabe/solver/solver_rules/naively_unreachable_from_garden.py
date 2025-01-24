@@ -18,14 +18,14 @@ class NaivelyUnreachableFromGarden(SolverRule):
             for incomplete_garden in incomplete_gardens
         ]
 
-        for cell in self.board.get_empty_cells():
+        for empty_cell in self.board.get_empty_cells():
             is_cell_reachable_by_a_clue = False
             for incomplete_garden, remaining_garden_size in incomplete_gardens_and_remaining_sizes:
-                if incomplete_garden.get_shortest_manhattan_distance_to_cell(cell) <= remaining_garden_size:
+                if incomplete_garden.get_shortest_manhattan_distance_to_cell(empty_cell) <= remaining_garden_size:
                     is_cell_reachable_by_a_clue = True
                     break
             if not is_cell_reachable_by_a_clue:
                 cell_changes.add_change(
-                    self.set_cell_to_state(cell, CellState.WALL, reason='Not Manhattan reachable by any gardens')
+                    self.set_cell_to_state(empty_cell, CellState.WALL, reason='Not Manhattan reachable by any gardens')
                 )
         return cell_changes
