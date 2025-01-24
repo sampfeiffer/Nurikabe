@@ -47,6 +47,9 @@ class Cell:
         self._neighbor_cell_map: dict[Direction, Cell] | None = None
         self._adjacent_neighbors: frozenset[Cell] | None = None
 
+        self._is_two_by_two_section_set = False
+        self._two_by_two_section: frozenset[Cell] | None = None
+
     def _get_key(self) -> tuple[int, int, int]:
         clue_int = 0 if self.clue is None else self.clue
         return self.row_number, self.col_number, clue_int
@@ -122,11 +125,27 @@ class Cell:
             {self.get_neighbor(direction) for direction in ADJACENT_DIRECTIONS if direction in self.get_neighbor_map()}
         )
 
+    def set_two_by_two_section(self, two_by_two_section: frozenset[Cell] | None) -> None:
+        """Sets the two-by-two section of cells where this cell is the top-left corner."""
+        self._two_by_two_section = two_by_two_section
+        self._is_two_by_two_section_set = True
+
     def get_neighbor_map(self) -> dict[Direction, Cell]:
         if self._neighbor_cell_map is None:
             msg = 'self._neighbor_cell_map must first be set'
             raise RuntimeError(msg)
         return self._neighbor_cell_map
+
+    def get_two_by_two_section(self) -> frozenset[Cell]:
+        """Return the two-by-two section of cells where this cell is the top-left corner."""
+        if not self._is_two_by_two_section_set:
+            msg = 'the two-by-two section is not yet set'
+            raise RuntimeError(msg)
+
+        if self._two_by_two_section is None:
+            msg = f'{self} does not start a two-by-two section since this cell is on the right or lower edge of board'
+            raise NonExistentNeighborError(msg)
+        return self._two_by_two_section
 
     def get_adjacent_neighbors(self) -> frozenset[Cell]:
         """Get a set of adjacent (non-diagonal) Cells."""
@@ -164,20 +183,14 @@ class Cell:
             raise NonExistentNeighborError(msg) from None
 
     def does_form_two_by_two_walls(self) -> bool:
-        """Returns True if this cell is the top left corner of a two by two section of walls."""
+        """Returns True if this cell is the top-left corner of a two-by-two section of walls."""
         try:
             two_by_two_section = self.get_two_by_two_section()
             return all(cell.cell_state.is_wall() for cell in two_by_two_section)
         except NonExistentNeighborError:
-            # Can't be top-left of two by two since this is on the right or lower edge of board so the required
-            # neighbors do not exist
+            # Can't be the top-left of a two-by-two section since this is on the right or lower edge of board so the
+            # required neighbors do not exist
             return False
-
-    def get_two_by_two_section(self) -> frozenset[Cell]:
-        """Return the two-by-two section of cells where this cell is the top-left corner."""
-        direction_list = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
-        neighbor_cells = self.get_neighbor_set(direction_list)
-        return neighbor_cells.union({self})
 
     def has_any_clues_adjacent(self) -> bool:
         return any(neighbor_cell for neighbor_cell in self.get_adjacent_neighbors() if neighbor_cell.has_clue)

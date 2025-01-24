@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import MagicMock
 
 from nurikabe.board import AdjacentCluesError, Board
+from nurikabe.cell import NonExistentNeighborError
 from nurikabe.cell_group import CellGroup
 from nurikabe.cell_state import CellState
 from nurikabe.level import BadLevelSetupError
@@ -66,6 +67,29 @@ class TestBoardSetup(TestBoard):
         )
         for center_cell in center_cells:
             self.assertEqual(len(center_cell.get_neighbor_map()), 8)
+
+        bottom_and_right_edge_cells = (
+            board.get_cell_from_grid(row_number=0, col_number=3),
+            board.get_cell_from_grid(row_number=1, col_number=3),
+            board.get_cell_from_grid(row_number=2, col_number=0),
+            board.get_cell_from_grid(row_number=2, col_number=1),
+            board.get_cell_from_grid(row_number=2, col_number=2),
+            board.get_cell_from_grid(row_number=2, col_number=3),
+        )
+        for cell in bottom_and_right_edge_cells:
+            with self.assertRaises(NonExistentNeighborError):
+                cell.get_two_by_two_section()
+
+        non_bottom_and_right_edge_cells = (
+            board.get_cell_from_grid(row_number=0, col_number=0),
+            board.get_cell_from_grid(row_number=0, col_number=1),
+            board.get_cell_from_grid(row_number=0, col_number=2),
+            board.get_cell_from_grid(row_number=1, col_number=0),
+            board.get_cell_from_grid(row_number=1, col_number=1),
+            board.get_cell_from_grid(row_number=1, col_number=2),
+        )
+        for cell in non_bottom_and_right_edge_cells:
+            self.assertEqual(len(cell.get_two_by_two_section()), 4)
 
 
 class TestBoardAsSimpleStringList(TestBoard):

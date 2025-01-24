@@ -38,7 +38,7 @@ class BoardStateChecker:
         if self.board.has_two_by_two_wall():
             raise NoPossibleSolutionFromCurrentStateError(
                 message='There is a two-by-two section of walls',
-                problem_cell_groups=frozenset({CellGroup(self.board.get_two_by_two_wall_sections())}),
+                problem_cell_groups=frozenset({CellGroup(self.board.get_two_by_two_wall_section_cells())}),
             )
 
     def check_for_isolated_walls(self, non_garden_cell_groups_with_walls: frozenset[CellGroup] | None = None) -> None:

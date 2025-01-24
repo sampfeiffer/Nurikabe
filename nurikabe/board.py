@@ -33,6 +33,8 @@ class Board:
         self.flat_cell_list = self.get_flat_cell_list()
         self.flat_cell_frozenset = frozenset(self.flat_cell_list)
         self.set_cell_neighbors()
+        self.two_by_two_sections = self.set_two_by_two_sections()
+
         self.is_board_frozen = False
 
         self.ensure_no_adjacent_clues()
@@ -103,6 +105,26 @@ class Board:
         else:
             neighbor_cell = None
         return neighbor_cell
+
+    def set_two_by_two_sections(self) -> frozenset[frozenset[Cell]]:
+        """
+        For each "start" cell, set the two-by-two section of cells where the start cell is the top-left cell in the
+        two-by-two section. Since the start cell is the top-left cell in each two-by-two section, the last row and
+        last column do not have a corresponding two-by-two section.
+        """
+        direction_list = (Direction.RIGHT, Direction.RIGHT_DOWN, Direction.DOWN)
+        last_row_index = self.level.number_of_rows - 1
+        last_column_index = self.level.number_of_columns - 1
+        two_by_two_sections: set[frozenset[Cell]] = set()
+        for row in self.cell_grid:
+            for start_cell in row:
+                if start_cell.row_number == last_row_index or start_cell.col_number == last_column_index:
+                    two_by_two_section = None
+                else:
+                    two_by_two_section = start_cell.get_neighbor_set(direction_list).union({start_cell})
+                    two_by_two_sections.add(frozenset(two_by_two_section))
+                start_cell.set_two_by_two_section(two_by_two_section)
+        return frozenset(two_by_two_sections)
 
     def is_valid_cell_coordinate(self, grid_coordinate: GridCoordinate) -> bool:
         return (
@@ -303,11 +325,12 @@ class Board:
     def has_two_by_two_wall(self) -> bool:
         return any(cell.does_form_two_by_two_walls() for cell in self.flat_cell_list)
 
-    def get_two_by_two_wall_sections(self) -> frozenset[Cell]:
+    def get_two_by_two_wall_section_cells(self) -> frozenset[Cell]:
+        """Returns the set of cells that are part of a two-by-two section of walls."""
         two_by_two_wall_section_cells: set[Cell] = set()
-        for cell in self.flat_cell_list:
-            if cell.does_form_two_by_two_walls():
-                two_by_two_wall_section_cells.update(cell.get_two_by_two_section())
+        for two_by_two_section in self.two_by_two_sections:
+            if all(cell.cell_state.is_wall() for cell in two_by_two_section):
+                two_by_two_wall_section_cells.update(two_by_two_section)
         return frozenset(two_by_two_wall_section_cells)
 
     def get_all_non_garden_cell_groups_with_walls(
