@@ -1,7 +1,9 @@
-from ...cell_change_info import CellChanges
+from line_profiler import profile
+from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_group import CellGroup
 from ...cell_state import CellState
 from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from ..rule_trigger import ALL_POSSIBLE_CELL_STATE_CHANGES
 from .abstract_solver_rule import SolverRule
 
 
@@ -11,6 +13,19 @@ class EnsureGardenCanExpandOneRoute(SolverRule):
     #  it's a duplicated check? This decision is pending some speed checks to see how much quicker this runs than the
     #  more complicated solver rules mentioned above.
 
+    @staticmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        return ALL_POSSIBLE_CELL_STATE_CHANGES
+
+    @staticmethod
+    def _get_rule_cost() -> float:
+        return 18
+
+    @staticmethod
+    def _is_saturating_rule() -> bool:
+        return False
+
+    @profile
     def apply_rule(self) -> CellChanges:
         """
         If there is an incomplete garden and only one empty cell adjacent to the garden, the garden must expand via

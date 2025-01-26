@@ -1,12 +1,33 @@
+from line_profiler import profile
 from collections import Counter
 
-from ...cell_change_info import CellChanges
+from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_state import CellState
 from ..board_state_checker import BoardStateChecker
+from ..rule_trigger import RuleTrigger
 from .abstract_solver_rule import SolverRule
 
 
 class SeparateGardensWithClues(SolverRule):
+    @staticmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        return frozenset({
+            RuleTrigger.WALL_TO_NON_WALL.value,
+            RuleTrigger.WALL_TO_EMPTY.value,
+            RuleTrigger.NON_WALL_TO_WALL.value,
+            RuleTrigger.NON_WALL_TO_EMPTY.value,
+            RuleTrigger.EMPTY_TO_NON_WALL.value,
+        })
+
+    @staticmethod
+    def _get_rule_cost() -> float:
+        return 48
+
+    @staticmethod
+    def _is_saturating_rule() -> bool:
+        return True
+
+    @profile
     def apply_rule(self) -> CellChanges:
         """If an empty cell is adjacent to more than one garden containing a clue, then it must be a wall."""
         BoardStateChecker(self.board).check_for_garden_with_multiple_clues()

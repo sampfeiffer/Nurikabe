@@ -313,13 +313,13 @@ class Board:
     def get_weak_garden_cells(self) -> frozenset[Cell]:
         return self.filter_cells(CellState.is_weak_garden_static)
 
-    def apply_cell_changes(self, cell_changes: CellChanges) -> None:
+    def apply_cell_changes(self, cell_changes: CellChanges, reason: str) -> None:
         for cell_change_info in cell_changes.cell_change_list:
             cell = self.get_cell_from_grid(
                 row_number=cell_change_info.grid_coordinate.row_number,
                 col_number=cell_change_info.grid_coordinate.col_number,
             )
-            cell.update_cell_state(new_cell_state=cell_change_info.after_state)
+            cell.update_cell_state(new_cell_state=cell_change_info.after_state, reason=reason)
         self.reset_cell_state_hash()
 
     def has_two_by_two_wall(self) -> bool:

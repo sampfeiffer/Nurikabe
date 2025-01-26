@@ -42,14 +42,14 @@ class UndoRedoControl:
             most_recent_cell_changes = self.undo_stack.pop()
             self.redo_stack.append(most_recent_cell_changes)
             reversed_cell_changes = most_recent_cell_changes.get_reversed_changes()
-            self.board.apply_cell_changes(reversed_cell_changes)
+            self.board.apply_cell_changes(reversed_cell_changes, reason='undo')
             self.board.update_painted_gardens()
 
     def handle_redo(self) -> None:
         if len(self.redo_stack) > 0:
             cell_changes = self.redo_stack.pop()
             self.undo_stack.append(cell_changes)
-            self.board.apply_cell_changes(cell_changes)
+            self.board.apply_cell_changes(cell_changes, reason='redo')
             self.board.update_painted_gardens()
 
     def set_button_status(self) -> None:

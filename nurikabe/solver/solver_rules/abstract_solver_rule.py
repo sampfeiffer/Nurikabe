@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 
 from ...board import Board
 from ...cell import Cell
-from ...cell_change_info import CellChangeInfo, CellChanges
+from ...cell_change_info import CellChangeInfo, CellChanges, CellStateChange
 from ...cell_state import CellState
 from ...garden import Garden
 
@@ -13,6 +13,27 @@ logger = logging.getLogger(__name__)
 class SolverRule(ABC):
     def __init__(self, board: Board):
         self.board = board
+        self.rule_triggers = self._get_rule_triggers()
+        self.rule_cost = self._get_rule_cost()
+        self.is_saturating_rule = self._is_saturating_rule()
+
+    @staticmethod
+    @abstractmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def _get_rule_cost() -> float:
+        raise NotImplementedError
+
+    @staticmethod
+    @abstractmethod
+    def _is_saturating_rule() -> bool:
+        raise NotImplementedError
+
+    def should_trigger_rule(self, unique_cell_state_changes: frozenset[CellStateChange]) -> bool:
+        return len(unique_cell_state_changes.intersection(self.rule_triggers)) > 0
 
     @abstractmethod
     def apply_rule(self) -> CellChanges:
@@ -22,8 +43,8 @@ class SolverRule(ABC):
         if not cell.is_clickable:
             msg = f'cell is not clickable: {cell}'
             raise RuntimeError(msg)
-        logger.debug('Setting %s to %s. Reason: %s', cell, target_cell_state, reason)
-        cell_change_info = cell.update_cell_state(target_cell_state)
+        logger.info('Setting %s to %s. Reason: %s', cell, target_cell_state, reason)
+        cell_change_info = cell.update_cell_state(target_cell_state, reason=reason)
         self.board.reset_cell_state_hash()
         return cell_change_info
 

@@ -1,9 +1,25 @@
-from ...cell_change_info import CellChanges
+from line_profiler import profile
+from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_state import CellState
+from ..rule_trigger import RuleTrigger
 from .abstract_solver_rule import SolverRule
 
 
 class NaivelyUnreachableFromGarden(SolverRule):
+    @staticmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        return frozenset({rule_trigger.value for rule_trigger in RuleTrigger if
+                          rule_trigger.value.after_state is not CellState.WALL})
+
+    @staticmethod
+    def _get_rule_cost() -> float:
+        return 30
+
+    @staticmethod
+    def _is_saturating_rule() -> bool:
+        return True
+
+    @profile
     def apply_rule(self) -> CellChanges:
         """
         If there are any empty cells that are naively unreachable by a garden, it must be a wall. Here, naively means

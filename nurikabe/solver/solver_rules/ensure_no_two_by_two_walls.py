@@ -1,13 +1,29 @@
-from ...cell_change_info import CellChanges
+from line_profiler import profile
+from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_group import CellGroup
 from ...cell_state import CellState
 from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from ..rule_trigger import RuleTrigger
 from .abstract_solver_rule import SolverRule
 
 
 class EnsureNoTwoByTwoWalls(SolverRule):
     CELL_COUNT_IN_TWO_BY_TWO_SECTION = 4
 
+    @staticmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        return frozenset({rule_trigger.value for rule_trigger in RuleTrigger if
+                          rule_trigger.value.after_state is not CellState.NON_WALL})
+
+    @staticmethod
+    def _get_rule_cost() -> float:
+        return 27
+
+    @staticmethod
+    def _is_saturating_rule() -> bool:
+        return True
+
+    @profile
     def apply_rule(self) -> CellChanges:
         """
         If marking an empty cell as a wall would create a two-by-two section of walls, then that cell must be a

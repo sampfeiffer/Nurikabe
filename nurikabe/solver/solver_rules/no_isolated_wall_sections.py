@@ -1,10 +1,25 @@
-from ...cell_change_info import CellChanges
+from line_profiler import profile
+from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_state import CellState
 from ..board_state_checker import BoardStateChecker
+from ..rule_trigger import ALL_POSSIBLE_CELL_STATE_CHANGES
 from .abstract_solver_rule import SolverRule
 
 
 class NoIsolatedWallSections(SolverRule):
+    @staticmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        return ALL_POSSIBLE_CELL_STATE_CHANGES
+
+    @staticmethod
+    def _get_rule_cost() -> float:
+        return 967
+
+    @staticmethod
+    def _is_saturating_rule() -> bool:
+        return True
+
+    @profile
     def apply_rule(self) -> CellChanges:
         """
         All walls must be connected vertically or horizontally. If there is an empty cell that would block all wall

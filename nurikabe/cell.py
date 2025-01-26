@@ -162,14 +162,17 @@ class Cell:
             return None
 
         new_cell_state = self.cell_state.get_next_in_cycle()
-        return self.update_cell_state(new_cell_state)
+        return self.update_cell_state(new_cell_state, reason='cell click')
 
-    def update_cell_state(self, new_cell_state: CellState) -> CellChangeInfo:
+    def update_cell_state(self, new_cell_state: CellState, reason: str = '') -> CellChangeInfo:
         old_cell_state = self.cell_state
         self.cell_state = new_cell_state
         self.draw_cell()
         return CellChangeInfo(
-            grid_coordinate=self.grid_coordinate, before_state=old_cell_state, after_state=self.cell_state
+            grid_coordinate=self.grid_coordinate,
+            before_state=old_cell_state,
+            after_state=self.cell_state,
+            reason=reason
         )
 
     def get_neighbor_set(self, direction_list: Iterable[Direction]) -> frozenset[Cell]:

@@ -1,10 +1,25 @@
-from ...cell_change_info import CellChanges
+from line_profiler import profile
+from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_state import CellState
 from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
+from ..rule_trigger import ALL_POSSIBLE_CELL_STATE_CHANGES
 from .abstract_solver_rule import SolverRule
 
 
 class NoIsolatedWallSectionsNaive(SolverRule):
+    @staticmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        return ALL_POSSIBLE_CELL_STATE_CHANGES
+
+    @staticmethod
+    def _get_rule_cost() -> float:
+        return 36
+
+    @staticmethod
+    def _is_saturating_rule() -> bool:
+        return False
+
+    @profile
     def apply_rule(self) -> CellChanges:
         """
         All walls must be connected vertically or horizontally. If there is a wall that only has one "escape route" to
@@ -19,6 +34,7 @@ class NoIsolatedWallSectionsNaive(SolverRule):
             # If there is one wall section, then we don't know that the wall section needs to expand
             return cell_changes
 
+        # TODO: can make this run multiple at once, but it still won't be saturating
         for wall_section in wall_sections:
             escape_routes = wall_section.get_empty_adjacent_neighbors()
             if len(escape_routes) == 0:

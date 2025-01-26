@@ -1,9 +1,24 @@
-from ...cell_change_info import CellChanges
+from line_profiler import profile
+from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_state import CellState
+from ..rule_trigger import RuleTrigger
 from .abstract_solver_rule import SolverRule
 
 
 class NaivelyUnreachableFromClueCell(SolverRule):
+    @staticmethod
+    def _get_rule_triggers() -> frozenset[CellStateChange]:
+        return frozenset({RuleTrigger.WALL_TO_EMPTY.value, RuleTrigger.NON_WALL_TO_EMPTY.value})
+
+    @staticmethod
+    def _get_rule_cost() -> float:
+        return 14
+
+    @staticmethod
+    def _is_saturating_rule() -> bool:
+        return True
+
+    @profile
     def apply_rule(self) -> CellChanges:
         """
         If there are any empty cells that are naively unreachable by a clue cell, it must be a wall. Here, naively means
