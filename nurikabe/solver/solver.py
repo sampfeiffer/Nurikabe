@@ -132,4 +132,4 @@ class Solver:
         print(res)
         import pandas as pd
         res_df = pd.DataFrame(res)
-        res_df.to_csv('solver_rule_stats.csv')
+        res_df.to_csv('stats/solver_rule_stats.csv')
