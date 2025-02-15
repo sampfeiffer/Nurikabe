@@ -1,4 +1,5 @@
 from line_profiler import profile
+from ...cell import Cell
 from ...cell_change_info import CellChanges, CellStateChange
 from ...cell_state import CellState
 from ..board_state_checker import NoPossibleSolutionFromCurrentStateError
@@ -35,6 +36,7 @@ class NoIsolatedWallSectionsNaive(SolverRule):
             return cell_changes
 
         # TODO: can make this run multiple at once, but it still won't be saturating
+        all_escape_route_cells: set[Cell] = set()
         for wall_section in wall_sections:
             escape_routes = wall_section.get_empty_adjacent_neighbors()
             if len(escape_routes) == 0:
@@ -44,11 +46,15 @@ class NoIsolatedWallSectionsNaive(SolverRule):
                 )
             if len(escape_routes) == 1:
                 only_escape_route = next(iter(escape_routes))  # Get first item in the list
-                cell_changes.add_change(
-                    self.set_cell_to_state(
-                        only_escape_route, CellState.WALL, reason='Ensure no naively isolated wall sections'
-                    )
-                )
+                all_escape_route_cells.add(only_escape_route)
                 # Because a cell was changed to a wall, the previously calculated wall_sections is no longer valid
-                return cell_changes
+                # return cell_changes
+
+        for escape_route_cell in all_escape_route_cells:
+            cell_changes.add_change(
+                self.set_cell_to_state(
+                    escape_route_cell, CellState.WALL, reason='Ensure no naively isolated wall sections'
+                )
+            )
+
         return cell_changes
