@@ -29,6 +29,6 @@ This code is a Python implementation of Nurikabe using pygame as the user interf
 ![nurikabe_gui](https://github.com/sampfeiffer/nurikabe/assets/10815714/e0ae11d6-b414-4397-9b50-7833b5401ffd)
 
 ## How to run the code
-Using Python 3.x, run `python main.py --use-solver true --level 1`
+Using Python 3.x, run `python -m nurikabe --use-solver true --level 1`
 
-Run `python main.py --help` to see all the options.
+Run `python -m nurikabe --help` to see all the options.
