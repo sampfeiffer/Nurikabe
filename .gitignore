@@ -6,8 +6,9 @@ __pycache__/
 # Pycharm
 .idea/
 
-venv/
+.venv/
 
 # Profiling files
 *.lprof
 profile_output*.txt
+stats/

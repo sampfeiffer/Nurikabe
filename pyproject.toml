@@ -1,3 +1,20 @@
+[project]
+name = "nurikabe"
+version = "0.1.0"
+description = "Nurikabe game and solver"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pygame~=2.6.1",
+]
+
+[dependency-groups]
+dev = [
+    "mypy~=1.15.0",
+    "pre-commit~=4.1.0",
+    "ruff~=0.9.6",
+]
+
 [tool.ruff]
 
 exclude = [
